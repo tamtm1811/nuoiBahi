@@ -569,6 +569,21 @@ html.mlock,html.mlock body{overflow:hidden;overscroll-behavior:none}
 .nkprev{background:linear-gradient(#ffe27a,#f4c430);border-radius:10px;padding:8px 10px;margin:6px 0;box-shadow:inset 0 0 0 2px #8a5a08}.nkprev small{display:block;font-size:9px;color:#6a3e00}.nkprev b{font-size:18px;color:#3a1e00}
 .nkin{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:3px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink);-webkit-user-select:text;user-select:text}
 .nkin:focus{outline:3px solid var(--org);outline-offset:1px}
+/* ===== SAO LƯU ===== */
+.clcode{background:linear-gradient(#2a2f5a,#1a1d3a);border:3px solid var(--ink);border-radius:12px;padding:10px 10px 9px;text-align:center;color:#fff;margin:6px 0 10px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.12)}
+.clcode small{display:block;font-size:9px;letter-spacing:1px;color:#9fe8ff}
+.clcode b{display:block;font-size:22px;letter-spacing:3px;color:#ffe066;margin:5px 0 6px;text-shadow:2px 2px 0 #000;-webkit-user-select:all;user-select:all;white-space:nowrap}
+.clcode em{display:block;font-style:normal;font-size:9px;color:#d8dcff;line-height:1.4}
+.tag.clgood{background:#5ab84a;color:#fff}.tag.clbad{background:#c0392b;color:#fff}
+.clmoved{background:#ffe8e0;border:3px solid #c0392b;border-radius:12px;padding:9px 10px;margin-bottom:10px;font-size:11px;line-height:1.4;color:#5a1a10}
+.clmoved b{display:block;font-size:12px;margin-bottom:3px}.clmoved .clbtns{display:flex;gap:6px;margin-top:8px}.clmoved .pbtn{flex:1;font-size:11px;padding:8px 4px;min-width:0}
+.clrest{background:#fff6e0;border-radius:12px;padding:9px 10px;box-shadow:inset 0 0 0 2px var(--line)}
+.clrest>b{display:block;font-size:12px;margin-bottom:6px}
+.clrow{display:flex;gap:6px;align-items:stretch}.clrow .nkin{flex:1;min-width:0;text-transform:uppercase;letter-spacing:2px;padding:9px 10px}.clrow .pbtn{flex:none;padding:0 16px}
+.hint.clerr{color:#c0392b}.hint.clwarn{grid-column:1/-1;margin:2px 0 0;color:#8a3a10}
+.clprev{display:grid;grid-template-columns:72px 1fr;gap:6px 10px;align-items:center;margin-top:8px;background:#fff;border-radius:10px;padding:8px;box-shadow:inset 0 0 0 2px #5ab84a;animation:rbin .3s steps(3)}
+.clprev canvas{width:72px;height:72px;image-rendering:pixelated;background:radial-gradient(#fff6c8,#ffe6a0);border-radius:8px}
+.clprev b{display:block;font-size:13px;margin-bottom:2px}.clprev small{display:block;font-size:10px;line-height:1.35;color:#6a4a20}.clprev .pbtn{grid-column:1/-1;margin-top:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -592,7 +607,7 @@ html.mlock,html.mlock body{overflow:hidden;overscroll-behavior:none}
     </div>
     <div class="reshint">Chạm vào từng tài nguyên để xem cách kiếm và cách dùng</div>
   </div>
-  <button id="rankbar" type="button"><span class="rbt"><canvas id="rb-cup" width="16" height="16"></canvas><b>BẢNG VÀNG</b></span><span id="rb-top" class="rbtop"></span><span id="rb-me" class="rbme"></span></button>
+  <button id="rankbar" type="button"><span class="rbt"><canvas id="rb-cup" width="16" height="16"></canvas><b>BẢNG<br>VÀNG</b></span><span id="rb-top" class="rbtop"></span><span id="rb-me" class="rbme"></span></button>
   <div id="stage" class="px">
     <canvas id="room"></canvas>
     <div id="floats"></div>
@@ -621,6 +636,7 @@ html.mlock,html.mlock body{overflow:hidden;overscroll-behavior:none}
     <button class="fbtn" id="f-miss"><img alt="">Nhiệm vụ<i class="dot"></i></button>
     <button class="fbtn" id="f-dex"><img alt="">Tiến hóa<i class="dot"></i></button>
     <button class="fbtn" id="f-mine"><img alt="">Máy đào<i class="dot"></i></button>
+    <button class="fbtn" id="f-cloud"><img alt="">Sao lưu<i class="dot"></i></button>
   </div>
   <div id="more"><button id="b-test" class="sbtn px">Bảng thử</button></div>
 </div>
@@ -664,6 +680,19 @@ html.mlock,html.mlock body{overflow:hidden;overscroll-behavior:none}
   <input id="nk-in" class="nkin" maxlength="12" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Nhập tên của Sếp">
   <p class="hint" id="nk-err" style="color:#c0392b"></p>
   <div class="acts"><button class="pbtn" id="nk-ok">Lưu tên</button><button class="pbtn blue" id="nk-rand">Gợi ý</button><button class="pbtn gray" data-close>Để sau</button></div>
+</div></div>
+
+<div id="m-cloud" class="modal"><div class="sheet px">
+  <h3>Sao lưu tiến trình<span class="tag" id="cl-st"></span></h3>
+  <p class="hint">Tiến trình được tự động lưu lên máy chủ. Khi đổi điện thoại, cài lại ứng dụng hay lỡ xóa dữ liệu, chỉ cần nhập mã này là lấy lại được Bahi, đồ đạc, thú chiến và thứ hạng.</p>
+  <div class="clcode"><small>MÃ KHÔI PHỤC CỦA BẠN</small><b id="cl-code"></b><em>Chép mã cất vào Ghi chú hoặc chụp màn hình. Ai có mã đều lấy được tiến trình, đừng chia sẻ.</em></div>
+  <div id="cl-moved" class="clmoved" hidden></div>
+  <div class="clrest"><b>Khôi phục từ mã đã có</b>
+    <div class="clrow"><input id="cl-in" class="nkin" maxlength="14" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX"><button class="pbtn blue" id="cl-find">Tìm</button></div>
+    <p class="hint" id="cl-msg"></p>
+    <div id="cl-prev"></div>
+  </div>
+  <div class="acts"><button class="pbtn" id="cl-copy">Chép mã</button><button class="pbtn blue" id="cl-save">Lưu ngay</button><button class="pbtn gray" data-close>Đóng</button></div>
 </div></div>
 
 <div id="m-wheel" class="modal"><div class="sheet px">
@@ -3487,7 +3516,8 @@ Object.assign(MAPS,{
  sword:['.......kk','......kwk','.....kwk.','....kwk..','.k.kwk...','..kwk....','..kk.....','.k..k....','k........'],
  capsule:['..kkkk..','.krrrrk.','krwrrrrk','krrrrrrk','kkkkkkkk','kwwwwwwk','.kwwwwk.','..kkkk..'],
  wheelIco:['..kkkk..','.kyyrrk.','kyyyrrrk','kyyykrrk','kbbkgggk','kbbbgggk','.kbbggk.','..kkkk..'],
- cup:['k......k','kkkkkkkk','kyyyyyyk','.kywyyk.','..kyyk..','...kk...','..kyyk..','.kkkkkk.']
+ cup:['k......k','kkkkkkkk','kyyyyyyk','.kywyyk.','..kyyk..','...kk...','..kyyk..','.kkkkkk.'],
+ cloud:['...kkk....','..kwwwkkk.','.kwwwwwwwk','kwwwwbwwwk','kwwwbbbwwk','kwwbbbbbwk','kwwwwbwwwk','.kkkkkkkk.']
 });
 const SPAL={
  bulb:{k:'#5e3519',y:'#ffe066',w:'#ffffff',g:'#8a95a8'},nut:{s:'#b6c1cd',k:'#3a4352',d:'#636f82'},drone:{k:'#3a4352',b:'#5b8fd8',w:'#ffffff',r:'#ff5a5a'},
@@ -3496,7 +3526,7 @@ const SPAL={
  coin:{k:'#7a4a00',y:'#ffd84a',w:'#fff6c8',d:'#d39410'},gem:{k:'#1d4a6e',w:'#ffffff',c:'#7fe0ff',b:'#2bb3d6'},ticket:{k:'#7a1a3a',p:'#ff8ab0',w:'#ffffff'},
  bolt:{k:'#7a5a00',y:'#ffe066'},chest:{k:'#3e230e',b:'#a86a3c',y:'#ffd84a'},gift:{k:'#3e230e',g:'#5b8fd8',r:'#ff5a7a'},core:{k:'#2e2070',c:'#b8a8ff',w:'#ffffff',m:'#ff5fdc'},
  battery:{k:'#2a2a35',g:'#5ad06a',w:'#d8ffd8'},bag:{k:'#5e3519',b:'#c08048',y:'#ffd84a'},bvface:{k:'#3e230e',w:'#ffffff',o:'#f7931e',c:'#fde6c4',r:'#b3301a'},
- sword:{k:'#3a4352',w:'#e8f4ff'},capsule:{k:'#3e230e',r:'#ff5a7a',w:'#ffffff'},wheelIco:{k:'#3e230e',y:'#ffd84a',r:'#e0472a',b:'#4f8fe0',g:'#5ab84a'},cup:{k:'#6e4a00',y:'#ffd84a',w:'#fff6c8'}};
+ sword:{k:'#3a4352',w:'#e8f4ff'},capsule:{k:'#3e230e',r:'#ff5a7a',w:'#ffffff'},wheelIco:{k:'#3e230e',y:'#ffd84a',r:'#e0472a',b:'#4f8fe0',g:'#5ab84a'},cup:{k:'#6e4a00',y:'#ffd84a',w:'#fff6c8'},cloud:{k:'#24456e',w:'#ffffff',b:'#3fa0e0'}};
 function sprIco(name,frame,pal){const key=name+(frame==null?'':frame),P=pal||SPAL[name];return ico(key,P,P&&P._ol||null);}
 function tintIco(map,col){return ico(map,{a:col,k:'#3a2a20',w:'#ffffff'},null,col);}
 
@@ -6094,12 +6124,12 @@ async function rankCall(method,body){const opt={method,headers:{'content-type':'
   const ct=r.headers.get('content-type')||'';if(!ct.includes('json'))throw new Error('noapi');const j=await r.json();if(!r.ok)throw Object.assign(new Error(j.error||'err'),{code:j.error});return j;}
 function rankApply(j){Object.assign(RANK,{top:j.top||[],me:j.me,ahead:j.ahead,total:j.total||0,at:j.at||Date.now(),ok:true});rankBar();if($('m-rank').classList.contains('show'))renderRank();hud();}
 async function rankFetch(){if(RANK.busy)return;RANK.busy=true;try{rankIdent();rankApply(await rankCall('GET'));}catch(e){if(e.message==='noapi'||e instanceof TypeError)RANK.ok=false;}finally{RANK.busy=false;rankBar();}}
-async function rankSync(force){if(!S.nick)return rankFetch();const now=Date.now();if(!force&&now-RANK.lastSync<25000)return;RANK.lastSync=now;rankIdent();if(!S.floorT)S.floorT=now;save();
+async function rankSync(force){if(!S.nick||CLOUD.moved)return rankFetch();const now=Date.now();if(!force&&now-RANK.lastSync<25000)return;RANK.lastSync=now;rankIdent();if(!S.floorT)S.floorT=now;save();
   try{rankApply(await rankCall('POST',{id:S.pid,secret:S.psec,profile:rankProfile()}));}catch(e){if(e.code==='owner'){S.pid=rid(20);S.psec=rid(32);save();}else if(e.message==='noapi'||e instanceof TypeError)RANK.ok=false;rankBar();}}
 // ---------- dải Bảng Vàng trên màn hình chính ----------
 function rankBar(){const top=$('rb-top'),me=$('rb-me');if(!top)return;
-  if(RANK.ok===false){top.innerHTML='<span class="rbx">Xếp hạng toàn server · cần bản cài từ Netlify</span>';me.textContent='Xem ›';return;}
-  const t=RANK.top;if(!t.length){top.innerHTML='<span class="rbx">Chưa ai ghi danh · Hãy là người đầu tiên!</span>';}
+  if(RANK.ok===false){top.innerHTML='<span class="rbx">Cần bản cài có máy chủ Netlify để xem bảng xếp hạng</span>';me.textContent='Xem';return;}
+  const t=RANK.top;if(!t.length){top.innerHTML='<span class="rbx">Hãy là người đầu tiên lập kỷ lục!</span>';}
   else{const k=RANK.tick%Math.min(3,t.length),e=t[k];top.innerHTML='';const s=document.createElement('span');s.className='rbe r'+e.rank;s.innerHTML='<i></i><b></b><em></em>';
     s.querySelector('i').textContent='#'+e.rank;s.querySelector('b').textContent=e.nick;s.querySelector('em').textContent='Tầng '+e.floor+(e.done?' · Chinh phục':'');top.appendChild(s);}
   me.textContent=!S.nick?'Ghi danh ›':RANK.me?'Bạn #'+RANK.me.rank+' ›':'Xem ›';
@@ -6167,6 +6197,81 @@ function rankInit(){drawCup();$('rankbar').onclick=()=>{sfx('tap');openRank();};
   $('rk-nick').onclick=()=>openNick(true);$('rk-climb').onclick=()=>{sfx('tap');closeModal();openTower();};
   setInterval(()=>{RANK.tick++;rankBar();},3500);setInterval(()=>{if(!document.hidden)rankFetch();},120000);setTimeout(()=>rankSync(true),2500);rankBar();}
 
+// ================= SAO LƯU TIẾN TRÌNH (Mã khôi phục, lưu trên Netlify Blobs) =================
+const SAVE_API='/api/save',CL_ABC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',DEVKEY='bahi.dev';
+const CLOUD={ok:null,at:0,busy:false,moved:null,lastTry:0,found:null,lock:false};
+let CL_DEV=null;
+function clGen(){const a=new Uint8Array(12);try{crypto.getRandomValues(a);}catch(e){for(let i=0;i<12;i++)a[i]=R()*256|0;}return[...a].map(x=>CL_ABC[x&31]).join('');}
+const clNorm=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const clFmt=c=>clNorm(c).replace(/(.{4})(?=.)/g,'$1-');
+const clValid=c=>/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{12}$/.test(c);
+function clCode(){if(!clValid(S.rcode||'')){S.rcode=clGen();save();}return S.rcode;}
+function clDev(){if(CL_DEV)return CL_DEV;try{CL_DEV=localStorage.getItem(DEVKEY);}catch(e){}
+  if(!CL_DEV||!/^[a-z0-9]{12,40}$/.test(CL_DEV)){CL_DEV=rid(24);try{localStorage.setItem(DEVKEY,CL_DEV);}catch(e){}}return CL_DEV;}
+function clWhen(t){if(!t)return'';const d=new Date(t),p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes())+' · '+p(d.getDate())+'/'+p(d.getMonth()+1);}
+function clMeta(){let p={};try{p=rankProfile();}catch(e){}
+  return{nick:S.nick||'',lv:S.lv,floor:Math.min(S.floor,TOWER_TOP),coin:Math.floor(S.coin),gem:Math.floor(S.gem),coll:Object.keys(S.inv||{}).length,pets:(S.pets||[]).length,
+    F:p.F||0,v:p.v||0,fr:p.fr||0,cos:p.cos||[],name:(FORMS[PET.F]||{}).name||''};}
+async function clCall(body,keep){const s=JSON.stringify(body),opt={method:'POST',headers:{'content-type':'application/json'},body:s};if(keep&&s.length<60000)opt.keepalive=true;
+  const r=await fetch(SAVE_API,opt),ct=r.headers.get('content-type')||'';if(!ct.includes('json'))throw new Error('noapi');
+  const j=await r.json();if(!r.ok)throw Object.assign(new Error(j.error||'err'),{code:j.error,j});return j;}
+// gửi bản lưu lên máy chủ
+async function clPush(force,keep){if(CLOUD.busy||CLOUD.lock)return false;if(CLOUD.moved&&!force)return false;CLOUD.busy=true;CLOUD.lastTry=Date.now();clCode();rankIdent(); // giữ cả danh tính Bảng Vàng trong bản lưu
+  const data=JSON.stringify(S);CL_DIRTY=false;let ok=false;
+  try{const j=await clCall({op:'put',code:S.rcode,dev:clDev(),data,meta:clMeta(),force:!!force},keep);CLOUD.ok=true;CLOUD.at=j.at||Date.now();if(force)CLOUD.moved=null;ok=true;}
+  catch(e){if(e.code==='moved'){CLOUD.ok=true;CLOUD.moved={at:e.j.at||0,claimAt:e.j.claimAt||0};}
+    else{CL_DIRTY=true;if(e.message==='noapi'||e instanceof TypeError)CLOUD.ok=false;}}
+  finally{CLOUD.busy=false;clUI();hudDot();}return ok;}
+function hudDot(){try{setDot('cloud',!S.rcodeSeen||!!CLOUD.moved,'!');}catch(e){}}
+// ---------- cửa sổ ----------
+function openCloud(){clCode();S.rcodeSeen=true;save();CLOUD.found=null;$('cl-prev').innerHTML='';$('cl-msg').textContent='';clUI();hudDot();showModal('cloud');if(CL_DIRTY||!CLOUD.at)clPush();}
+function clUI(){if(!$('m-cloud'))return;$('cl-code').textContent=clFmt(S.rcode||'');
+  const st=$('cl-st');st.className='tag'+(CLOUD.moved?' clbad':CLOUD.ok?' clgood':'');
+  st.textContent=CLOUD.busy?'Đang lưu...':CLOUD.moved?'Đã chuyển máy':CLOUD.ok===false?'Chưa kết nối':CLOUD.at?'Đã lưu '+clWhen(CLOUD.at).split(' · ')[0]:'Chưa lưu';
+  const mv=$('cl-moved');mv.hidden=!CLOUD.moved;
+  if(CLOUD.moved&&!mv._on){mv._on=1;mv.innerHTML='<b>Mã này đang được dùng ở thiết bị khác</b><span id="cl-mvt"></span><div class="clbtns"><button class="pbtn blue" id="cl-pull">Tải bản trên mây về</button><button class="pbtn gray" id="cl-keep">Dùng máy này</button></div>';
+    $('cl-pull').onclick=()=>{sfx('tap');$('cl-in').value=clFmt(S.rcode);clFind();};
+    $('cl-keep').onclick=()=>clArm($('cl-keep'),'Chạm lần nữa: ghi đè',async()=>{const ok=await clPush(true);toast(ok?'Máy này đã trở thành bản chính':'Chưa lưu được, thử lại sau');});}
+  if(CLOUD.moved)$('cl-mvt').textContent='Tiến trình đã được khôi phục sang máy khác lúc '+clWhen(CLOUD.moved.claimAt||CLOUD.moved.at)+'. Máy này đã ngừng tự lưu để không ghi đè lên bên đó.';
+  if(!CLOUD.moved)mv._on=0;
+  $('cl-save').disabled=!!CLOUD.moved;}
+function clArm(btn,txt,fn){const now=Date.now();if(btn._arm&&now-btn._arm<4000){btn._arm=0;btn.textContent=btn.dataset.t;fn();return;}
+  btn.dataset.t=btn.dataset.t||btn.textContent;btn._arm=now;btn.textContent=txt;sfx('tap');setTimeout(()=>{if(btn._arm===now){btn._arm=0;btn.textContent=btn.dataset.t;}},4000);}
+async function clCopy(){const c=clFmt(clCode());let ok=false;
+  try{await navigator.clipboard.writeText(c);ok=true;}catch(e){try{const t=document.createElement('textarea');t.value=c;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-999px;top:0';document.body.appendChild(t);t.select();t.setSelectionRange(0,99);ok=document.execCommand('copy');t.remove();}catch(e2){}}
+  sfx('tap');toast(ok?'Đã chép mã '+c+'. Hãy cất vào Ghi chú hoặc chụp màn hình.':'Chưa chép được. Hãy chụp màn hình mã này.',3600);}
+// ---------- khôi phục ----------
+async function clFind(){const code=clNorm($('cl-in').value),msg=$('cl-msg'),pv=$('cl-prev');pv.innerHTML='';CLOUD.found=null;
+  if(!clValid(code)){msg.textContent='Mã gồm 12 ký tự (chữ in hoa và số), dạng XXXX-XXXX-XXXX.';msg.className='hint clerr';return;}
+  msg.className='hint';msg.textContent='Đang tìm...';$('cl-find').disabled=true;
+  try{const j=await clCall({op:'get',code});CLOUD.found={code,data:j.data,meta:j.meta||{},at:j.at};msg.textContent='';clPreview();}
+  catch(e){msg.className='hint clerr';msg.textContent=e.code==='notfound'?'Không tìm thấy tiến trình nào với mã này. Kiểm tra lại từng ký tự.':e.message==='noapi'||e instanceof TypeError?'Chưa kết nối được máy chủ. Hãy mở trò chơi từ trang Netlify và thử lại.':'Có lỗi khi tìm, thử lại sau.';}
+  finally{$('cl-find').disabled=false;}}
+function clPreview(){const f=CLOUD.found,m=f.meta,pv=$('cl-prev'),mine=f.code===S.rcode;
+  const d=document.createElement('div');d.className='clprev';let cv;try{cv=rankRowCanvas({F:m.F,v:m.v,fr:m.fr,cos:m.cos});}catch(e){cv=document.createElement('canvas');}
+  const info=document.createElement('div'),b=document.createElement('b'),s1=document.createElement('small'),s2=document.createElement('small'),s3=document.createElement('small');
+  b.textContent=(m.nick||'Chưa ghi danh')+(m.name?' · '+m.name:'');s1.textContent='Cấp '+(m.lv||1)+' · Tháp tầng '+(m.floor||0)+' · '+(m.pets||0)+' thú chiến';
+  s2.textContent=fmt(m.coin||0)+' xu · '+fmt(m.gem||0)+' đá · '+(m.coll||0)+' vật phẩm';s3.textContent='Lưu lúc '+clWhen(f.at);info.append(b,s1,s2,s3);
+  const warn=document.createElement('p');warn.className='hint clwarn';
+  warn.textContent=mine?'Đây là mã của chính máy này. Tiến trình trên máy sẽ được thay bằng bản trên mây.':'Tiến trình hiện tại trên máy này sẽ bị thay thế. Mã cũ của máy là '+clFmt(S.rcode||'')+', hãy chép lại nếu muốn giữ.';
+  const go=document.createElement('button');go.className='pbtn gold';go.id='cl-go';go.textContent='Khôi phục tiến trình này';go.onclick=()=>clArm(go,'Chạm lần nữa để xác nhận',clRestore);
+  d.append(cv,info,warn,go);pv.appendChild(d);setTimeout(()=>d.scrollIntoView({block:'nearest',behavior:'smooth'}),30);}
+async function clRestore(){const f=CLOUD.found;if(!f)return;const msg=$('cl-msg'),go=$('cl-go');let o;
+  try{o=JSON.parse(f.data);if(!o||typeof o!=='object'||typeof o.lv!=='number')throw 0;}catch(e){msg.className='hint clerr';msg.textContent='Bản lưu này bị hỏng, không thể khôi phục.';return;}
+  go.disabled=true;msg.className='hint';msg.textContent='Đang khôi phục...';
+  try{await clCall({op:'claim',code:f.code,dev:clDev()});}catch(e){go.disabled=false;msg.className='hint clerr';msg.textContent='Chưa kết nối được máy chủ, thử lại sau.';return;}
+  o.rcode=f.code;o.rcodeSeen=true;CLOUD.lock=true;S=o;try{localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}
+  sfx('coin');msg.textContent='Khôi phục thành công. Đang tải lại trò chơi...';setTimeout(()=>location.reload(),900);}
+function cloudInit(){clDev();clCode();
+  $('f-cloud').onclick=()=>{sfx('tap');openCloud();};$('cl-copy').onclick=clCopy;$('cl-save').onclick=async()=>{sfx('tap');const ok=await clPush();if(ok)toast('Đã lưu tiến trình lên máy chủ');else if(CLOUD.ok===false)toast('Chưa kết nối được máy chủ');};
+  $('cl-find').onclick=()=>{sfx('tap');clFind();};$('cl-in').onkeydown=e=>{if(e.key==='Enter')clFind();};
+  $('cl-in').oninput=e=>{const v=clFmt(e.target.value).slice(0,14);if(v!==e.target.value)e.target.value=v;$('cl-prev').innerHTML='';CLOUD.found=null;$('cl-msg').textContent='';};
+  // tự lưu: tối đa 1 lần mỗi 45 giây khi có thay đổi, và ngay khi rời ứng dụng
+  setInterval(()=>{if(!CL_DIRTY||document.hidden||CLOUD.moved)return;if(Date.now()-CLOUD.lastTry>(CLOUD.ok===false?300000:45000))clPush();},15000);
+  const away=()=>{if(CL_DIRTY&&CLOUD.ok!==false&&!CLOUD.moved)clPush(false,true);};
+  setTimeout(()=>{document.addEventListener('visibilitychange',()=>{if(document.hidden)away();});window.addEventListener('pagehide',away);},0); // sau trình lưu máy của ui.js
+  setTimeout(()=>clPush(),3500);hudDot();}
+
 // ================= TRẠNG THÁI / VÒNG LẶP =================
 const KEY='beVuongIso.v2',MAXQ=3,OFFLINE_CAP=6*3600,ENERGY_SEC=1200,MINE_HOURS=4;
 const DECAY={food:1/180,clean:1/240,smart:1/300};
@@ -6187,7 +6292,8 @@ function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r
   const now=Date.now()/1000;if(!S.eT)S.eT=now;
   if(S.last){const dt=Math.min(OFFLINE_CAP,Math.max(0,now-S.last));decay(dt);mineTick(Math.max(0,now-S.last));}S.last=now;
   dayRoll();regenEnergy();SFX.on=S.sound!==false;}
-function save(){S.last=Date.now()/1000;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let CL_DIRTY=true; // có thay đổi chưa gửi lên máy chủ sao lưu
+function save(){S.last=Date.now()/1000;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}CL_DIRTY=true;}
 function decay(dt){for(const k in DECAY)S[k]=clamp(S[k]-DECAY[k]*dt,0,100);}
 function dayRoll(){const d=today();if(S.qDay!==d){S.qDay=d;S.qCount=0;S.qExtra=0;S.qPerf=true;S.qStop=false;}if(S.mDay!==d){S.mDay=d;S.mProg={};S.mClaim={};S.mAll=false;}}
 function regenEnergy(){const now=Date.now()/1000;if(S.energy>=S.emax){S.eT=now;return;}const n=Math.floor((now-S.eT)/ENERGY_SEC);if(n>0){S.energy=Math.min(S.emax,S.energy+n);S.eT+=n*ENERGY_SEC;if(S.energy>=S.emax)S.eT=now;}}
@@ -6358,7 +6464,7 @@ function setImg(el,c,s){if(el)el.src=icoData(c,s||4);}
 function setIcons(){const u=n=>ico(n,UIPAL,null);
   setImg($('i-food'),u('icoApple'));setImg($('i-clean'),u('icoDrop'));setImg($('i-smart'),u('icoBook'));setImg($('b-feed'),u('icoApple'));setImg($('b-bath'),u('icoDrop'));setImg($('b-study'),u('icoBook'));setImg($('i-lv'),u('icoStar'));
   setImg($('i-coin'),sprIco('coin'));setImg($('i-gem'),sprIco('gem'));setImg($('i-ticket'),sprIco('ticket'));setImg($('i-bolt'),sprIco('bolt'));
-  const F={pets:sprIco('paw'),gacha:sprIco('capsule'),wheel:sprIco('wheelIco'),slot:sprIco('bvface'),tower:sprIco('sword'),bag:sprIco('chest'),miss:sprIco('cup'),dex:sprIco('core'),mine:sprIco('coin')};
+  const F={pets:sprIco('paw'),gacha:sprIco('capsule'),wheel:sprIco('wheelIco'),slot:sprIco('bvface'),tower:sprIco('sword'),bag:sprIco('chest'),miss:sprIco('cup'),dex:sprIco('core'),mine:sprIco('coin'),cloud:sprIco('cloud')};
   for(const k in F)setImg($('f-'+k).querySelector('img'),F[k]);}
 function setDot(id,on,txt){const d=$('f-'+id).querySelector('.dot');d.classList.toggle('on',!!on);d.textContent=txt||'!';$('f-'+id).classList.toggle('hot',!!on);}
 // 3 câu mỗi ngày; đúng cả 3 câu đầu → mở thêm 2 câu thưởng; sai ở câu thưởng → dừng ngay
@@ -6387,7 +6493,7 @@ function hud(){dayRoll();regenEnergy();const F=PET.F,st=stats();
   $('c-study').classList.toggle('locked',!testMode&&S.qCount>=qMax());
   setDot('gacha',S.ticket>0,S.ticket>9?'9+':String(S.ticket));setDot('wheel',wheelFree(),'1');setDot('tower',S.energy>=S.emax,'!');
   setDot('miss',missionReady()||loginReady(),'!');setDot('dex',evoReady()||evoClaimable()>=0,'!');
-  const mfull=S.mine>=mineCap()*0.5;setDot('mine',mfull,fmt(S.mine));setDot('bag',false);setDot('pets',petsDot(),'!');setDot('slot',false);
+  const mfull=S.mine>=mineCap()*0.5;setDot('mine',mfull,fmt(S.mine));setDot('bag',false);setDot('pets',petsDot(),'!');setDot('slot',false);hudDot();
   wallets();costUI();heroUI();
   $('b-snd').textContent=SFX.on?'ÂM: BẬT':'ÂM: TẮT';}
 
@@ -6567,6 +6673,7 @@ function initUI(){
     const o=[...a.children].filter(x=>x!==c),sec=x=>/\b(blue|gray)\b/.test(x.className);o.sort((x,y)=>sec(y)-sec(x));
     if(a.closest('#m-gacha')){a.classList.add('prio3');c.classList.add('cX');a.insertBefore($('g-10'),c);a.insertBefore($('g-1'),$('g-10'));$('g-1').classList.add('cMain');$('g-10').classList.add('cSec');const gb=document.querySelector('.g-btns');if(gb)gb.remove();return;}
     if(a.closest('#m-rank')){a.classList.add('prio3');c.classList.add('cX');$('rk-climb').classList.add('cMain');$('rk-nick').classList.add('cSec');return;}
+    if(a.closest('#m-cloud')){a.classList.add('prio3');c.classList.add('cX');$('cl-copy').classList.add('cMain');$('cl-save').classList.add('cSec');return;}
     if(a.closest('#m-nick')){a.classList.add('prio3');c.classList.add('cX');$('nk-ok').classList.add('cMain');$('nk-rand').classList.add('cSec');return;}
     if(a.closest('#t-lobby')){a.classList.add('prio3');c.classList.add('cX');$('t-go').classList.add('cMain');$('t-sweep').classList.add('cSec');return;}
     if(a.closest('#m-wheel,#m-slot')&&o.length===1){a.classList.add('prio');c.classList.remove('cC');c.classList.add('cX');o[0].classList.add('cC','cMain');return;}
@@ -6577,7 +6684,7 @@ function initUI(){
   document.querySelectorAll('.modal>.sheet').forEach(sh=>{const body=document.createElement('div');body.className='sbody';const foot=document.createElement('div');foot.className='sfoot';
     const docks=[...sh.querySelectorAll('.acts.dock,.acts.sdock')];[...sh.childNodes].forEach(n=>body.appendChild(n));sh.appendChild(body);
     if(docks.length){docks.forEach(d=>{const home=d.parentElement;d._home=home;foot.appendChild(d);});sh.appendChild(foot);sh.classList.add('hasfoot');}});
-  {const f=document.querySelector('#m-rank .sfoot');if(f)f.insertBefore($('rk-me'),f.firstChild);}rankInit();
+  {const f=document.querySelector('#m-rank .sfoot');if(f)f.insertBefore($('rk-me'),f.firstChild);}rankInit();cloudInit();
   const syncDocks=()=>document.querySelectorAll('.sfoot .acts').forEach(d=>{const h=d._home;d.hidden=!!(h&&h.closest('[hidden]'));});
   ['t-lobby','b-view','c-view'].forEach(id=>{const el=$(id);if(el)new MutationObserver(syncDocks).observe(el,{attributes:true,attributeFilter:['hidden']});});syncDocks();
   $('q-next').onclick=()=>{if(!testMode&&S.qCount>=qMax()){closeModal();return;}openQuiz();};
