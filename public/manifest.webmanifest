@@ -1,0 +1,18 @@
+{
+  "id": "nuoi-bahi",
+  "name": "Nuôi Bahi",
+  "short_name": "Nuôi Bahi",
+  "description": "Game nuôi Bahi pixel isometric: tiến hóa phân nhánh, gacha, tháp 100 tầng và học kiến thức bảo hiểm mỗi ngày.",
+  "lang": "vi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2a1a13",
+  "theme_color": "#2a1a13",
+  "icons": [
+    {"src": "icons/bahi-192-v3.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/bahi-512-v3.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/bahi-maskable-512-v3.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

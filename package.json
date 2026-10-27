@@ -1,0 +1,10 @@
+{
+  "name": "nuoi-bahi",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Nuôi Bahi: game nuôi thú pixel + Bảng Vàng xếp hạng (Netlify Functions + Netlify Blobs)",
+  "dependencies": {
+    "@netlify/blobs": "^11.1.6"
+  }
+}
