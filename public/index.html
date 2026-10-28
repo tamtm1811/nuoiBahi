@@ -62,7 +62,7 @@ img.ic,.ic{image-rendering:pixelated;width:16px;height:16px;flex:none}
 .fact{margin-top:10px;background:#eaf6ff;padding:8px 10px;box-shadow:0 0 0 2px #7fb8e0 inset;font-size:12px;line-height:1.45;font-weight:600;animation:cardin .4s steps(4) both}
 .fact b{display:block;color:#2f62b0;font-size:12px;margin-bottom:2px}
 /* stage */
-#stage{position:relative;padding:0;line-height:0;background:var(--bg)}
+#stage{position:relative;padding:0;line-height:0;background:var(--bg);flex:none}
 #room{width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;display:block;cursor:pointer}
 #floats{position:absolute;inset:0;pointer-events:none;overflow:hidden;line-height:1.2}
 .ft{position:absolute;transform:translate(-50%,-50%);font-size:12px;color:#fff;text-shadow:1px 1px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink);white-space:nowrap;animation:ft 1.3s steps(8) forwards}
@@ -584,6 +584,36 @@ html.mlock,html.mlock body{overflow:hidden;overscroll-behavior:none}
 .clprev{display:grid;grid-template-columns:72px 1fr;gap:6px 10px;align-items:center;margin-top:8px;background:#fff;border-radius:10px;padding:8px;box-shadow:inset 0 0 0 2px #5ab84a;animation:rbin .3s steps(3)}
 .clprev canvas{width:72px;height:72px;image-rendering:pixelated;background:radial-gradient(#fff6c8,#ffe6a0);border-radius:8px}
 .clprev b{display:block;font-size:13px;margin-bottom:2px}.clprev small{display:block;font-size:10px;line-height:1.35;color:#6a4a20}.clprev .pbtn{grid-column:1/-1;margin-top:2px}
+/* ===== TIẾN HÓA THÚ CHIẾN ===== */
+#pevo{position:fixed;inset:0;z-index:60;background:radial-gradient(circle at 50% 40%,#2a1640,#0a0612 75%);display:flex;align-items:center;justify-content:center;padding:calc(var(--st) + 12px) 14px calc(var(--sb) + 14px)}
+#pevo[hidden]{display:none}
+.pevbox{width:min(100%,380px);display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;text-align:center}
+.pevbox>small{font-size:10px;letter-spacing:2px;color:#c8a0ff}
+#pevo-cv{width:min(100%,320px);aspect-ratio:160/112;image-rendering:pixelated;border:3px solid #3a2a50;border-radius:14px;box-shadow:0 0 30px rgba(160,110,255,.35)}
+#pevo-n{font-size:16px;text-shadow:2px 2px 0 #000}
+.pevo-br{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+#pevo.show .pevo-br{opacity:1;transform:none}
+.pevc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border-radius:12px;border:3px solid #3a2a50;background:#1a1028}
+.pevc canvas{width:84px;height:75px;image-rendering:pixelated}
+.pevc b{font-size:12px}.pevc small{font-size:9px;color:#b8a8d8}
+.pevc.on{border-color:var(--pc);box-shadow:0 0 14px var(--pc),inset 0 0 12px rgba(255,255,255,.08);animation:gpop .5s steps(5)}
+.pevc.on small{color:var(--pc);font-weight:700;letter-spacing:1px}
+.pevc.myst{background:repeating-linear-gradient(45deg,#140c20 0 6px,#1a1028 6px 12px)}
+.pq{width:84px;height:75px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;color:#3a2a5a;text-shadow:0 0 12px #7a5aa8}.pevc.myst b{color:#7a6a9a;font-size:14px}
+#pevo-ok{display:none;min-width:60%}#pevo.show #pevo-ok{display:block}
+.pevo-hint{font-size:9px;color:#8a7aa8;margin:0}#pevo.show .pevo-hint{display:none}
+/* ===== NÚT BẠN TRONG PHÒNG ===== */
+#roompets{position:absolute;right:6px;top:6px;z-index:3;display:flex;align-items:center;gap:3px;padding:3px 7px 3px 4px;border:2px solid var(--ink);border-radius:10px;line-height:1;
+  background:linear-gradient(#fffaf0 0 2px,var(--cream) 2px 60%,#f6e3bf 60%);box-shadow:0 3px 0 var(--ink);font-size:10px;font-weight:700;color:var(--ink)}
+#roompets:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+#roompets img{width:18px;height:18px;image-rendering:pixelated}
+.rplist{display:flex;flex-direction:column;gap:6px}
+.rprow{display:grid;grid-template-columns:56px 1fr auto;gap:8px;align-items:center;padding:4px 8px 4px 4px;border-radius:10px;background:#fffaf0;box-shadow:inset 0 0 0 2px var(--line)}
+.rprow.on{background:#eafbe4;box-shadow:inset 0 0 0 2px #5ab84a}
+.rprow canvas{width:56px;height:50px;image-rendering:pixelated}
+.rpinfo b{display:block;font-size:12px}.rpinfo small{display:block;font-size:9px;color:#7a5a3a}
+.rptog{font:inherit;font-size:11px;font-weight:700;padding:7px 10px;border-radius:9px;border:2px solid var(--ink);background:#fff;color:var(--ink);box-shadow:0 2px 0 var(--ink)}
+.rptog.on{background:#5ab84a;color:#fff}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -610,6 +640,7 @@ html.mlock,html.mlock body{overflow:hidden;overscroll-behavior:none}
   <button id="rankbar" type="button"><span class="rbt"><canvas id="rb-cup" width="16" height="16"></canvas><b>BẢNG<br>VÀNG</b></span><span id="rb-top" class="rbtop"></span><span id="rb-me" class="rbme"></span></button>
   <div id="stage" class="px">
     <canvas id="room"></canvas>
+    <button id="roompets" type="button" aria-label="Chọn bạn trong phòng"><img id="rp-ic" alt=""><span id="rp-n">1/2</span></button>
     <div id="floats"></div>
     <div id="banner"><small>TIẾN HÓA THÀNH CÔNG</small><div id="bn-name"></div><div id="bn-desc"></div></div>
     <div id="toast"></div>
@@ -693,6 +724,15 @@ html.mlock,html.mlock body{overflow:hidden;overscroll-behavior:none}
     <div id="cl-prev"></div>
   </div>
   <div class="acts"><button class="pbtn" id="cl-copy">Chép mã</button><button class="pbtn blue" id="cl-save">Lưu ngay</button><button class="pbtn gray" data-close>Đóng</button></div>
+</div></div>
+
+<div id="pevo" hidden><div class="pevbox"><small id="pevo-k"></small><canvas id="pevo-cv" width="160" height="112"></canvas><b id="pevo-n"></b><div id="pevo-br" class="pevo-br"></div><button class="pbtn gold" id="pevo-ok">Tuyệt vời!</button><p class="pevo-hint">Chạm để xem nhanh</p></div></div>
+
+<div id="m-roompets" class="modal"><div class="sheet px">
+  <h3>Bạn trong phòng<span class="tag" id="rp-cnt">1/2</span></h3>
+  <p class="hint">Chọn tối đa 2 bạn đi lại trong phòng cùng Bahi. Thú vẫn ra trận bình thường dù ở trong phòng hay không.</p>
+  <div id="rp-list" class="rplist"></div>
+  <div class="acts"><button class="pbtn gray" data-close>Đóng</button></div>
 </div></div>
 
 <div id="m-wheel" class="modal"><div class="sheet px">
@@ -2160,7 +2200,7 @@ const RBON=[0,0.05,0.1,0.16,0.24,0.3];
 const TRAITS=[
  {id:'armor',n:'Giáp Dày',d:'Thủ x1.9',good:'xuyên giáp, phép, độc, bỏng'},
  {id:'agile',n:'Nhanh Nhẹn',d:'Né 30% đòn cận chiến và tầm xa',good:'phép, triệu hồi, đa đòn, độc'},
- {id:'regen',n:'Tự Hồi Máu',d:'Hồi 5% máu mỗi lượt (trùm: 3%)',good:'sát thương bùng nổ, kết liễu, độc (giảm hồi máu)'},
+ {id:'regen',n:'Tự Hồi Máu',d:'Hồi máu mỗi lượt (yếu dần ở tầng cao)',good:'sát thương bùng nổ, kết liễu, độc (giảm hồi máu)'},
  {id:'thorns',n:'Gai Phản Đòn',d:'Phản 30% sát thương cận chiến',good:'tầm xa, phép, hút máu'},
  {id:'shield',n:'Khiên Năng Lượng',d:'Chặn hoàn toàn 4 đòn đầu',good:'đa đòn, triệu hồi, độc, bỏng'},
  {id:'brute',n:'Cuồng Bạo',d:'Công x1.5, Máu x0.85',good:'né tránh, hồi máu, khiên, phản đòn'}];
@@ -2179,11 +2219,51 @@ const TBOSS=[
  {n:'Tử Thần Zero-Day',col:'#7fe8ff',tr:[1,5],sk:'Lưỡi Hái Ngày Số Không',sd:'Mọi đòn xuyên 35% giáp và mạnh gấp đôi khi Bahi còn dưới 35% máu.',kit:{every:3,skm:3.0,pierce:0.35,exe:2,exeAt:0.35},m:[1.0,0.97,1,1.05]},
  {n:'Đế Vương Mã Độc Tối Thượng',col:'#ff3a3a',tr:[0,4],sk:'Thiên Thạch Diệt Thế',sd:'Mưa thiên thạch 5 đòn, gây bỏng và choáng. Khi gục lần đầu sẽ hồi sinh ở Giai Đoạn 2, cuồng nộ hơn.',kit:{every:4,skm:3.0,sh:5,burn:0.6,stun:0.3,p2:1},m:[0.88,0.95,0.7,1]}];
 function bigBoss(f){return f>0&&f%10===0&&f<=TOWER_TOP?TBOSS[f/10-1]:null;}
-function floorTraits(f){const bb=bigBoss(f);if(bb)return bb.tr.slice();const a=(f*5+2)%6;if(f%5===0)return[a,(a+3)%6];return[a];}
+// ===== 24 LOÀI QUÁI THƯỜNG (4 cũ + 20 mới) =====
+// m: hệ số [Máu, Công, Thủ, Tốc]; k: bộ kỹ năng (every: mấy lượt tung chiêu, skm: hệ số chiêu, sh: số đòn, dt: loại sát thương...)
+// from/to: dải tầng xuất hiện. Mỗi tầng cố định 1 loài để người chơi học cách khắc chế.
+const MSPEC=[
+ {n:'Bọ Lỗi',col:'#5ab84a',from:1,to:12,m:[1,1,1,1],sk:'Cắn Lỗi',k:{every:4,skm:1.8}},
+ {n:'Virus Gai',col:'#d6309a',from:1,to:14,m:[0.95,1.05,0.95,1],sk:'Gai Nhiễm Độc',k:{every:4,skm:1.9,poison:0.02,pmax:3}},
+ {n:'Sâu Trojan',col:'#c98a4f',from:2,to:16,m:[1.1,0.95,1.1,0.95],sk:'Đóng Cửa Gỗ',k:{every:4,skm:2.0,guard:1}},
+ {n:'Ma Spam',col:'#9a80e0',from:3,to:18,m:[0.9,1,0.9,1.05],sk:'Thư Rác Dồn Dập',k:{every:3,skm:1.6,dt:'magic',drain:20}},
+ {n:'Lính Robot Tí Hon',col:'#5b8fd8',from:6,to:36,m:[0.95,1.05,1,1],sk:'Song Pháo Mini',k:{dt:'ranged',every:3,skm:2.0,sh:2,first:1.3}},
+ {n:'Hiệp Sĩ Thiếc',col:'#9aa6b6',from:9,to:40,m:[1.1,0.9,1.15,0.9],sk:'Khiên Thiếc Phản Kích',k:{every:4,skm:2.2,guard:1,shield:0.06}},
+ {n:'Chó Săn Cơ Khí',col:'#d2620f',from:11,to:44,m:[0.95,1.05,0.95,1.2],sk:'Hàm Thép Xé Toạc',k:{every:3,skm:1.9,sh:2,poison:0.025,pmax:4,first:1.4}},
+ {n:'Ninja Máy Lỗi',col:'#3a4352',from:13,to:47,m:[0.85,1.05,0.9,1.25],sk:'Phân Thân Lỗi',k:{eva:0.22,every:3,skm:2.1,sh:3,dodgeS:1}},
+ {n:'Bọ Cạp Thép',col:'#b8860b',from:16,to:50,m:[1.05,1.05,1.2,0.95],sk:'Đuôi Độc Xuyên Giáp',k:{every:4,skm:2.3,poison:0.022,pmax:4,pierce:0.15}},
+ {n:'Nhện Máy Giăng Tơ',col:'#7a4fc0',from:19,to:53,m:[0.95,1,1,1.05],sk:'Lưới Tơ Điện',k:{dt:'ranged',every:3,skm:1.7,sh:2,drain:30,stun:0.2}},
+ {n:'Cú Radar',col:'#3fc7c0',from:22,to:56,m:[0.9,1.05,0.9,1.15],sk:'Sóng Radar Gây Nhiễu',k:{dt:'magic',every:3,skm:1.9,mslow:0.15,curse:0.06}},
+ {n:'Pháp Sư Bóng Tối',col:'#5649b2',from:25,to:59,m:[0.85,1.2,0.85,1],sk:'Hắc Viêm',k:{dt:'magic',every:3,skm:2.2,burn:0.22,curse:0.06}},
+ {n:'Phù Thủy Rút Hồn',col:'#a71b9d',from:28,to:62,m:[0.95,1.1,0.9,1],sk:'Rút Hồn',k:{dt:'magic',every:3,skm:2.2,ssteal:0.5,steal:0.06}},
+ {n:'Đạo Sĩ Hắc Phù',col:'#3a2a40',from:32,to:66,m:[1,1,1,0.95],sk:'Hắc Phù Định Thân',k:{dt:'magic',every:4,skm:2.0,stun:0.4,lock:2}},
+ {n:'Thiên Sứ Sa Ngã',col:'#2a1a3a',from:36,to:70,m:[1.05,1.1,1,1],sk:'Lông Vũ Tận Thế',k:{dt:'magic',every:4,skm:2.2,sh:3,heal:0.07,shatter:1}},
+ {n:'Kỵ Sĩ Thiên Giới Sa Đọa',col:'#c8a040',from:40,to:74,m:[1.15,1.1,1.15,0.95],sk:'Thương Phán Xét',k:{every:4,skm:2.6,pierce:0.3,enr:0.35,exe:1.5,exeAt:0.3}},
+ {n:'Hồn Ma Đèn Lồng',col:'#ff9a3a',from:44,to:99,m:[0.9,1.05,0.9,1.05],sk:'Lửa Ma Trơi',k:{dt:'magic',every:3,skm:1.8,burn:0.25,eva:0.12}},
+ {n:'Oan Hồn Tóc Dài',col:'#e8f0ff',from:48,to:99,m:[0.95,1.05,0.9,1.1],sk:'Tiếng Khóc Nửa Đêm',k:{dt:'magic',eva:0.3,every:4,skm:2.2,drain:40,curse:0.08}},
+ {n:'Bóng Ma Dữ Liệu',col:'#3fe8ff',from:52,to:99,m:[0.9,1.15,0.85,1.1],sk:'Xóa Sạch Bộ Nhớ',k:{dt:'magic',every:3,skm:2.3,sh:4,shatter:1,cleanse:1}},
+ {n:'Kỹ Nữ U Sầu',col:'#c0405a',from:56,to:99,m:[0.95,1.1,0.9,1.05],sk:'Khúc Ly Biệt',k:{dt:'magic',every:3,skm:2.0,sh:2,ssteal:0.4,mslow:0.12,curse:0.1}},
+ {n:'Ca Nương Tỳ Bà',col:'#8a5ad8',from:60,to:99,m:[1,1.1,0.95,1],sk:'Thập Diện Mai Phục',k:{dt:'ranged',every:4,skm:2.6,sh:5,stun:0.3}},
+ {n:'Bù Nhìn Ma Ám',col:'#a87a50',from:65,to:99,m:[1.2,1,1.1,0.9],sk:'Rơm Cháy Âm Ỉ',k:{thorns:0.12,regen:0.012,every:4,skm:1.9,burn:0.18}},
+ {n:'Rối Gỗ Dây Tơ',col:'#d8a868',from:70,to:99,m:[1,1.1,1,1.1],sk:'Vũ Điệu Dây Tơ',k:{every:3,skm:2.1,sh:3,dodgeS:1,eva:0.08}},
+ {n:'Hề Hộp Ác Mộng',col:'#e0472a',from:75,to:99,m:[1.05,1.15,0.95,1.05],sk:'Bất Ngờ Chưa!',k:{first:2.2,every:4,skm:2.6,stun:0.25,enr:0.3}}];
+// hộ vệ bí ẩn của tháp: mạnh ngang quái tầng 90
+const GUARD={floor:90,col:'#3a6ae0',k:{every:3,skm:2.6,sh:3,eva:0.2,first:1.5,pierce:0.2,enr:0.25},m:[1.05,1.05,1,1.15]};
+function monKind(f){if(bigBoss(f))return{sp:-1,elite:false};const el=MSPEC.map((s,i)=>i).filter(i=>f>=MSPEC[i].from&&f<=MSPEC[i].to),boss=f%5===0;
+  return{sp:el[((boss?f*11+5:f*13+7)>>>0)%el.length],elite:boss};}
+function floorTraits(f){const bb=bigBoss(f);if(bb)return bb.tr.slice();const a=(f*5+2)%6;if(f%5===0||f>=DIFF.t2)return[a,(a+3)%6];return[a];}
 const MONK=1.12; // quái mạnh hơn 12% để bù sức của thú chiến
-function hpRamp(f){return 1+0.012*Math.max(0,f-40);}
-function atkRamp(f){return 1+0.0003*Math.pow(Math.max(0,f-55),2);}
-function monBase(f){const boss=f%5===0,bb=bigBoss(f),q=bb?bb.m:[1,1,1,1],ramp=hpRamp(f),m=(boss?1.9:1)*MONK*ramp;return{hp:Math.round((90+f*42)*m*q[0]),atk:Math.round((9+f*3.1)*(boss?1.25:1)*MONK*ramp*atkRamp(f)*q[1]),def:Math.round((4+f*2)*q[2]),spd:Math.round((9+f*1.05)*q[3]),crit:5+Math.min(20,f*0.5)};}
+// Đường cong độ khó (răng cưa): tăng dần đều, gắt hơn ở nửa trên tháp, đỉnh nhọn ở tầng boss rồi chùng xuống tầng kế
+// hệ số theo mốc mỗi 10 tầng (tinh chỉnh bằng mô phỏng: tầng f cần khoảng cấp 0,9×f để thắng 50%)
+function diffK(f){const k=DIFF.k;if(f<=5)return 1+(k[0]-1)*Math.max(0,f)/5;if(f>=95)return k[9];const i=Math.floor((f-5)/10),t=(f-5-i*10)/10;return k[i]+(k[i+1]-k[i])*t;}
+function hpRamp(f){return diffK(f);}
+function atkRamp(f){return diffK(f);}
+// hệ số riêng từng tầng trùm (từ mô phỏng): trùm giữa ≈ cấp tầng thường +6, trùm canh tháp ≈ +10, tầng 100 ≈ cấp 115
+const BADJ={15:1.11,25:1.45,35:0.97,45:0.77,55:1.2,65:0.77,75:0.755,85:0.95,95:0.94,10:0.94,20:1.3,30:1.1,40:1.13,50:0.98,60:0.82,70:0.92,80:0.89,90:1.24,100:0.89};
+const DIFF={k:[1.338,1.522,1.26,2.82,2.25,1.94,2.62,2.57,2.43,2.21],d1:0.006,mh:1.5,ma:1.15,bh:2.2,ba:1.35,t2:85};
+function monBase(f,kind,guard){const boss=f%5===0&&!guard,bb=guard?null:bigBoss(f),q=bb?bb.m:[1,1,1,1],sp=guard?GUARD:(kind&&kind.sp>=0?MSPEC[kind.sp]:null),sm=sp?sp.m:[1,1,1,1],ramp=hpRamp(f),ba=boss?(BADJ[f]||1):1,bm=bb?[DIFF.bh*ba,DIFF.ba*ba]:boss?[DIFF.mh*ba,DIFF.ma*ba]:[1,1],m=bm[0]*MONK*ramp;
+  return{hp:Math.round((90+f*42)*m*q[0]*sm[0]),atk:Math.round((9+f*3.1)*bm[1]*MONK*atkRamp(f)*q[1]*sm[1]),def:Math.round((4+f*2)*(1+DIFF.d1*f)*q[2]*sm[2]),spd:Math.round((9+f*1.05)*q[3]*sm[3]),crit:(guard?25:5)+Math.min(20,f*0.5)};}
+function monKit(f,kind){const bb=bigBoss(f);if(bb)return Object.assign({t:'melee'},bb.kit);const sp=MSPEC[kind.sp],k=Object.assign({t:'melee'},sp.k);if(kind.elite)k.skm=(k.skm||1.8)*1.15;return k;}
 function petBase(F,lv,gear){const k=KIT[F],p=k.p,s=SM[STAGE_OF[F]]*KK[F],g=gear||{hp:0,atk:0,def:0,spd:0,crit:0};
   return{hp:(100+lv*22)*p[0]*s*(1+g.hp/100),atk:(10+lv*3.2)*p[1]*s*(1+g.atk/100),def:(5+lv*2.1)*p[2]*SM[STAGE_OF[F]]*(1+g.def/100),
     spd:(10+lv*1.1)*p[3]*(1+g.spd/100),crit:p[4]+g.crit};}
@@ -2192,7 +2272,8 @@ function mkUnit(side,st,kit,traits){const u={side,hp:Math.round(st.hp),max:Math.
   (traits||[]).forEach(i=>{const t=TRAITS[i].id;if(t==='armor')u.def*=1.9;if(t==='agile')u.eva=0.3;if(t==='regen')u.regen=kit.rg||0.05;if(t==='thorns')u.thorns=0.3;if(t==='shield')u.block=4;if(t==='brute'){u.atk*=1.5;u.hp=u.max=Math.round(u.hp*0.85);}});
   return u;}
 function mkAlly(ps){return ps?{side:'ally',hp:1,max:1,atk:ps.atk,spd:ps.spd,crit:ps.kit.crit||0,cd:1.8,eva:0,kit:ps.kit,gauge:0,stun:0,acts:0,poison:0,burn:0,burnT:0,block:0,shield:0,regen:0,thorns:0,broken:0,dodge:0,name:ps.name}:null;}
-function newFight(petSt,F,f,ps){const tr=floorTraits(f),mb=monBase(f);const B={me:mkUnit('me',petSt,KIT[F],[]),mon:mkUnit('mon',mb,bigBoss(f)?Object.assign({t:'melee'},bigBoss(f).kit):{t:'melee',skill:1.8,every:4},tr),ally:mkAlly(ps),traits:tr,turns:0,over:null,boss:f%5===0,big:bigBoss(f)?f/10-1:-1};B.mon.atk0=B.mon.atk;B.mon.regen*=Math.min(1,50/Math.max(1,f));if(typeof applyGearFx==='function')applyGearFx(B.me);return B;}
+function newFight(petSt,F,f,ps){const tr=floorTraits(f),kind=monKind(f),mb=monBase(f,kind);const B={me:mkUnit('me',petSt,KIT[F],[]),mon:mkUnit('mon',mb,monKit(f,kind),tr),kind,ally:mkAlly(ps),traits:tr,turns:0,over:null,boss:f%5===0,big:bigBoss(f)?f/10-1:-1};B.mon.atk0=B.mon.atk;B.mon.regen*=Math.min(1,35/Math.max(1,f));if(typeof applyGearFx==='function')applyGearFx(B.me);return B;}
+function guardUnit(){const u=mkUnit('mon',monBase(GUARD.floor,null,true),Object.assign({t:'melee'},GUARD.k),[]);u.atk0=u.atk;u.guard=1;return u;}
 function hitOnce(B,a,d,mult,type,ev,rng,tag){
   if(type!=='magic'&&type!=='summon'&&type!=='pet'&&rng()<d.eva){ev.push({k:'miss',to:d.side});return 0;}
   if(d.dodge>0){d.dodge--;ev.push({k:'miss',to:d.side});return 0;}
@@ -2250,7 +2331,8 @@ function stepFight(B,rng){const ev=[];if(B.over)return ev;const me=B.me,mo=B.mon
     if(k.summon&&d.hp>0)hitOnce(B,a,d,k.summon,'summon',ev,rng,'summon');
     if(k.focus&&a.crit<(a.crit0||0)+30)a.crit+=k.focus;
     if(k.echo&&rng()<k.echo){a.gauge+=70;ev.push({k:'status',to:'me',s:'echo'});}}
-  else{const sk=a.acts%(k.every||4)===0,hits=sk?(k.sh||1):1,hm=sk?(k.skm||1.8)/(hits>1?hits*0.82:1):1;ev.push({k:'act',who:'mon',skill:sk,bs:sk&&B.big>=0?B.big:-1});
+  else{if(k.enr&&!a.enraged&&a.hp<a.max*0.35){a.enraged=1;a.atk*=1+k.enr;a.spd*=1.1;ev.push({k:'status',to:'mon',s:'enrage'});}
+    const sk=a.acts%(k.every||4)===0,hits=sk?(k.sh||1):1,hm=(sk?(k.skm||1.8)/(hits>1?hits*0.82:1):1)*(a.acts===1&&k.first?k.first:1);ev.push({k:'act',who:'mon',skill:sk,bs:sk&&B.big>=0?B.big:-1});
     for(let i=0;i<hits&&d.hp>0;i++){const dm=hitOnce(B,a,d,hm,k.dt||'melee',ev,rng);if(sk&&k.ssteal&&dm>0){const h=Math.min(a.max-a.hp,Math.round(dm*k.ssteal));if(h>0){a.hp+=h;ev.push({k:'heal',to:'mon',v:h});}}}
     if(sk&&d.hp>0){if(k.stun&&rng()<k.stun&&!(d.stun>0)){d.stun=1;ev.push({k:'status',to:'me',s:'stun'});}
       if(k.burn){d.burnT=3;d.burn=Math.max(d.burn,a.atk*k.burn*0.5);ev.push({k:'status',to:'me',s:'burn'});}
@@ -2258,6 +2340,11 @@ function stepFight(B,rng){const ev=[];if(B.over)return ev;const me=B.me,mo=B.mon
       if(k.drain){d.gauge-=k.drain;ev.push({k:'status',to:'me',s:'drain'});}
       if(k.lock){d.noReg=k.lock;d.lock=k.lock;ev.push({k:'status',to:'me',s:'lock'});}}
     if(sk&&k.guard){a.block=Math.max(a.block,k.guard);ev.push({k:'status',to:'mon',s:'guard'});}
+    if(sk&&a.hp>0){if(k.heal){const h=Math.min(a.max-a.hp,Math.round(a.max*k.heal*(a.noReg>0?0.3:1)));if(h>0){a.hp+=h;ev.push({k:'heal',to:'mon',v:h});}}
+      if(k.curse&&d.hp>0&&(d.curseN||0)<3){d.curseN=(d.curseN||0)+1;d.atk*=1-k.curse;ev.push({k:'status',to:'me',s:'curse'});}
+      if(k.mslow&&d.hp>0&&!d.mslowed){d.mslowed=1;d.spd*=1-k.mslow;ev.push({k:'status',to:'me',s:'slow'});}
+      if(k.dodgeS){a.dodge=Math.max(a.dodge,k.dodgeS);ev.push({k:'status',to:'mon',s:'dodge'});}
+      if(k.cleanse&&(a.poison>0||a.burnT>0)){a.poison=0;a.burnT=0;ev.push({k:'status',to:'mon',s:'cleanse'});}}
     if(sk&&al&&al.stun<1){al.stun=1;ev.push({k:'status',to:'ally',s:'roar'});}
     if(d.hp>0&&a.hp>0&&d.kit.counter&&rng()<d.kit.counter){ev.push({k:'counter'});hitOnce(B,d,a,0.7,d.kit.t==='melee'?'melee':'ranged',ev,rng,'counter');}}
   return fin(B,ev);}
@@ -2922,39 +3009,39 @@ for(const id of[45,46,51,52,54,56,69,74])FORMS[id].scale=0.92;FORMS[71].scale=1.
 
 // ================= THỜI TRANG HIỂN THỊ TRÊN BAHI: lưng / đầu / mặt =================
 // vẽ bằng các lớp hình học của rig nên tự có viền chọn lọc, đổ bóng, phóng theo bậc tiến hóa
-function olOf(cc){return mix(cc[2],'#000000',0.55);}
+function cosOl(cc){return mix(cc[2],'#000000',0.55);}
 function rEl(cx,cy,rx,ry,a,pal,ol,o={}){const c=Math.cos(-a),s=Math.sin(-a),m=Math.max(rx,ry);
   return pFn(bbx(cx-m,cy-m,cx+m,cy+m),(x,y)=>{const dx=x-cx,dy=y-cy,u=(dx*c-dy*s)/rx,v=(dx*s+dy*c)/ry,d=u*u+v*v;if(d>1)return null;const b=sh3(pal,u,v);return o.col?o.col(u,v,d,b):b;},ol);}
 function ringEl(cx,cy,rx,ry,t,col,ol){const m=Math.max(rx,ry)+t;return pFn(bbx(cx-m,cy-m,cx+m,cy+m),(x,y)=>{const a=(x-cx)/rx,b=(y-cy)/ry,d=Math.sqrt(a*a+b*b),k=t/Math.min(rx,ry);
   return Math.abs(d-1)<=k?(y<cy?col[0]:col[1]):null;},ol);}
-function star4(cx,cy,r,pal,ol){return pPoly([[cx,cy-r],[cx+r*0.32,cy-r*0.32],[cx+r,cy],[cx+r*0.32,cy+r*0.32],[cx,cy+r],[cx-r*0.32,cy+r*0.32],[cx-r,cy],[cx-r*0.32,cy-r*0.32]],pal,ol);}
+function cosStar(cx,cy,r,pal,ol){return pPoly([[cx,cy-r],[cx+r*0.32,cy-r*0.32],[cx+r,cy],[cx+r*0.32,cy+r*0.32],[cx,cy+r],[cx-r*0.32,cy+r*0.32],[cx-r,cy],[cx-r*0.32,cy-r*0.32]],pal,ol);}
 function layersTop(L,hx){let t=1e9;for(const l of L){if(l.face||!l.bb)continue;if(l.bb[2]<hx-3||l.bb[0]>hx+3)continue;if(l.bb[1]<t)t=l.bb[1];}return t+1;}
 const COSD={
  // ---------- lưng ----------
- cape(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=olOf(cc),L=c.hh*1.95,y1=nk+L,w0=hw*0.95,w1=hw*1.32,pts=[[hx-w0,nk-2.5*u],[hx+w0,nk-2.5*u],[hx+w1,y1]];
+ cape(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc),L=c.hh*1.95,y1=nk+L,w0=hw*0.95,w1=hw*1.32,pts=[[hx-w0,nk-2.5*u],[hx+w0,nk-2.5*u],[hx+w1,y1]];
    for(let k=1;k<8;k++){const x=hx+w1-(2*w1)*k/8;pts.push([x,y1+(k%2?-2.2*u:0)]);}pts.push([hx-w1,y1]);
    o.back.push(pPoly(pts,cc,ol,{col:(x,y,nx,ny,b)=>it.trim&&y>y1-2.8*u?it.trim:Math.abs(nx)>0.8?cc[2]:Math.abs(nx)>0.6&&Math.floor(y/2)%3===0?cc[0]:b}));
    o.head.push(pEl(hx,nk+0.6*u,1.5*u,1.3*u,it.trim?['#fff3a0','#ffd84a','#b8860b']:['#fff3a0','#d8b040','#8a6a10'],'#4a3a00'));},
  balloon(it,c,o){const{hx,hy,hw,hh,nk,u}=c,cc=it.cc,bx=hx+hw+6*u,by=hy-hh-9*u;
    o.back.push(pCurve([[hx+hw*0.4,nk],[hx+hw+3*u,hy],[bx-0.5*u,by+6.5*u]],0.45*u,0.45*u,['#ffffff','#e8e0d0','#a8987a'],'#5a4a3a'));
-   o.back.push(pPoly([[bx-1.2*u,by+6.8*u],[bx+1.2*u,by+6.8*u],[bx,by+5*u]],cc,olOf(cc)));
-   o.back.push(pEl(bx,by,5*u,6*u,cc,olOf(cc),{col:(x,y,nx,ny,b)=>(nx+0.35)**2+(ny+0.45)**2<0.05?'#ffffff':b}));},
+   o.back.push(pPoly([[bx-1.2*u,by+6.8*u],[bx+1.2*u,by+6.8*u],[bx,by+5*u]],cc,cosOl(cc)));
+   o.back.push(pEl(bx,by,5*u,6*u,cc,cosOl(cc),{col:(x,y,nx,ny,b)=>(nx+0.35)**2+(ny+0.45)**2<0.05?'#ffffff':b}));},
  quiver(it,c,o){const{hx,hy,hw,hh,nk,u}=c,cc=it.cc,ax=hx-hw-4.5*u,ay=hy-hh*0.9,bx=hx-hw*0.2,by=nk+hh*0.5;
    for(let k=0;k<3;k++){const x=ax+(k-1)*1.8*u+0.4*u,y=ay-2.4*u-(k%2)*1.4*u;o.back.push(pCap(x+1.2*u,y+3*u,x,y,0.45*u,0.45*u,['#e8e0d0','#c8b898','#8a7a5a'],'#4a3a2a'));
      o.back.push(pPoly([[x-1.4*u,y-0.4*u],[x+1.4*u,y-0.4*u],[x,y-3.4*u]],['#ff8a7a','#e04040','#8a1a1a'],'#4a0a0a'));}
-   o.back.push(pCap(ax,ay,bx,by,3.1*u,2.7*u,cc,olOf(cc),{col:(x,y,nx,ny,b,t)=>t<0.1||Math.abs(t-0.55)<0.05?'#ffd84a':b}));},
- leafwing(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=olOf(cc);for(const s of[-1,1]){const cx=hx+s*(hw+6*u),cy=nk-7*u;
+   o.back.push(pCap(ax,ay,bx,by,3.1*u,2.7*u,cc,cosOl(cc),{col:(x,y,nx,ny,b,t)=>t<0.1||Math.abs(t-0.55)<0.05?'#ffd84a':b}));},
+ leafwing(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){const cx=hx+s*(hw+6*u),cy=nk-7*u;
    o.back.push(rEl(cx,cy,10*u,4.2*u,s*-0.55,cc,ol,{col:(uu,v,d,b)=>Math.abs(v)<0.12?cc[0]:(Math.abs(uu*7)%2<0.35&&Math.abs(v)<0.8?cc[2]:b)}));}},
- fairy(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=olOf(cc);for(const s of[-1,1]){
+ fairy(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){
    for(const[dx,dy,rx,ry,a]of[[hw+3*u,-9*u,7.5*u,4.6*u,-0.6],[hw+1*u,0.5*u,5*u,3.2*u,0.45]])
      o.back.push(rEl(hx+s*dx,nk+dy,rx,ry,s*a,cc,ol,{col:(uu,v,d)=>d>0.7?cc[2]:(Math.abs(uu-0.35)<0.16&&Math.abs(v)<0.25)?'#ffb0e0':d<0.25?'#ffffff':cc[1]}));}},
- bat(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=olOf(cc),b=it.big?1.25:1;for(const s of[-1,1]){const X=d=>hx+s*d;
+ bat(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc),b=it.big?1.25:1;for(const s of[-1,1]){const X=d=>hx+s*d;
    const root=[X(hw*0.5),nk-4*u],elb=[X(hw+6*u*b),nk-15*u*b],tip=[X(hw+17*u*b),nk-9*u*b];
    o.back.push(pPoly([root,elb,tip,[X(hw+13*u*b),nk-1*u],[X(hw+9*u*b),nk-4*u],[X(hw+5.5*u*b),nk+1.5*u],[X(hw+1.5*u),nk-2*u],[X(hw*0.5),nk+2*u]],cc,ol,
      {col:(x,y,nx,ny,bb)=>it.vein&&Math.abs((x-root[0])*(elb[1]-root[1])-(y-root[1])*(elb[0]-root[0]))<1.4*u*Math.hypot(elb[0]-root[0],elb[1]-root[1])*0.12?it.vein:bb}));
    o.back.push(pCurve([root,elb,tip],0.9*u,0.5*u,[cc[0],cc[1],cc[2]],ol));
    o.back.push(pPoly([[elb[0]-1*u,elb[1]+0.5*u],[elb[0]+1*u,elb[1]+0.5*u],[elb[0]+s*1.5*u,elb[1]-3*u]],['#ffffff','#e8e0d0','#a8987a'],'#3a2a1a'));}},
- feather(it,c,o,sets){const{hx,nk,hw,u}=c,cc=it.cc,ol=olOf(cc);const S=sets||[[-0.2,13],[0.15,17],[0.5,20],[0.85,21],[1.2,18]];
+ feather(it,c,o,sets){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);const S=sets||[[-0.2,13],[0.15,17],[0.5,20],[0.85,21],[1.2,18]];
    for(const s of[-1,1]){const rx=hx+s*hw*0.72,ry=nk-4*u;
      S.forEach(([a,len])=>{const tx=rx+s*Math.cos(a)*len*u,ty=ry-Math.sin(a)*len*u;
        o.back.push(pCap(rx,ry,tx,ty,3.3*u,1.3*u,cc,ol,{col:(x,y,nx,ny,b,t)=>it.fire&&t>0.62?(t>0.82?'#fff3a0':'#ffb020'):t>0.78?cc[0]:Math.abs(ny)<0.18&&t>0.2?cc[2]:b}));});
@@ -2968,12 +3055,12 @@ const COSD={
      {col:(x,y,nx,ny,bb)=>Math.abs((x-a[0])*px+(y-a[1])*py)<0.5*u?'#ffffff':bb}));
    o.back.push(pCap(a[0]+px*4.5*u,a[1]+py*4.5*u,a[0]-px*4.5*u,a[1]-py*4.5*u,1*u,1*u,PAL.gold,OLC.gold));
    o.back.push(pCap(a[0],a[1],a[0]-dx/l*6*u,a[1]-dy/l*6*u,1*u,1*u,PAL.wood,OLC.wood));o.back.push(pEl(a[0]-dx/l*7*u,a[1]-dy/l*7*u,1.4*u,1.4*u,PAL.gold,OLC.gold));},
- jet(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=olOf(cc);for(const s of[-1,1]){const x=hx+s*(hw+1.2*u),y=nk-1*u;
+ jet(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){const x=hx+s*(hw+1.2*u),y=nk-1*u;
    o.back.push(pPoly([[x-2.2*u,y+6*u],[x+2.2*u,y+6*u],[x+1.2*u,y+12*u],[x,y+15*u],[x-1.2*u,y+12*u]],['#fff3a0','#ffb020','#ff5a2a'],'#a0300a'));
    o.back.push(pRR(x,y,3*u,6*u,1.4*u,cc,ol,{col:(xx,yy,nx,ny,b)=>ny<-0.62?'#e0472a':Math.abs(ny-0.1)<0.12?cc[2]:b}));o.back.push(pRR(x,y+6.3*u,2.3*u,1.3*u,0.4,PAL.dsteel,OLC.steel));}},
  // ---------- đầu ----------
  leaf(it,c,o){const{hx,T,u}=c,cc=it.cc;o.head.push(pCap(hx+1*u,T-1*u,hx+1.6*u,T+0.8*u,0.5*u,0.5*u,['#8a5a2e','#6a4020','#4a2a10'],'#2a1a0a'));
-   o.head.push(rEl(hx-0.5*u,T-3*u,5*u,2.4*u,0.45,cc,olOf(cc),{col:(a,b,d,bb)=>Math.abs(b)<0.15?cc[0]:bb}));},
+   o.head.push(rEl(hx-0.5*u,T-3*u,5*u,2.4*u,0.45,cc,cosOl(cc),{col:(a,b,d,bb)=>Math.abs(b)<0.15?cc[0]:bb}));},
  beanie(it,c,o){const{hx,T,u}=c,cc=it.cc;const y=T+0.5*u;
    o.head.push(pFn(bbx(hx-6*u,y-4.5*u,hx+6*u,y),(x,yy)=>{const a=(x-hx)/(6*u),b=(yy-y)/(4.5*u);if(a*a+b*b>1||yy>y)return null;const k=Math.floor((a+1)*3);return yy>y-1*u?'#3a3a48':[cc[1],cc[0],cc[2]][k%3];},'#2a1a1a'));
    o.head.push(pCap(hx,y-4.5*u,hx,y-6*u,0.5*u,0.5*u,PAL.dsteel,OLC.steel));o.head.push(pRR(hx,y-6.6*u,5.5*u,0.8*u,0.3,['#fff3a0','#ffd84a','#c09010'],'#6a4a00'));},
@@ -2982,44 +3069,44 @@ const COSD={
    o.head.push(pEl(x,y,0.9*u,0.9*u,['#fff3a0','#ffd84a','#d0a020'],'#7a5a00'));}},
  cloud(it,c,o){const{hx,T,u}=c,cc=it.cc,y=T-10*u;   for(const x of[-3,0,3]){const xx=hx+x*u;o.head.push(pCap(xx,y+3*u,xx-0.6*u,y+6*u,0.45*u,0.45*u,['#cfefff','#7ad0ff','#3a8ae0'],'#1a4a8a'));}
    o.head.push(pFn(bbx(hx-8*u,y-5*u,hx+8*u,y+2.6*u),(x,yy)=>{const e=(cx,cy,r)=>(x-cx)**2+(yy-cy)**2<r*r;if(!(e(hx-4*u,y,3.2*u)||e(hx,y-1.8*u,4*u)||e(hx+4*u,y-0.3*u,3.4*u)||(Math.abs(x-hx)<6*u&&yy>y-0.5*u&&yy<y+2.4*u)))return null;
-     return yy>y+1.2*u?cc[2]:yy<y-2.5*u?cc[0]:cc[1];},olOf(cc)));},
- cat(it,c,o){const{hx,T,u}=c,cc=it.cc,ol=olOf(cc),y=T;o.head.push(pCurve([[hx-4.5*u,y-1*u],[hx-7*u,y-2.5*u],[hx-6*u,y-5*u]],0.8*u,0.6*u,cc,ol));
+     return yy>y+1.2*u?cc[2]:yy<y-2.5*u?cc[0]:cc[1];},cosOl(cc)));},
+ cat(it,c,o){const{hx,T,u}=c,cc=it.cc,ol=cosOl(cc),y=T;o.head.push(pCurve([[hx-4.5*u,y-1*u],[hx-7*u,y-2.5*u],[hx-6*u,y-5*u]],0.8*u,0.6*u,cc,ol));
    o.head.push(pEl(hx-0.5*u,y-2.4*u,5*u,2.8*u,cc,ol,{col:(x,yy,nx,ny,b)=>Math.abs(nx*3)%1<0.2&&ny<0?cc[2]:b}));
    o.head.push(pPoly([[hx+1.5*u,y-6*u],[hx+2.8*u,y-8.8*u],[hx+3.6*u,y-6*u]],cc,ol));o.head.push(pPoly([[hx+4.4*u,y-6*u],[hx+5.4*u,y-8.8*u],[hx+6.5*u,y-5.8*u]],cc,ol));
    o.head.push(pEl(hx+4*u,y-4.6*u,3.2*u,2.6*u,cc,ol,{col:(x,yy,nx,ny,b)=>Math.abs(ny-0.05)<0.14&&Math.abs(Math.abs(nx)-0.45)<0.22?'#3a1d10':(ny>0.4&&Math.abs(nx)<0.14?'#ff8aa0':b)}));},
- horns(it,c,o){const{hx,hy,hw,hh,u}=c,cc=it.cc,ol=olOf(cc);for(const s of[-1,1]){const bx=hx+s*hw*0.6,by=hy-hh+1.4*u;
+ horns(it,c,o){const{hx,hy,hw,hh,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){const bx=hx+s*hw*0.6,by=hy-hh+1.4*u;
    o.head.push(pCurve([[bx,by],[bx+s*1.2*u,by-3.5*u],[bx+s*3.6*u,by-6.5*u]],1.7*u,0.35*u,cc,ol));}},
- stars(it,c,o){const{hx,T,u}=c,cc=it.cc,ol=olOf(cc);for(const[dx,dy,r]of[[-7,-1,2.2],[-2.5,-5,2.6],[3,-5.4,2.2],[7.5,-1.6,2.4]])o.head.push(star4(hx+dx*u,T+dy*u,r*u,cc,ol));},
- halo(it,c,o){const{hx,T,u}=c,cc=it.cc;o.head.push(ringEl(hx,T-5*u,7*u,2.2*u,0.75*u,[cc[0],cc[1]],olOf(cc)));},
- crown(it,c,o){const{hx,T,u}=c,cc=it.cc,y=T+0.6*u,ol=olOf(cc);
+ stars(it,c,o){const{hx,T,u}=c,cc=it.cc,ol=cosOl(cc);for(const[dx,dy,r]of[[-7,-1,2.2],[-2.5,-5,2.6],[3,-5.4,2.2],[7.5,-1.6,2.4]])o.head.push(cosStar(hx+dx*u,T+dy*u,r*u,cc,ol));},
+ halo(it,c,o){const{hx,T,u}=c,cc=it.cc;o.head.push(ringEl(hx,T-5*u,7*u,2.2*u,0.75*u,[cc[0],cc[1]],cosOl(cc)));},
+ crown(it,c,o){const{hx,T,u}=c,cc=it.cc,y=T+0.6*u,ol=cosOl(cc);
    o.head.push(pPoly([[hx-5.5*u,y],[hx+5.5*u,y],[hx+5.5*u,y-5*u],[hx+3*u,y-2.6*u],[hx+1.6*u,y-6*u],[hx,y-3*u],[hx-1.6*u,y-6*u],[hx-3*u,y-2.6*u],[hx-5.5*u,y-5*u]],cc,ol,
      {col:(x,yy,nx,ny,b)=>yy>y-1.6*u?(Math.abs(x-hx)<0.9*u?'#e83a4a':cc[2]):b}));for(const d of[-5.5,0,5.5])o.head.push(pEl(hx+d*u*(d?1:0),y-(d?5.6:3.6)*u,0.9*u,0.9*u,['#ffb0b8','#e83a4a','#8a1a2a'],'#4a0a14'));},
  flame(it,c,o){const{hx,T,u}=c,cc=it.cc,y=T-4*u;o.head.push(pFn(bbx(hx-4*u,y-9*u,hx+4*u,y+3*u),(x,yy)=>{const t=(y+2.5*u-yy)/(11*u);if(t<0||t>1)return null;
-   const w=4*u*Math.sin(Math.PI*Math.min(1,t*1.15+0.05))*(1-t*0.55)+0.3*u,cx=hx+Math.sin(t*5)*1.2*u*t;if(Math.abs(x-cx)>w)return null;const k=Math.abs(x-cx)/w;return k<0.35&&t<0.7?cc[0]:k<0.7?cc[1]:cc[2];},olOf(cc)));},
- laurel(it,c,o){const{hx,hy,hw,hh,u}=c,cc=it.cc,ol=olOf(cc);for(const s of[-1,1])for(let k=0;k<5;k++){const t=k/4,x=hx+s*hw*(1.02-t*0.7),y=hy-hh+3*u-t*4.5*u-Math.sin(t*3)*0.8*u;
+   const w=4*u*Math.sin(Math.PI*Math.min(1,t*1.15+0.05))*(1-t*0.55)+0.3*u,cx=hx+Math.sin(t*5)*1.2*u*t;if(Math.abs(x-cx)>w)return null;const k=Math.abs(x-cx)/w;return k<0.35&&t<0.7?cc[0]:k<0.7?cc[1]:cc[2];},cosOl(cc)));},
+ laurel(it,c,o){const{hx,hy,hw,hh,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1])for(let k=0;k<5;k++){const t=k/4,x=hx+s*hw*(1.02-t*0.7),y=hy-hh+3*u-t*4.5*u-Math.sin(t*3)*0.8*u;
    o.head.push(rEl(x,y,2.2*u,1*u,s*(0.9-t*1.6),cc,ol));}},
- sundisk(it,c,o){const{hx,T,u}=c,cc=it.cc,ol=olOf(cc),r=6.2*u,cy=T-r-1.5*u;
+ sundisk(it,c,o){const{hx,T,u}=c,cc=it.cc,ol=cosOl(cc),r=6.2*u,cy=T-r-1.5*u;
    for(const s of[-1,1])o.head.push(pCurve([[hx+s*2.5*u,T+0.5*u],[hx+s*(r+3.2*u),cy+1*u],[hx+s*(r*0.4),cy-r-2.6*u]],1.5*u,0.5*u,['#f8f4ec','#d8d0c0','#8a7a6a'],'#3a2a1a'));
    o.head.push(pEl(hx,cy,r,r,cc,ol,{col:(x,y,nx,ny,b)=>nx*nx+ny*ny>0.74?cc[2]:(nx+0.4)**2+(ny+0.4)**2<0.06?'#ffffff':b}));
    o.head.push(pCurve([[hx,cy+r*0.85],[hx+1*u,cy+r*0.3],[hx,cy-r*0.1]],1.1*u,0.8*u,['#8ad070','#3a9a4a','#1a5a2a'],'#0a2a10'));},
  // ---------- mặt ----------
- nose(it,c,o){const{fx,fy,s}=c,cc=it.cc;o.face.push(pEl(fx,fy+0.8*s,1.9*s,1.7*s,cc,olOf(cc),{col:(x,y,nx,ny,b)=>(nx+0.4)**2+(ny+0.4)**2<0.1?'#ffffff':b}));},
- stache(it,c,o){const{fx,fy,s}=c,cc=it.cc;for(const k of[-1,1])o.face.push(pCurve([[fx,fy+1.7*s],[fx+k*2.6*s,fy+2.5*s],[fx+k*4.4*s,fy+0.9*s]],1.15*s,0.45*s,cc,olOf(cc)));},
+ nose(it,c,o){const{fx,fy,s}=c,cc=it.cc;o.face.push(pEl(fx,fy+0.8*s,1.9*s,1.7*s,cc,cosOl(cc),{col:(x,y,nx,ny,b)=>(nx+0.4)**2+(ny+0.4)**2<0.1?'#ffffff':b}));},
+ stache(it,c,o){const{fx,fy,s}=c,cc=it.cc;for(const k of[-1,1])o.face.push(pCurve([[fx,fy+1.7*s],[fx+k*2.6*s,fy+2.5*s],[fx+k*4.4*s,fy+0.9*s]],1.15*s,0.45*s,cc,cosOl(cc)));},
  glasses(it,c,o){const{fx,ex,ey,s}=c,cc=it.cc,col=[cc[1],cc[2]];for(const k of[-1,1])o.face.push(ringEl(fx+k*ex,ey,2.5*s,2.4*s,0.55*s,col,null));
    o.face.push(pCap(fx-ex+2.6*s,ey-0.3*s,fx+ex-2.6*s,ey-0.3*s,0.45*s,0.45*s,[cc[1],cc[1],cc[2]],null));},
  patch(it,c,o){const{fx,ex,ey,s,hx,hw,hy,hh}=c,cc=it.cc;o.face.push(pCap(hx-hw+0.6,hy-hh+2.6*s,hx+hw-0.6,ey-0.8*s,0.45*s,0.45*s,cc,null));
-   o.face.push(pEl(fx-ex,ey+0.2*s,2.5*s,2.3*s,cc,olOf(cc),{col:(x,y,nx,ny,b)=>(nx+0.3)**2+(ny+0.5)**2<0.06?'#7a7a8a':b}));},
+   o.face.push(pEl(fx-ex,ey+0.2*s,2.5*s,2.3*s,cc,cosOl(cc),{col:(x,y,nx,ny,b)=>(nx+0.3)**2+(ny+0.5)**2<0.06?'#7a7a8a':b}));},
  shades(it,c,o){const{fx,ex,ey,s}=c,cc=it.cc;o.face.push(pFn(bbx(fx-ex-3.2*s,ey-1.8*s,fx+ex+3.2*s,ey+2*s),(x,y)=>{const dx=Math.abs(x-fx);
    if(y<ey-1.6*s||y>ey+(dx>ex-2.6*s&&dx<ex+2.6*s?1.9*s:-0.4*s)||dx>ex+3*s)return null;const lx=x-(x<fx?fx-ex:fx+ex);return(lx>-2*s&&lx<-0.6*s&&y<ey-0.5*s&&y>ey-1.4*s)||(lx>0.4*s&&lx<1.2*s&&y>ey+0.2*s&&y<ey+1*s)?'#ffffff':cc[1];},null));},
  ninja(it,c,o){const{fx,fy,hw,s}=c,cc=it.cc;o.face.push(pRR(fx,fy+2.6*s,hw*0.9,2.6*s,0.4,cc,null,{col:(x,y,nx,ny,b)=>Math.abs(ny)<0.12?cc[0]:b}));},
  monocle(it,c,o){const{fx,ex,ey,s}=c,cc=it.cc;o.face.push(pCurve([[fx+ex+1*s,ey+2.4*s],[fx+ex+2.6*s,ey+5*s],[fx+ex+4.4*s,ey+6.4*s]],0.35*s,0.35*s,[cc[1],cc[1],cc[2]],null));
    o.face.push(ringEl(fx+ex,ey,2.7*s,2.7*s,0.55*s,[cc[1],cc[2]],null));},
- kitsune(it,c,o){const{fx,fy,ex,ey,s}=c,cc=it.cc,ol=olOf(cc);for(const k of[-1,1])o.face.push(pPoly([[fx+k*2*s,fy-4.6*s],[fx+k*6*s,fy-4.4*s],[fx+k*5.4*s,fy-8.4*s]],cc,ol,{col:(x,y,nx,ny,b)=>Math.abs(nx)<0.3&&ny>-0.4?'#e04040':b}));
+ kitsune(it,c,o){const{fx,fy,ex,ey,s}=c,cc=it.cc,ol=cosOl(cc);for(const k of[-1,1])o.face.push(pPoly([[fx+k*2*s,fy-4.6*s],[fx+k*6*s,fy-4.4*s],[fx+k*5.4*s,fy-8.4*s]],cc,ol,{col:(x,y,nx,ny,b)=>Math.abs(nx)<0.3&&ny>-0.4?'#e04040':b}));
    o.face.push(pFn(bbx(fx-6.4*s,fy-5.4*s,fx+6.4*s,fy+6*s),(x,y)=>{const a=(x-fx)/(6.2*s),b=(y-fy)/(5.2*s);if(a*a+b*b>1&&!(Math.abs(x-fx)<2.2*s&&y>fy&&y<fy+5.6*s))return null;
      for(const k of[-1,1]){const lx=x-(fx+k*ex),ly=y-ey;if(Math.abs(lx)<1.8*s&&Math.abs(ly+lx*k*0.35)<0.45*s)return'#1a0a0a';if(Math.abs(lx)<2.3*s&&Math.abs(ly+lx*k*0.35+1*s)<0.4*s)return'#e04040';}
      if(Math.abs(x-fx)<0.6*s&&y<fy-2.8*s&&y>fy-4.2*s)return'#e04040';if(y>fy+4.6*s&&Math.abs(x-fx)<1*s)return'#2a1a1a';return b>0.4?cc[1]:cc[0];},ol));},
  visor(it,c,o){const{fx,ex,ey,s}=c,cc=it.cc;o.face.push(pRR(fx,ey,ex+3.6*s,2.1*s,0.5,[cc[1],cc[1],cc[2]],'#0a0a14',{col:(x,y,nx,ny,b)=>Math.abs(ny)<0.22?cc[0]:Math.abs(ny)<0.5&&Math.floor((x-fx)/s)%3===0?mix(cc[0],cc[1],0.6):b}));},
- masq(it,c,o){const{fx,ex,ey,s,hx,hw}=c,cc=it.cc,ol=olOf(cc);o.face.push(pCurve([[fx+ex+2.5*s,ey-1*s],[fx+ex+5*s,ey-5*s],[fx+ex+4*s,ey-9*s]],1.4*s,0.4*s,['#fff3a0','#f4c430','#b8860b'],'#6e4a00'));
+ masq(it,c,o){const{fx,ex,ey,s,hx,hw}=c,cc=it.cc,ol=cosOl(cc);o.face.push(pCurve([[fx+ex+2.5*s,ey-1*s],[fx+ex+5*s,ey-5*s],[fx+ex+4*s,ey-9*s]],1.4*s,0.4*s,['#fff3a0','#f4c430','#b8860b'],'#6e4a00'));
    o.face.push(pFn(bbx(fx-ex-3.6*s,ey-2.6*s,fx+ex+3.6*s,ey+2.6*s),(x,y)=>{let best=9;for(const k of[-1,1]){const a=(x-fx-k*ex)/(3.3*s),b=(y-ey)/(2.3*s);best=Math.min(best,a*a+b*b);
      if(((x-fx-k*ex)/(1.5*s))**2+((y-ey)/(1*s))**2<1)return'#1a0a1a';}if(best>1&&!(Math.abs(x-fx)<1.5*s&&Math.abs(y-ey+0.4*s)<0.9*s))return null;return best>0.6?cc[0]:cc[1];},ol));}};
 // gắn đồ thời trang vào bộ lớp của nhân vật
@@ -3464,6 +3551,8 @@ function drawParts(g,front,L){for(const p of (L||PARTS)){if(p.front!==front)cont
     case'bubble':{const r=p.size;pxRing(g,x,y,r,r,'#ffffff');if(r>1.5){g.fillStyle='#d8f4ff';g.fillRect(x-1,y-1,1,1);}}break;
     case'ring':{const r=p.r0+(1-f)*p.r1;pxRing(g,x,y,r,r*(p.flat||0.5),f>0.5?p.col:p.col2||p.col,(p.t*20|0)%2+1);}break;
     case'conf':{g.fillStyle=p.col;const w=(Math.floor(p.t*12)%2)?2:1;g.fillRect(x,y,w,3-w);}break;
+    case'tico':{if(p.blink&&f<0.3&&Math.floor(p.t*12)%2)break;blit(g,tintIco(p.maps?p.maps[Math.floor(p.t*8)%2]:p.map,p.col),x,y);}break;
+    case'cbub':{const r=p.size;pxRing(g,x,y,r,r,p.col);if(r>1.5){g.fillStyle='#ffffff';g.fillRect(x-1,y-1,1,1);}}break;
     case'drop':g.fillStyle=p.col||'#7fd0ff';g.fillRect(x,y,1,2);break;
     case'crumb':g.fillStyle=p.col;g.fillRect(x,y,1,1);break;
     case'bolt':{g.fillStyle=p.col;let cx=x,cy=y;for(let k=0;k<5;k++){const nx=cx+(k%2?2:-2),ny=cy+2;pxLine(g,cx,cy,nx,ny,p.col);cx=nx;cy=ny;}}break;
@@ -3531,7 +3620,8 @@ function sprIco(name,frame,pal){const key=name+(frame==null?'':frame),P=pal||SPA
 function tintIco(map,col){return ico(map,{a:col,k:'#3a2a20',w:'#ffffff'},null,col);}
 
 const RAR=['N','R','SR','SSR','UR'],RCOL=['#9aa6b6','#5ab84a','#9a6af0','#f4c430','#ff5fdc'];
-const RATES=[0.5,0.32,0.13,0.04,0.009,0.001],PITY=60,SOFT=45,UPITY=150,USOFT=110,MRUP=0.06,WISH_UR=200,WISH_MR=500;
+// tỉ lệ khắt khe kiểu gacha lớn (Siêu hiếm ~1,6%, Huyền thoại ~0,35%): đồ hiếm thật sự hiếm
+const RATES=[0.62,0.28,0.08,0.016,0.0035,0.0005],PITY=90,SOFT=74,UPITY=300,USOFT=250,MRUP=0.03,WISH_UR=300,WISH_MR=900;
 const STN={hp:'Máu',atk:'Công',def:'Thủ',spd:'Tốc',crit:'Chí mạng',xp:'XP',coin:'Xu'};
 const ITEMS=[
  {id:'c_bulb',slot:'pet',r:0,name:'Bóng Đèn Bay',st:{xp:4},spr:'bulb'},
@@ -3596,7 +3686,7 @@ function bonusCoin(n){return Math.round(n*(1+gearBonus().coin/100));}
 // ---------- gacha ----------
 function rollRarity(minR){S.pity=(S.pity||0)+1;S.upity=(S.upity||0)+1;let r;
   if(S.upity>=UPITY)r=4;
-  else if(S.pity>=PITY)r=R()<0.12?4:3;
+  else if(S.pity>=PITY)r=R()<0.06?4:3;
   else{const soft=S.pity>=SOFT?(S.pity-SOFT+1)*0.06:0,usoft=S.upity>=USOFT?(S.upity-USOFT+1)*0.006:0,u=R(),p5=RATES[5],p4=RATES[4]+usoft,p3=RATES[3]+soft,p2=RATES[2],p1=RATES[1];
     r=u<p5?5:u<p5+p4?4:u<p5+p4+p3?3:u<p5+p4+p3+p2?2:u<p5+p4+p3+p2+p1?1:0;}
   if(minR&&r<minR)r=minR;if(r>=3)S.pity=0;if(r>=4)S.upity=0;return r;}
@@ -3914,6 +4004,80 @@ function applyGearFx(u){const fx=gearFx();if(!Object.keys(fx).length)return;cons
   if(fx.poison&&!k.poison){k.poison=fx.poison;k.pmax=4;}
   if(fx.thorns)u.thorns=(u.thorns||0)+fx.thorns;if(fx.regen)u.regen=(u.regen||0)+fx.regen;if(fx.eva)u.eva=Math.min(0.5,(u.eva||0)+fx.eva);
   if(fx.block)u.block=(u.block||0)+Math.round(fx.block);if(fx.shield)u.shield=(u.shield||0)+Math.round(u.max*fx.shield);if(fx.cdmg)u.cd+=fx.cdmg;if(fx.gstun)u.gstun=fx.gstun;}
+
+// ================= 200 VẬT PHẨM MỚI: vũ khí lạ, cánh, ánh sáng trang trí =================
+// ---- 28 hình vũ khí mới (14x14) ----
+Object.assign(MAPS,{"i_umbrella":["......aa......","....cccccc....","..ccsccccscc..",".cccsccccsccc.","ccccsccccscccc","cscscscscscscs","......hh......","......hh......","......hh......","......hh......","......hh......","......hh..h...",".......hhhh...",".............."],"i_ribbon":["..........cc..","........cs..c.",".......c.....s","......s......c",".....c..csc.s.","....c..s...c..","....s..c......",".....cs.......","....hh........","...hj.........","..hj..........",".hj...........","hj............",".............."],"i_icecream":["....cccccc....","...cwcccccs...","...cwccsccs...","...ccccccss...","...gcgccgcs...","...ccccccss...","...ccsccccs...","...cccccccs...","....ccccss....","......hh......","......hh......","......hh......","......jj......",".............."],"i_cone":["....cc.cc.....","...cwccccc....","..cwccccccs...","..cccsccccs...","..gcccccgcs...","...ccccccs....","...aaaaaaa....","...abababa....","....ababa.....","....babab.....",".....aba......",".....bab......","......a.......",".............."],"i_wheel":["..r...a...r...","...a.nnnn.a...","..rannmmnnar..","...nm....mn...",".rn........nr.","anm...hh...mna",".n...hjjh...n.",".n...hjjh...n.","anm...hh...mna",".rn........nr.","...nm....mn...","..rannmmnnar..","...a.nnnn.a...","..r...a...r..."],"i_chakram":["......w.......","...w.nnnn.w...","....nnmmnn....","...nm....mn...","..n........n..","wnm...hh...mnw",".n...hjjh...n.",".n...hjjh...n.","wnm...hh...mnw","..n........n..","...nm....mn...","....nnmmnn....","...w.nnnn.w...","......w......."],"i_lolly":["....ccccc.....","...csssssc....","..cswwwwwsc...","..cswcccwsc...","..cswcscwsc...","..cswcccwsc...","..cswwwwwsc...","...csssssc....","....ccccc.....","......hh......",".....hh.......","....hh........","...hh.........",".............."],"i_brush":["...........sc.","..........scc.",".........sccc.","........sccc..",".......accs...","......aab.....",".....hj.......","....hj........","...hj.........","..hj..........",".hj...........","hj............","a.............",".............."],"i_flute":["............hh","...........hhh","..........hjh.",".........hhh..","........hjh...",".......hhh....","......hjh.....",".....hhh......","....hhh.......","...hhh........","..ahh.........",".rah..........",".rr...........","..r..........."],"i_lute":["...........hh.","..........hhh.",".........hh...","........hh....",".......hh.....","...cccch......","..ccccccc.....",".cccccccss....",".ccccjcccs....",".cccjjjccs....",".ccccjcccs....","..ccaaacss....","...cssss......",".............."],"i_scythe":["...wmmmmd.....",".wmnnnnnmd....","wmd.....hnd...","md.....hj.....","d......hj.....","......hj......","......hj......",".....hj.......",".....hj.......","....hj........","....hj........","...hj.........","...aa.........",".............."],"i_whip":[".....hhhh.....","....h....h....","...h......h...","...h.......h..","....h......h..",".....hh...h...",".......hhh....","......h.......",".....h........","....aa........","...ajj........","..ajj.........",".ajj..........",".jj..........."],"i_yoyo":["......a.......","......a.......","......a.......","......a.......","....cccccc....","...cwccccsc...","..cwcggggccs..","..ccggaaggcs..","..ccggaaggcs..","..cccggggccs..","...ccccccss...","....cssssc....","..............",".............."],"i_broom":["............hj","...........hj.","..........hj..",".........hj...","........hj....",".......hj.....","......hj......",".....aab......","...cccccs.....","..ccscscss....",".cscscscss....","cscscscss.....","sscscss.......",".............."],"i_pan":["..............","...nnnnn......","..nmmmmmn.....",".nmwmmmmmn....",".nmmmmmmmn....",".nmmmmmmmn....",".nmmmmmmmnd...","..nmmmmmndhh..","...ndddnd.hjh.","...........hjh","............hj","..............","..............",".............."],"i_boomer":["..jj..........",".jhhj.........",".jhhhj........","..jhhhj.......","...jhhhj......","....jhhhj.....",".....jhhhjjj..","......jhhhhhj.","......jhhhhhhj",".......jjjhhj.","..........jj..","..............","..............",".............."],"i_claw":["..w...w...w...","..mw..mw..mw..","...m...m...m..","...mn..mn..mn.","...nn..nn..nn.","..aaaaaaaaaa..","..abbbbbbbba..","..abhhhhhhba..","...bhhhhhhb...","....hhhhhh....","....hjjjjh....",".....hhhh.....","..............",".............."],"i_bell":["......aa......",".....abba.....","....aaaaaa....","...aawaaaab...","...awaaaaab...","...aaaaaaab...","..aaaaaaaabb..","..aaaaaaaaab..",".abbbbbbbbbbb.","......bb......",".....rrrr.....","....rr..rr....","...r......r...",".............."],"i_mirror":["....aaaaa.....","...aeeeeea....","..aewweeega...","..aeweeeega...","..aeeeeegga...","..aeeeeegga...","...aeeegga....","....aaaaa.....","......hh......","......hj......","......hj......","......hj......",".....aaaa.....",".............."],"i_pinwheel":["...cc.........","...ccc........","...cccc...ss..","....ccc..sss..",".rr..caasss...",".rrrraaass....","..rrraaggggg..","...rraa.ggg...",".....h...gg...",".....h........",".....h........",".....h........",".....h........",".....j........"],"i_candy":["....wrwr......","...rw..wr.....","..wr....rw....","..rw....wr....","........rw....","........wr....","........rw....","........wr....","........rw....","........wr....","........rw....","........wr....","........rw....",".............."],"i_starw":["........a.....",".......aaa....","....aaaawaaaa.",".....aaaaaaa..","......aaaaa...",".....aaa.aaa..",".....aa...aa..",".......hh.....","......hj......",".....hj.......","....hj........","...hj.........","..hj..........",".a............"],"i_bubble":["....eeee...w..","...e....e..ww.","..e......e....","..e......e.w..","..e......e....","...e....e.....","....eeee......","......h.......","......h.......",".....hj.......",".....hj.......","....hj........","....hj........","...aa........."],"i_bread":["...........aa.","..........abab",".........abab.","........abab..",".......abab...","......abab....",".....abab.....","....abab......","...abab.......","..abab........",".abab.........",".bab..........","..b...........",".............."],"i_mic":["........nnn...",".......nwmmn..",".......nmmmn..","........ndd...",".......aa.....","......ha......",".....hj.......","....hj........","...hj.........","..hj..........",".r............","r.............","..............",".............."],"i_lantern":["hhhhhhhhhj....","........a.....",".......aaa....","......rrrrr...",".....rwrrrrr..",".....rwrrrrr..",".....rrrrrrr..","......rrrrr...",".......aaa....","........a.....",".......a.a....","..............","..............",".............."],"i_kite":["....c.........","...csc........","..cscsc.......",".cscscsc......","..cscsc.......","...csc........","....c.........","....a.........",".....a........","......a...a...",".......a.a.a..","........a...a.","..............",".............."],"i_nunchaku":["...hh.........","...hj.........","...hj.........","...hj.........","...hj.........","...aa.........","....a.........",".....a........","......a.......",".......aahhhhh",".......ajjjjjh","..............","..............",".............."]});
+Object.assign(ICLOTH,{pink:{c:'#ff9ac8',s:'#c05a8a'},mint:{c:'#8af0c8',s:'#3a9a7a'},sky:{c:'#8ad8ff',s:'#3a8ac0'},cream:{c:'#fff0d0',s:'#d8b880'},choco:{c:'#8a5a3a',s:'#5a3a1a'},lilac:{c:'#c8a8ff',s:'#7a5ac0'}});
+Object.assign(IACC,{pink:{a:'#ffb0d8',b:'#d0609a'},cyan:{a:'#9ff4ff',b:'#3a9ac0'},purple:{a:'#c8a0ff',b:'#7a4ad0'},black:{a:'#5a5a6a',b:'#2a2a38'},white:{a:'#ffffff',b:'#c0c8d8'}});
+// hạt hiệu ứng tô màu (dùng cho hào quang mới)
+Object.assign(MAPS,{mnote:['..aa.','..a.a','..a..','.aa..','aaa..','.a...'],mlant:['.k..','aaaa','awaa','aaaa','aaaa','.k..'],mmoon:['.aaa.','aa...','a....','aa...','.aaa.'],
+ mbf0:['aa.aa','awkwa','.aka.','aa.aa'],mbf1:['.a.a.','.aka.','.aka.','.a.a.'],mfeat:['.a.','awa','awa','aa.','.a.','a..']});
+// ---- kiểu đồ thời trang mới ----
+function wquad(b,t,w0,w1){const dx=t[0]-b[0],dy=t[1]-b[1],l=Math.hypot(dx,dy)||1,px=-dy/l,py=dx/l;return[[b[0]+px*w0,b[1]+py*w0],[t[0]+px*w1,t[1]+py*w1],[t[0]-px*w1*0.6,t[1]-py*w1*0.6],[b[0]-px*w0,b[1]-py*w0]];}
+Object.assign(COSD,{
+ mech(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){const b=[hx+s*hw*0.55,nk-4*u];
+   [[0.3,15],[0.72,18],[1.12,14]].forEach(([a,len],k)=>{const t=[b[0]+s*Math.cos(a)*len*u,b[1]-Math.sin(a)*len*u];
+     o.back.push(pPoly(wquad(b,t,1.6*u,2.6*u),cc,ol,{col:(x,y,nx,ny,bb)=>{const d=Math.hypot(x-t[0],y-t[1]);return d<2.2*u?'#7ff0ff':Math.abs(((x-b[0])*(t[1]-b[1])-(y-b[1])*(t[0]-b[0]))/len/u)<0.6*u?cc[0]:bb;}}));});
+   o.back.push(pEl(b[0],b[1],2.4*u,2.4*u,PAL.dsteel,OLC.steel,{col:(x,y,nx,ny,bb)=>nx*nx+ny*ny<0.2?'#7ff0ff':bb}));}},
+ crystal(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){const b=[hx+s*hw*0.6,nk-4*u];
+   [[0.15,13,2.4],[0.62,19,3],[1.1,14,2.2]].forEach(([a,len,w])=>{const t=[b[0]+s*Math.cos(a)*len*u,b[1]-Math.sin(a)*len*u],m=[(b[0]+t[0])/2,(b[1]+t[1])/2],dx=t[0]-b[0],dy=t[1]-b[1],l=Math.hypot(dx,dy),px=-dy/l,py=dx/l;
+     o.back.push(pPoly([b,[m[0]+px*w*u,m[1]+py*w*u],t,[m[0]-px*w*u,m[1]-py*w*u]],cc,ol,{col:(x,y,nx,ny,bb)=>((x-m[0])*px+(y-m[1])*py)>0.2*u?cc[0]:bb}));});
+   o.back.push(cosStar(b[0]+s*Math.cos(0.62)*19*u,b[1]-Math.sin(0.62)*19*u-1*u,2*u,['#ffffff','#ffffff','#e8f8ff'],null));}},
+ butter(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){
+   for(const[dx,dy,rx,ry,a]of[[hw+5*u,-9*u,8.5*u,6.2*u,-0.45],[hw+3*u,1.5*u,5.8*u,4.6*u,0.5]])
+     o.back.push(rEl(hx+s*dx,nk+dy,rx,ry,s*a,cc,ol,{col:(uu,v,d)=>d>0.72?cc[2]:((uu-0.3)**2+(v+0.2)**2<0.05||(uu+0.25)**2+(v-0.3)**2<0.03)?'#ffffff':Math.abs(v)<0.1?cc[2]:d<0.3?cc[0]:cc[1]}));}},
+ cloudw(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){const cs=[0,1,2,3,4].map(k=>[hx+s*(hw+2*u+k*3*u),nk-3*u-k*2.4*u+(k>2?(k-2)*1.6*u:0),(4.4-k*0.45)*u]);
+   const x0=Math.min(...cs.map(q=>q[0]-q[2])),x1=Math.max(...cs.map(q=>q[0]+q[2])),y0=Math.min(...cs.map(q=>q[1]-q[2])),y1=Math.max(...cs.map(q=>q[1]+q[2]));
+   o.back.push(pFn(bbx(x0,y0,x1,y1),(x,y)=>{let best=null;for(const q of cs){const d=Math.hypot(x-q[0],y-q[1])/q[2];if(d<=1&&(best==null||d<best))best=d;}if(best==null)return null;
+     return y<nk-6*u&&best<0.55?cc[0]:best>0.78?cc[2]:cc[1];},ol));}},
+ ribbonw(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc),N=12;
+   for(const s of[-1,1]){const up=[],dn=[];for(let k=0;k<=N;k++){const t=k/N;up.push([hx+s*(1*u+t*(hw+16*u)),nk-3*u-8*u*Math.sin(t*Math.PI*0.85)+1.8*u*Math.sin(t*Math.PI*2.6)]);
+       dn.push([hx+s*(1*u+t*(hw+11*u)),nk+1*u+3.5*u*t+1.6*u*Math.sin(t*Math.PI*2.4)]);}
+     o.back.push(pCurve(up,1.8*u,0.9*u,cc,ol,{col:(x,y,nx,ny,b)=>Math.abs(ny)<0.22?cc[0]:b}));o.back.push(pCurve(dn,1.5*u,0.8*u,cc,ol,{col:(x,y,nx,ny,b)=>Math.abs(ny)<0.22?cc[0]:b}));}
+   for(const s of[-1,1])o.back.push(rEl(hx+s*2.2*u,nk-2*u,2.4*u,1.6*u,s*0.3,cc,ol));},
+ origami(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){const X=d=>hx+s*d,r=[X(hw*0.5),nk-3*u],t=[X(hw+16*u),nk-15*u],m=[X(hw+11*u),nk-5*u],bk=[X(hw+8*u),nk+2*u];
+   o.back.push(pPoly([r,t,m],[cc[0],cc[0],cc[1]],ol));o.back.push(pPoly([r,m,bk],[cc[1],cc[1],cc[2]],ol));}},
+ dfly(it,c,o){const{hx,nk,hw,u}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1])for(const[dx,dy,rx,ry,a]of[[hw+8*u,-7*u,10*u,2.5*u,-0.28],[hw+7*u,-1.5*u,9*u,2.2*u,0.22]])
+   o.back.push(rEl(hx+s*dx,nk+dy,rx,ry,s*a,cc,ol,{col:(uu,v,d)=>d>0.75||Math.abs(v)<0.12?cc[2]:hash(Math.floor(uu*6+9),Math.floor(v*3+9))<0.5?cc[0]:cc[1]}));},
+ hbow(it,c,o){const{hx,T,u,hw}=c,cc=it.cc,ol=cosOl(cc),x=hx+hw*0.45,y=T+0.5*u;
+   for(const s of[-1,1])o.head.push(pPoly([[x,y],[x+s*5*u,y-3.2*u],[x+s*5.4*u,y+2.4*u]],cc,ol,{col:(xx,yy,nx,ny,b)=>Math.abs(ny)<0.15?cc[0]:b}));
+   o.head.push(pEl(x,y,1.5*u,1.4*u,cc,ol));},
+ hbulb(it,c,o){const{hx,T,u}=c,cc=it.cc,ol=cosOl(cc),y=T-8*u;
+   for(const a of[-2.4,-1.57,-0.75,-3.9+1.57*2.5]){const d=dirv(a+1.57);o.head.push(pCap(hx+Math.cos(a)*5*u,y+Math.sin(a)*5*u,hx+Math.cos(a)*7*u,y+Math.sin(a)*7*u,0.5*u,0.4*u,cc,null));}
+   o.head.push(pRR(hx,y+3.6*u,1.8*u,1.4*u,0.4,PAL.steel,OLC.steel,{col:(x,yy,nx,ny,b)=>Math.floor((yy-y)/u)%2?PAL.steel[2]:b}));
+   o.head.push(pEl(hx,y,3.4*u,3.6*u,cc,ol,{col:(x,yy,nx,ny,b)=>(nx+0.35)**2+(ny+0.4)**2<0.07?'#ffffff':nx*nx+ny*ny<0.3?cc[0]:b}));},
+ moonc(it,c,o){const{hx,T,u,hw}=c,cc=it.cc,ol=cosOl(cc),x=hx-hw*0.55,y=T+1.6*u;
+   o.head.push(pFn(bbx(x-4*u,y-4*u,x+4*u,y+4*u),(xx,yy)=>{if(Math.hypot(xx-x,yy-y)>3.8*u||Math.hypot(xx-x-1.8*u,yy-y+1.2*u)<3.1*u)return null;return xx<x-1.5*u?cc[0]:cc[1];},ol));
+   o.head.push(cosStar(x+3.4*u,y-3.2*u,1.3*u,['#ffffff','#ffffff','#fff3c0'],null));},
+ hlant(it,c,o){const{hx,T,u,hw}=c,cc=it.cc,ol=cosOl(cc);for(const s of[-1,1]){const x=hx+s*(hw+3*u),y=T-2.5*u;
+   o.head.push(pRR(x,y-3.4*u,1.6*u,0.6*u,0.3,PAL.gold,OLC.gold));o.head.push(pRR(x,y,2.4*u,3*u,1.2*u,cc,ol,{col:(xx,yy,nx,ny,b)=>Math.abs(ny)<0.6&&Math.floor((yy-y)/u+9)%2===0?cc[0]:b}));
+   o.head.push(pRR(x,y+3.4*u,1.6*u,0.6*u,0.3,PAL.gold,OLC.gold));o.head.push(pCap(x,y+4*u,x,y+6*u,0.35*u,0.35*u,cc,null));}},
+ horbs(it,c,o){const{hx,T,u,hw}=c,cc=it.cc,ol=cosOl(cc),n=it.n||3,R2=hw*0.95+2*u;for(let k=0;k<n;k++){const a=Math.PI*(1.12+0.76*k/(n-1));
+   const x=hx+Math.cos(a)*R2,y=T+2*u+Math.sin(a)*R2*0.75;o.head.push(pEl(x,y,1.9*u,1.9*u,cc,ol,{col:(xx,yy,nx,ny,b)=>(nx+0.4)**2+(ny+0.4)**2<0.12?'#ffffff':b}));}}});
+// ---- hào quang ánh sáng mới (gọi từ auraTick) ----
+const AURA2={firefly:3,glitter:8,bubbleC:4,note:2.5,conf:6,ember:10,snowC:6,petalC:3,featherF:1.5,ringp:1.2,bfly:1.2,lantern:1,moon:1,orbit:16,starfall:1.5};
+function auraFX2(it,a,x,y,b,hw,T,front){const col=()=>it.rb?rainbow(T,R()*8):pick(it.cols);
+  switch(a){
+    case'firefly':spawn({type:'spark',x,y,vx:rnd(-6,6),vy:rnd(-6,2),life:rnd(1.2,2),col:col(),k:rnd(0,6),upd(p,d){p.k+=d*3;p.vx+=Math.sin(p.k)*20*d;p.vy+=Math.cos(p.k*1.3)*12*d;},front});break;
+    case'glitter':spawn({type:'star',x,y:y+rnd(-6,6),vy:-rnd(2,6),life:0.5,col:col(),front});break;
+    case'bubbleC':spawn({type:'cbub',x,y,vy:-rnd(8,14),vx:rnd(-3,3),size:rnd(1,2.5)|0,life:1.3,col:col(),front});break;
+    case'note':spawn({type:'tico',map:'mnote',col:col(),x,y:y-6,vy:-rnd(8,12),vx:rnd(-4,4),life:1.3,front});break;
+    case'conf':spawn({type:'conf',x,y:b[1]-30,vy:rnd(10,16),vx:rnd(-6,6),life:1.6,col:col(),front});break;
+    case'ember':spawn({type:'px',x:C.x+rnd(-hw,hw),y:C.y-rnd(0,6),vy:-rnd(14,24),vx:rnd(-4,4),size:R()<0.3?2:1,life:rnd(0.6,1.1),col:col(),front:R()<0.4});break;
+    case'snowC':spawn({type:'px',x:x+rnd(-6,6),y:b[1]-34,vy:rnd(6,11),size:R()<0.3?2:1,life:2,col:col(),k:rnd(0,6),upd(p,d){p.k+=d*3;p.vx=Math.sin(p.k)*6;},front});break;
+    case'petalC':spawn({type:'px',x,y:b[1]-30,vy:rnd(8,13),size:2,life:1.8,col:col(),k:rnd(0,6),upd(p,d){p.k+=d*4;p.vx=Math.sin(p.k)*12;},front});break;
+    case'featherF':spawn({type:'tico',map:'mfeat',col:col(),x,y:b[1]-32,vy:rnd(6,10),life:2.2,k:rnd(0,6),upd(p,d){p.k+=d*2.5;p.vx=Math.sin(p.k)*10;},front});break;
+    case'ringp':spawn({type:'ring',x:C.x,y:C.y,r0:4,r1:24,flat:0.35,life:0.9,col:col(),col2:col(),front:false});for(let k=0;k<3;k++)spawn({type:'spark',x:C.x+rnd(-14,14),y:C.y-rnd(0,3),vy:-rnd(8,16),life:0.6,col:col(),front:R()<0.5});break;
+    case'bfly':spawn({type:'tico',maps:['mbf0','mbf1'],col:col(),x,y:y-4,vx:rnd(-8,8),vy:-rnd(3,8),life:2.4,k:rnd(0,6),upd(p,d){p.k+=d*2;p.vx+=Math.sin(p.k)*14*d;p.vy+=Math.cos(p.k*1.7)*10*d;},front});break;
+    case'lantern':{const n=it.many?2:1;for(let k=0;k<n;k++)spawn({type:'tico',map:'mlant',col:col(),x:x+rnd(-4,4),y:y+6,vy:-rnd(5,9),life:2.4,k:rnd(0,6),upd(p,d){p.k+=d*2;p.vx=Math.sin(p.k)*4;},front:R()<0.4});}break;
+    case'moon':spawn({type:'tico',map:'mmoon',col:col(),x,y,vy:-rnd(3,6),life:1.8,blink:1,front});break;
+    case'orbit':{const n=it.n||4,rr=hw+5;for(let k=0;k<n;k++){const an=T*2.2+k*6.283/n;spawn({type:k%2?'spark':'star',x:b[0]+Math.cos(an)*rr,y:b[1]+Math.sin(an)*rr*0.42-4,life:0.12,col:col(),front:Math.sin(an)>0});}}break;
+    case'starfall':{const sx=b[0]+rnd(-hw-12,hw-6),sy=b[1]-38;spawn({type:'star',x:sx,y:sy,vx:42,vy:30,life:0.55,col:col(),front,upd(p,d){if(R()<0.6)spawn({type:'px',x:p.x,y:p.y,life:0.3,col:p.col,front:p.front});}});}break;}}
+// ---- đăng ký 200 món vào kho ----
+const NEWGEAR2={"weapon":[["w2_umb0",0,"Ô Che Mưa Tím","umbrella",",wood,,lilac,silver",{"def":0.4,"atk":0.4,"hp":0.2}],["w2_rib0",0,"Dải Lụa Đỏ Tập Múa","ribbon",",wood,,red,gold",{"spd":0.5,"atk":0.5}],["w2_ice0",0,"Que Kem Dâu","icecream",",wood,ruby,pink",{"atk":0.5,"hp":0.5}],["w2_cone0",0,"Kem Ốc Quế Vani","cone",",,pearl,cream,bronze",{"hp":0.6,"xp":0.4}],["w2_lol0",0,"Kẹo Mút Sọc Hồng","lolly",",white,,pink",{"coin":0.5,"atk":0.5}],["w2_bru0",0,"Bút Lông Thư Pháp","brush",",bamboo,,black,bronze",{"atk":0.5,"xp":0.5}],["w2_flu0",0,"Sáo Trúc Mục Đồng","flute",",bamboo,,,bronze",{"spd":0.5,"xp":0.5},{"d":"Thổi một khúc là trâu tự đi về chuồng."}],["w2_bro0",0,"Chổi Rơm Quét Sân","broom",",wood,,yellow,bronze",{"spd":0.6,"atk":0.4}],["w2_pan0",0,"Chảo Gang Nhà Bếp","pan","dsteel,black",{"def":0.5,"atk":0.5},{"d":"Đập đâu móp đó."}],["w2_bre0",0,"Bánh Mì Giòn Rụm","bread",",,,,bronze",{"hp":0.6,"atk":0.4},{"d":"Vũ khí quốc dân. Đói thì ăn được."}],["w2_pin0",0,"Chong Chóng Giấy","pinwheel",",wood,emer,sky",{"spd":0.7,"coin":0.3}],["w2_can0",0,"Gậy Kẹo Giáng Sinh","candy","iron",{"atk":0.6,"coin":0.4}],["w2_bub0",0,"Que Thổi Bong Bóng","bubble",",green,sapph",{"xp":0.6,"hp":0.4}],["w2_kit0",0,"Diều Sáo Đồng Quê","kite",",,,orange,bronze",{"spd":0.6,"xp":0.4}],["w2_yoy0",0,"Yo-yo Gỗ Tiểu Học","yoyo",",,topaz,red",{"atk":0.5,"spd":0.5}],["w2_boo0",0,"Boomerang Gỗ Tập Ném","boomer",",wood",{"atk":0.6,"spd":0.4}],["w2_whi0",0,"Roi Mây Chăn Trâu","whip",",leather,,,bronze",{"atk":0.7,"crit":0.3}],["w2_bel0",0,"Chuông Gió Mái Hiên","bell",",,,,bronze",{"xp":0.5,"def":0.5}],["w2_mir0",0,"Gương Cầm Tay Soi Mặt","mirror",",wood,pearl,,silver",{"def":0.5,"xp":0.5}],["w2_lan0",0,"Đèn Lồng Giấy Trung Thu","lantern",",wood,,,gold",{"hp":0.5,"coin":0.5}],["w2_nun0",0,"Côn Nhị Khúc Gỗ","nunchaku",",wood,,,iron",{"atk":0.6,"spd":0.4}],["w2_mic0",0,"Micro Karaoke","mic","iron,black,,,silver",{"xp":0.5,"crit":0.3,"coin":0.2}],["w2_lut0",0,"Đàn Ghi-ta Tập Chơi","lute",",wood,,brown,bronze",{"xp":0.5,"spd":0.5}],["w2_fan0",0,"Quạt Nan Mùa Hè","fan",",bamboo,,white,bronze",{"spd":0.6,"def":0.4}],["w2_wan0",0,"Đũa Phép Kẹo Bông","wand","pink,white,peach",{"atk":0.5,"xp":0.5}],["w2_swo0",0,"Kiếm Nhựa Đồ Chơi","sword","pink,red,topaz,,red",{"atk":0.5,"coin":0.5},{"d":"Có đèn nhấp nháy và tiếng xèo xèo."}],["w2_spe0",0,"Xiên Que Nướng","spear","iron,bamboo",{"atk":0.7,"hp":0.3}],["w2_sta0",0,"Gậy Chống Ông Bụt","staff",",wood,pearl",{"xp":0.6,"hp":0.4},{"d":"Ông Bụt hiện lên hỏi: \"Vì sao con khóc?\""}],["w2_ham0",0,"Búa Hơi Đồ Chơi","hammer","pink,red,peach",{"atk":0.6,"def":0.4},{"d":"Kêu \"chíp\" mỗi lần đập."}],["w2_bow0",0,"Cung Cành Liễu","bow","iron,green",{"atk":0.6,"spd":0.4}],["w2_dag0",0,"Dao Rọc Giấy","dagger","iron,red",{"crit":0.5,"atk":0.5}],["w2_stw0",0,"Đũa Ngôi Sao Lấp Lánh","starw",",white,,,gold",{"crit":0.4,"xp":0.6}],["w2_umb1",1,"Ô Giấy Dầu Hội An","umbrella",",bamboo,,red,gold",{"def":0.5,"atk":0.3,"spd":0.2}],["w2_rib1",1,"Dải Lụa Hồng Nghê Thường","ribbon",",white,,pink,gold",{"spd":0.6,"crit":0.4}],["w2_ice1",1,"Que Kem Bạc Hà Mát Lạnh","icecream",",wood,emer,mint",{"spd":0.5,"def":0.5}],["w2_cone1",1,"Kem Ốc Quế Sô-cô-la","cone",",,ruby,choco,bronze",{"hp":0.6,"atk":0.4}],["w2_bru1",1,"Bút Lông Họa Sư","brush",",dark,,purple,gold",{"atk":0.5,"crit":0.3,"xp":0.2}],["w2_flu1",1,"Sáo Ngọc Bích","flute",",green,,,gold",{"spd":0.5,"crit":0.3,"xp":0.2}],["w2_bro1",1,"Chổi Bay Phù Thủy Tập Sự","broom",",dark,,purple,silver",{"spd":0.7,"crit":0.3}],["w2_pan1",1,"Chảo Chống Dính Thần Tốc","pan","iron,red",{"def":0.6,"hp":0.4}],["w2_yoy1",1,"Yo-yo Tia Chớp","yoyo",",,sapph,blue",{"spd":0.6,"crit":0.4}],["w2_boo1",1,"Boomerang Thổ Dân","boomer",",red",{"atk":0.6,"crit":0.4}],["w2_whi1",1,"Roi Da Thuần Thú","whip",",black,,,red",{"atk":0.7,"crit":0.3}],["w2_cla0",1,"Vuốt Mèo Hoang","claw","iron,leather,,,bronze",{"atk":0.6,"crit":0.4}],["w2_bel1",1,"Chuông Đồng Chùa Cổ","bell",",,,,gold",{"def":0.5,"hp":0.3,"xp":0.2}],["w2_mir1",1,"Gương Bát Quái Nhập Môn","mirror",",dark,topaz,,gold",{"def":0.6,"crit":0.4}],["w2_lan1",1,"Đèn Kéo Quân","lantern",",bamboo,,,gold",{"hp":0.4,"spd":0.3,"coin":0.3}],["w2_nun1",1,"Côn Nhị Khúc Võ Đường","nunchaku",",black,,,gold",{"atk":0.6,"spd":0.4},{"d":"Hô \"Á-tà!\" để tăng khí thế (không có tác dụng thật)."}],["w2_lut1",1,"Đàn Nguyệt Cầm","lute",",dark,,red,gold",{"xp":0.4,"crit":0.3,"spd":0.3}],["w2_kit1",1,"Diều Rồng Bay","kite",",,,green,gold",{"spd":0.6,"atk":0.4}],["w2_pin1",1,"Chong Chóng Tre Bay","pinwheel",",bamboo,topaz,yellow",{"spd":0.8,"xp":0.2}],["w2_scy0",1,"Liềm Gặt Lúa","scythe","iron,wood",{"atk":0.7,"crit":0.3}],["w2_fan1",1,"Quạt Lông Vũ","fan",",white,,white,silver",{"spd":0.5,"def":0.3,"xp":0.2}],["w2_mic1",1,"Micro Ca Sĩ Hội Chợ","mic","gold,black,,,gold",{"coin":0.5,"crit":0.3,"xp":0.2}],["w2_bre1",1,"Bánh Mì Pate Đặc Biệt","bread",",,,,gold",{"hp":0.7,"atk":0.3},{"d":"Đủ nhân. Hơi cay."}],["w2_tri0",1,"Xiên Bắt Cá","trident","iron,wood",{"atk":0.6,"spd":0.4}],["w2_lol1",1,"Kẹo Mút Khổng Lồ","lolly",",red,,orange",{"atk":0.6,"hp":0.4}],["w2_can1",1,"Gậy Kẹo Bạc Hà","candy","jade",{"atk":0.6,"spd":0.4}],["w2_umb2",2,"Ô Bay Gió Bấc","umbrella",",black,,black,silver",{"def":0.5,"spd":0.3,"atk":0.2},{"px":{"eva":0.05},"d":"Mở ra là gió bấc nổi lên, bay lơ lửng như đi dạo trên mây."}],["w2_rib2",2,"Dải Lụa Hằng Nga","ribbon",",white,,white,silver",{"spd":0.5,"crit":0.3,"hp":0.2},{"px":{"eva":0.06},"d":"Dải lụa quấn quanh vầng trăng của Hằng Nga."}],["w2_ice2",2,"Que Kem Băng Vĩnh Cửu","icecream",",white,sapph,sky",{"atk":0.6,"spd":0.3},{"px":{"gstun":0.05},"d":"Liếm một miếng là đông cứng tận óc."}],["w2_whe0",2,"Vòng Lửa Tập Sự","wheel","fire,red,,,gold",{"atk":0.7,"spd":0.3},{"px":{"burnHit":0.04}}],["w2_cha0",2,"Vòng Phi Đao Thép","chakram","iron,dark",{"atk":0.6,"crit":0.4},{"px":{"pierce":0.08}}],["w2_bru2",2,"Thần Bút Mã Lương","brush",",gold,,black,gold",{"atk":0.5,"xp":0.3,"crit":0.2},{"px":{"gstun":0.05},"d":"Vẽ gì thành nấy. Vẽ con hổ thì hổ nhảy ra."}],["w2_flu2",2,"Sáo Thần Gọi Rắn","flute",",green,,,jade",{"crit":0.4,"atk":0.4,"spd":0.2},{"px":{"poison":0.03}}],["w2_scy1",2,"Lưỡi Hái Bù Nhìn","scythe","rust,dark",{"atk":0.8,"crit":0.2},{"px":{"exe":1.3}}],["w2_whi2",2,"Roi Gai Hoa Hồng","whip",",red,,,red",{"atk":0.6,"crit":0.4},{"px":{"thorns":0.08}}],["w2_cla1",2,"Vuốt Hổ Trắng","claw","holy,white,,,silver",{"atk":0.6,"crit":0.4},{"px":{"cdmg":0.2}}],["w2_bel2",2,"Chuông Trấn Hồn","bell",",,,,jade",{"def":0.5,"hp":0.3,"crit":0.2},{"px":{"gstun":0.06}}],["w2_mir2",2,"Gương Chiếu Yêu","mirror",",red,ruby,,gold",{"def":0.5,"crit":0.3,"atk":0.2},{"px":{"pierce":0.1},"d":"Soi vào là yêu quái hiện nguyên hình."}],["w2_lut2",2,"Đàn Tỳ Bà Ma Lễ Hải","lute",",dark,,purple,gold",{"atk":0.5,"spd":0.3,"crit":0.2},{"px":{"gstun":0.06},"d":"Gảy một tiếng là gió bão nổi lên. Báu vật của Tứ Đại Thiên Vương."}],["w2_yoy2",2,"Yo-yo Plasma","yoyo",",,amet,purple",{"atk":0.6,"spd":0.4},{"px":{"burnHit":0.03}}],["w2_kit2",2,"Diều Hâu Thép","kite",",,,gray,iron",{"atk":0.6,"spd":0.4},{"px":{"pierce":0.08}}],["w2_lan2",2,"Đèn Lồng Ma Trơi","lantern",",black,,,purple",{"atk":0.5,"hp":0.3,"crit":0.2},{"px":{"burnHit":0.04}}],["w2_cone2",2,"Kem Ốc Quế Núi Lửa","cone",",,ruby,red,gold",{"atk":0.7,"hp":0.3},{"px":{"burnHit":0.04},"d":"Kem nóng. Đúng vậy, kem nóng."}],["w2_bro2",2,"Chổi Bay Sao Chổi","broom",",dark,,sky,gold",{"spd":0.7,"crit":0.3},{"px":{"eva":0.05}}],["w2_whe1",3,"Phong Hỏa Luân","wheel","fire,red,,,gold",{"atk":0.7,"spd":0.4},{"px":{"burnHit":0.06,"eva":0.05},"d":"Bánh xe gió lửa dưới chân Na Tra. Đạp lên là bay vút qua biển lửa."}],["w2_rib3",3,"Hỗn Thiên Lăng","ribbon",",gold,,red,gold",{"atk":0.5,"spd":0.4,"crit":0.2},{"px":{"gstun":0.08},"d":"Dải lụa đỏ của Na Tra, vung lên là sông biển nổi sóng."}],["w2_cha1",3,"Càn Khôn Quyển","chakram","gold,gold",{"atk":0.6,"def":0.3,"crit":0.2},{"px":{"gstun":0.08,"pierce":0.1},"d":"Vòng vàng ném ra như sao băng, trúng đâu chấn động đó."}],["w2_fan2",3,"Quạt Lông Ngỗng Khổng Minh","fan",",white,,white,gold",{"atk":0.4,"crit":0.4,"xp":0.3},{"px":{"eva":0.08},"d":"Phe phẩy một cái, mượn được cả gió đông."}],["w2_umb3",3,"Ô Thái Cực Âm Dương","umbrella",",black,,white,silver",{"def":0.5,"atk":0.3,"hp":0.3},{"px":{"block":1,"eva":0.05}}],["w2_scy2",3,"Lưỡi Hái Bóng Đêm","scythe","shadow,black",{"atk":0.8,"crit":0.3},{"px":{"exe":1.45,"steal":0.03}}],["w2_mir3",3,"Gương Thần Biết Nói","mirror",",gold,pearl,,gold",{"def":0.4,"xp":0.4,"crit":0.3},{"px":{"eva":0.06,"shield":0.06},"d":"Gương luôn nói thật, dù chẳng ai muốn nghe."}],["w2_flu3",3,"Sáo Thần Trương Lương","flute",",green,,,gold",{"spd":0.5,"crit":0.3,"atk":0.3},{"px":{"gstun":0.08},"d":"Một khúc sáo đêm khiến tám nghìn quân Sở nhớ quê mà bỏ trận."}],["w2_lol2",3,"Kẹo Mút Hố Đen","lolly",",black,,purple",{"atk":0.7,"crit":0.3},{"px":{"pierce":0.15}}],["w2_cla2",4,"Vuốt Thiên Lang","claw","ice,white,,,silver",{"atk":0.7,"crit":0.4,"spd":0.2},{"px":{"cdmg":0.3,"steal":0.04},"d":"Móng vuốt của sói trời tru dưới trăng tròn."}],["w2_bel3",4,"Chuông Đông Hoàng","bell",",,,,gold",{"def":0.5,"hp":0.4,"atk":0.2},{"px":{"gstun":0.1,"shield":0.1},"d":"Chuông khai thiên lập địa, một tiếng ngân rung chuyển tam giới."}],["w2_bru3",4,"Bút Phán Quan","brush",",red,,black,gold",{"atk":0.6,"crit":0.4,"xp":0.2},{"px":{"exe":1.5,"pierce":0.15},"d":"Bút son của quan Phán xét dưới âm phủ. Gạch tên ai, người đó hết số."}],["w2_umb4",4,"Ô Vạn Hoa Thiên Đình","umbrella",",gold,,purple,gold",{"def":0.5,"hp":0.4,"atk":0.3},{"px":{"block":2,"regen":0.02}}],["w2_lut3",5,"Cây Đàn Thần Thạch Sanh","lute",",gold,,gold,gold",{"atk":0.6,"hp":0.4,"crit":0.3,"xp":0.2},{"px":{"gstun":0.12,"regen":0.03,"shield":0.1},"d":"Tiếng đàn của Thạch Sanh khiến mười tám nước chư hầu cởi giáp xin hàng."}]],"back":[["cb2_cape_b",0,"Áo Choàng Xanh Biển",null,null,{"def":0.3,"hp":0.2},{"cos":"cape","cc":["#8ac8ff","#4a8ae0","#2a4a9a"]}],["cb2_cape_y",0,"Áo Choàng Vàng Nắng",null,null,{"coin":0.3,"xp":0.2},{"cos":"cape","cc":["#fff3a0","#ffd84a","#c09010"]}],["cb2_leaf_p",0,"Cánh Lá Bàng Mùa Thu",null,null,{"spd":0.3,"hp":0.2},{"cos":"leafwing","cc":["#ffc080","#f0601e","#a03010"]}],["cb2_fairy_g",0,"Cánh Bướm Xanh Lá",null,null,{"xp":0.3,"spd":0.2},{"cos":"fairy","cc":["#f0ffe8","#b8f0a0","#6ab84a"]}],["cb2_ball_r",0,"Bóng Bay Đỏ",null,null,{"coin":0.3,"xp":0.2},{"cos":"balloon","cc":["#ffb0a0","#ff5a5a","#b02a2a"]}],["cb2_ball_b",0,"Bóng Bay Xanh Dương",null,null,{"xp":0.3,"spd":0.2},{"cos":"balloon","cc":["#b0e0ff","#4aa8e0","#2a6a9a"]}],["cb2_ori_w",0,"Cánh Hạc Giấy",null,null,{"xp":0.3,"def":0.2},{"cos":"origami","cc":["#ffffff","#f0f0f8","#c8c8d8"],"d":"Gấp đủ nghìn con hạc giấy thì một điều ước thành sự thật."}],["cb2_cloud_w",0,"Cánh Mây Bông",null,null,{"hp":0.3,"def":0.2},{"cos":"cloudw","cc":["#ffffff","#e8f0ff","#b8c8e0"]}],["cb2_dfly_r",0,"Cánh Chuồn Chuồn Ớt",null,null,{"spd":0.4,"crit":0.1},{"cos":"dfly","cc":["#ffe0d0","#ff8a6a","#c04a2a"]}],["cb2_rib_p",0,"Dải Lụa Hồng Bay",null,null,{"spd":0.3,"xp":0.2},{"cos":"ribbonw","cc":["#ffe0f0","#ff9ac8","#c05a8a"]}],["cb2_but_y",0,"Cánh Bướm Vàng",null,null,{"coin":0.3,"spd":0.2},{"cos":"butter","cc":["#fff8c0","#ffe066","#d0a020"]}],["cb2_quiv_g",0,"Ống Tên Tre",null,null,{"atk":0.3,"spd":0.2},{"cos":"quiver","cc":["#d8f0a0","#8ab84a","#4a6a2a"]}],["cb2_mech0",0,"Cánh Thiếc Tự Chế",null,null,{"def":0.3,"atk":0.2},{"cos":"mech","cc":["#e8eef4","#9aa6b6","#5a6678"],"d":"Ghép từ vỏ lon và dây kẽm. Không bay được."}],["cb2_flag_b",0,"Cờ Hiệu Đội Bóng",null,null,{"atk":0.3,"coin":0.2},{"cos":"flag","cc":["#ffffff","#3a8ae0","#1a4a8a"]}],["cb2_bat_g",0,"Cánh Dơi Đêm Trăng",null,null,{"crit":0.3,"atk":0.2},{"cos":"bat","cc":["#8a8aa0","#4a4a5a","#2a2a38"]}],["cb2_fairy_p",1,"Cánh Tiên Hồng Phấn",null,null,{"xp":0.3,"hp":0.2},{"cos":"fairy","cc":["#ffffff","#ffd0ec","#e08ab8"]}],["cb2_but_b",1,"Cánh Bướm Đêm Lam",null,null,{"crit":0.3,"spd":0.2},{"cos":"butter","cc":["#d0e8ff","#5a8ae0","#2a3a8a"]}],["cb2_dfly_b",1,"Cánh Chuồn Chuồn Kim",null,null,{"spd":0.5},{"cos":"dfly","cc":["#e8fbff","#9fe8ff","#4aa8d8"]}],["cb2_ori_r",1,"Cánh Phượng Giấy Đỏ",null,null,{"atk":0.3,"crit":0.2},{"cos":"origami","cc":["#ffd0c0","#ff6a5a","#b02a2a"]}],["cb2_cloud_p",1,"Cánh Mây Hoàng Hôn",null,null,{"hp":0.3,"xp":0.2},{"cos":"cloudw","cc":["#ffe8f0","#ffb0c8","#d0789a"]}],["cb2_rib_b",1,"Dải Lụa Thiên Thanh",null,null,{"spd":0.3,"def":0.2},{"cos":"ribbonw","cc":["#e8f8ff","#8ad8ff","#3a8ac0"]}],["cb2_mech1",1,"Cánh Robot Tuần Tra",null,null,{"def":0.3,"spd":0.2},{"cos":"mech","cc":["#e0f0ff","#5b8fd8","#2a4a8a"]}],["cb2_crys0",1,"Cánh Thạch Anh Hồng",null,null,{"def":0.3,"hp":0.2},{"cos":"crystal","cc":["#ffe8f4","#ffb0d8","#c06a9a"]}],["cb2_fea_b",1,"Cánh Chim Én",null,null,{"spd":0.4,"crit":0.1},{"cos":"feather","cc":["#8ab8ff","#3a5aa0","#1a2a5a"]}],["cb2_leaf_g",1,"Cánh Lá Sen",null,null,{"hp":0.3,"xp":0.2},{"cos":"leafwing","cc":["#c8f0b0","#5ab870","#2a7a4a"]}],["cb2_cape_r",1,"Áo Choàng Hiệp Sĩ Đỏ",null,null,{"atk":0.3,"def":0.2},{"cos":"cape","cc":["#ff9a8a","#d84a4a","#8a2a2a"],"trim":"#ffd84a"}],["cb2_jet_r",1,"Ba Lô Tên Lửa Đỏ",null,null,{"spd":0.5},{"cos":"jet","cc":["#ffb0a0","#e04a4a","#8a2a2a"]}],["cb2_ball_h",1,"Bóng Bay Trái Tim",null,null,{"xp":0.3,"hp":0.2},{"cos":"balloon","cc":["#ffd0e0","#ff7aa8","#c03a6a"]}],["cb2_crys1",2,"Cánh Pha Lê Băng",null,null,{"def":0.3,"hp":0.2},{"cos":"crystal","cc":["#ffffff","#bff0ff","#5ab0e0"],"px":{"shield":0.04}}],["cb2_mech2",2,"Cánh Cơ Giáp Chiến Đấu",null,null,{"atk":0.3,"def":0.2},{"cos":"mech","cc":["#fff0d0","#d8a040","#8a5a10"],"px":{"thorns":0.05}}],["cb2_but_r",2,"Cánh Bướm Lửa",null,null,{"atk":0.3,"crit":0.2},{"cos":"butter","cc":["#fff0a0","#ff8a2a","#c0301a"],"px":{"burnHit":0.02}}],["cb2_rib_g",2,"Dải Lụa Ngũ Sắc",null,null,{"spd":0.3,"xp":0.2},{"cos":"ribbonw","cc":["#fff8c0","#a8e86a","#4aa83a"],"px":{"eva":0.03}}],["cb2_ori_g",2,"Cánh Rồng Giấy Vàng",null,null,{"coin":0.3,"atk":0.2},{"cos":"origami","cc":["#fff8d0","#ffd84a","#c09010"]}],["cb2_dfly_v",2,"Cánh Ve Sầu Mùa Hạ",null,null,{"spd":0.3,"xp":0.2},{"cos":"dfly","cc":["#f0fff0","#c8f0d0","#7ab88a"],"px":{"eva":0.03}}],["cb2_bat_r",2,"Cánh Ma Cà Rồng Đỏ",null,null,{"atk":0.4,"crit":0.1},{"cos":"bat","cc":["#ff8a8a","#a01a2a","#4a0a14"],"px":{"steal":0.02}}],["cb2_fea_p",2,"Cánh Công Xòe",null,null,{"crit":0.3,"coin":0.2},{"cos":"feather","cc":["#c8fff0","#3ac8a0","#1a6a6a"]}],["cb2_cloud_s",2,"Cánh Mây Giông",null,null,{"atk":0.3,"spd":0.2},{"cos":"cloudw","cc":["#d8dce8","#8a90a8","#4a5068"],"px":{"gstun":0.03}}],["cb2_crys2",3,"Cánh Kim Cương Vĩnh Cửu",null,null,{"def":0.3,"hp":0.3},{"cos":"crystal","cc":["#ffffff","#e8f8ff","#a8c8e8"],"px":{"shield":0.06,"thorns":0.05}}],["cb2_mech3",3,"Cánh Thiên Thần Máy",null,null,{"hp":0.3,"atk":0.3},{"cos":"mech","cc":["#ffffff","#e8f0ff","#9ab0d0"],"px":{"regen":0.01,"shield":0.04}}],["cb2_but_g",3,"Cánh Bướm Hoàng Kim",null,null,{"coin":0.4,"crit":0.2},{"cos":"butter","cc":["#fffbe0","#ffd84a","#b8860b"],"px":{"eva":0.04}}],["cb2_rib_r",3,"Hồng Lăng Bay Lượn",null,null,{"atk":0.3,"spd":0.3},{"cos":"ribbonw","cc":["#ffd0d0","#e83a4a","#8a1a2a"],"px":{"gstun":0.04}}],["cb2_ori_b",3,"Cánh Thiên Nga Giấy Bạc",null,null,{"hp":0.3,"def":0.3},{"cos":"origami","cc":["#ffffff","#e0e8f8","#a0b0d0"],"px":{"regen":0.01}}],["cb2_crys3",4,"Cánh Thủy Tinh Hư Không",null,null,{"atk":0.3,"crit":0.3,"spd":0.2},{"cos":"crystal","cc":["#e8d8ff","#9a6ae0","#4a2a8a"],"px":{"pierce":0.08,"eva":0.04}}],["cb2_but_m",4,"Cánh Bướm Thiên Hà",null,null,{"hp":0.3,"atk":0.3,"xp":0.2},{"cos":"butter","cc":["#ffe8ff","#c070ff","#5a2aa0"],"px":{"regen":0.015,"cdmg":0.15}}],["cb2_bang",5,"Cánh Chim Bằng Vạn Dặm",null,null,{"hp":0.3,"atk":0.3,"def":0.2,"spd":0.2},{"cos":"seraph","cc":["#fff8e0","#e8c060","#8a6a10"],"px":{"eva":0.06,"shield":0.08},"d":"Cá Côn hóa chim Bằng, một lần vỗ cánh bay chín vạn dặm."}]],"head":[["ch2_bow_r",0,"Nơ Đỏ Xinh Xắn",null,null,{"coin":0.3,"xp":0.2},{"cos":"hbow","cc":["#ffb0b0","#ff4a5a","#a01a2a"]}],["ch2_bow_b",0,"Nơ Xanh Học Trò",null,null,{"xp":0.4,"def":0.1},{"cos":"hbow","cc":["#c8e8ff","#4a9ae0","#2a5a9a"]}],["ch2_bulb",0,"Bóng Đèn Ý Tưởng",null,null,{"xp":0.5},{"cos":"hbulb","cc":["#fffbe0","#ffe066","#d0a020"],"d":"Sáng lên mỗi khi nghĩ ra điều hay."}],["ch2_star_y",0,"Sao Giấy Dán Tường",null,null,{"crit":0.3,"xp":0.2},{"cos":"stars","cc":["#fff8c0","#ffe066","#c09010"]}],["ch2_moon_y",0,"Kẹp Tóc Trăng Khuyết",null,null,{"xp":0.3,"spd":0.2},{"cos":"moonc","cc":["#fffbe0","#ffe066","#d0a020"]}],["ch2_lan_r",0,"Đèn Lồng Mini Bay",null,null,{"coin":0.3,"hp":0.2},{"cos":"hlant","cc":["#ffe0a0","#e83a3a","#8a1a1a"]}],["ch2_halo_g",0,"Vầng Sáng Lục Bảo",null,null,{"hp":0.3,"def":0.2},{"cos":"halo","cc":["#e8ffe8","#7ae07a","#3a9a3a"]}],["ch2_flame_g",0,"Lửa Ma Xanh Lá",null,null,{"atk":0.3,"crit":0.2},{"cos":"flame","cc":["#f0ffe0","#7ae04a","#3a8a1a"]}],["ch2_orbs_b",1,"Ba Quả Cầu Lam",null,null,{"def":0.3,"spd":0.2},{"cos":"horbs","cc":["#e8f8ff","#7ad0ff","#3a8ae0"]}],["ch2_bow_p",1,"Nơ Lụa Hồng Đào",null,null,{"hp":0.3,"coin":0.2},{"cos":"hbow","cc":["#ffe0f0","#ff9ac8","#c05a8a"]}],["ch2_moon_b",1,"Kẹp Tóc Trăng Bạc",null,null,{"spd":0.3,"crit":0.2},{"cos":"moonc","cc":["#ffffff","#d8e8ff","#8aa0c8"]}],["ch2_lan_y",1,"Đèn Lồng Vàng Trung Thu",null,null,{"xp":0.3,"coin":0.2},{"cos":"hlant","cc":["#fff8c0","#ffc040","#c07010"]}],["ch2_star_b",1,"Chòm Sao Xanh",null,null,{"crit":0.3,"spd":0.2},{"cos":"stars","cc":["#ffffff","#9fd8ff","#4a8ae0"]}],["ch2_halo_p",1,"Vầng Sáng Hồng",null,null,{"hp":0.3,"xp":0.2},{"cos":"halo","cc":["#fff0f8","#ffb0d8","#d0609a"]}],["ch2_orbs_r",2,"Tam Muội Chân Hỏa",null,null,{"atk":0.3,"crit":0.2},{"cos":"horbs","cc":["#fff3a0","#ff8a2a","#c0301a"],"px":{"burnHit":0.02}}],["ch2_bulb_r",2,"Bóng Đèn Cầu Vồng",null,null,{"xp":0.4,"crit":0.1},{"cos":"hbulb","cc":["#ffe0ff","#ff7ae0","#c03aa0"],"px":{"cdmg":0.08}}],["ch2_flame_v",2,"Lửa Linh Hồn Tím",null,null,{"atk":0.3,"crit":0.2},{"cos":"flame","cc":["#ffe0ff","#c070ff","#6a2ad0"],"px":{"burnHit":0.02}}],["ch2_moon_r",2,"Huyết Nguyệt",null,null,{"atk":0.4,"crit":0.1},{"cos":"moonc","cc":["#ffd0d0","#e83a4a","#8a1a2a"],"px":{"steal":0.015}}],["ch2_orbs_g",3,"Ngũ Hành Thần Châu",null,null,{"atk":0.2,"def":0.2,"hp":0.2,"crit":0.2},{"cos":"horbs","cc":["#ffffff","#ffd84a","#b8860b"],"px":{"shield":0.04},"n":5}],["ch2_halo_m",4,"Thánh Quang Thất Sắc",null,null,{"hp":0.3,"atk":0.3,"xp":0.2},{"cos":"halo","cc":["#ffffff","#ffe0ff","#c070ff"],"px":{"regen":0.015,"shield":0.05}}]],"aura":[["au2_ff_g",0,"Đom Đóm Ven Sông",null,null,{"spd":0.5,"xp":0.5},{"aura":"firefly","cols":["#e8ffa0","#b8f05a","#6ab83a"],"rb":0,"col":"#b8f05a"}],["au2_gl_w",0,"Lấp Lánh Bạc",null,null,{"crit":0.4,"xp":0.6},{"aura":"glitter","cols":["#ffffff","#e8f0ff","#b8c8e0"],"rb":0,"col":"#e8f0ff"}],["au2_bub_p",0,"Bong Bóng Hồng",null,null,{"hp":0.5,"xp":0.5},{"aura":"bubbleC","cols":["#ffe0f0","#ffb0d8","#ff7ab8"],"rb":0,"col":"#ffb0d8"}],["au2_note_b",0,"Nốt Nhạc Lam",null,null,{"xp":0.6,"spd":0.4},{"aura":"note","cols":["#c8e8ff","#5aa8ff","#2a6ad8"],"rb":0,"col":"#5aa8ff"}],["au2_conf",0,"Mưa Giấy Kim Tuyến",null,null,{"coin":0.6,"xp":0.4},{"aura":"conf","cols":["#ffe066","#ff7aa8","#7ad0ff"],"rb":0,"col":"#ff7aa8"}],["au2_emb_o",0,"Than Hồng Bay",null,null,{"atk":0.6,"spd":0.4},{"aura":"ember","cols":["#fff0a0","#ffa040","#e04a1a"],"rb":0,"col":"#ffa040"}],["au2_snow_b",0,"Bông Tuyết Xanh",null,null,{"def":0.6,"hp":0.4},{"aura":"snowC","cols":["#ffffff","#bfe8ff","#7ac0ff"],"rb":0,"col":"#bfe8ff"}],["au2_pet_y",0,"Hoa Mai Ngày Tết",null,null,{"coin":0.5,"hp":0.5},{"aura":"petalC","cols":["#fff8c0","#ffe066","#ffc020"],"rb":0,"col":"#ffe066"}],["au2_fea_w",0,"Lông Vũ Trắng",null,null,{"spd":0.5,"def":0.5},{"aura":"featherF","cols":["#ffffff","#f0f0f8","#c8c8d8"],"rb":0,"col":"#f0f0f8"}],["au2_ring_g",0,"Vòng Sáng Lục",null,null,{"hp":0.5,"def":0.5},{"aura":"ringp","cols":["#c8ffc8","#5ae05a","#2a8a2a"],"rb":0,"col":"#5ae05a"}],["au2_bf_y",0,"Bướm Vàng Dập Dìu",null,null,{"xp":0.5,"coin":0.5},{"aura":"bfly","cols":["#fff8c0","#ffd84a","#c09010"],"rb":0,"col":"#ffd84a"}],["au2_lan_r",0,"Đèn Lồng Đỏ Phố Cổ",null,null,{"coin":0.6,"hp":0.4},{"aura":"lantern","cols":["#ffe0a0","#e83a3a","#8a1a1a"],"rb":0,"col":"#e83a3a"}],["au2_moon_y",0,"Trăng Khuyết Lơ Lửng",null,null,{"xp":0.5,"spd":0.5},{"aura":"moon","cols":["#fffbe0","#fff1a6","#d8c060"],"rb":0,"col":"#fff1a6"}],["au2_gl_p",0,"Kim Tuyến Hồng",null,null,{"crit":0.4,"coin":0.6},{"aura":"glitter","cols":["#ffffff","#ffd0ec","#ff8ac8"],"rb":0,"col":"#ffd0ec"}],["au2_ff_b",0,"Đom Đóm Lam",null,null,{"spd":0.5,"def":0.5},{"aura":"firefly","cols":["#e8ffff","#7ff0ff","#3ab0e0"],"rb":0,"col":"#7ff0ff"}],["au2_note_r",1,"Giai Điệu Tình Yêu",null,null,{"hp":0.5,"xp":0.5},{"aura":"note","cols":["#ffd0dc","#ff5a7a","#c02a4a"],"rb":0,"col":"#ff5a7a"}],["au2_orb_b",1,"Vệ Tinh Xanh Quay Quanh",null,null,{"def":0.5,"spd":0.5},{"aura":"orbit","cols":["#e8f8ff","#7ad0ff","#3a8ae0"],"rb":0,"col":"#7ad0ff"}],["au2_emb_b",1,"Lửa Ma Trơi Lam",null,null,{"atk":0.5,"crit":0.5},{"aura":"ember","cols":["#e8fbff","#7ab0ff","#3a5ae0"],"rb":0,"col":"#7ab0ff"}],["au2_sf_y",1,"Sao Băng Nhỏ",null,null,{"crit":0.5,"spd":0.5},{"aura":"starfall","cols":["#ffffff","#fff1a6","#ffd84a"],"rb":0,"col":"#fff1a6"}],["au2_bf_b",1,"Bướm Xanh Huyền Ảo",null,null,{"spd":0.5,"xp":0.5},{"aura":"bfly","cols":["#e0f0ff","#5ab0ff","#2a5ad8"],"rb":0,"col":"#5ab0ff"}],["au2_bub_rb",1,"Bong Bóng Cầu Vồng",null,null,{"xp":0.5,"coin":0.5},{"aura":"bubbleC","cols":null,"rb":1,"col":"#ff9ef0"}],["au2_pet_p",1,"Hoa Đào Mùa Xuân",null,null,{"hp":0.5,"spd":0.5},{"aura":"petalC","cols":["#ffe8f0","#ffb0c8","#ff7aa0"],"rb":0,"col":"#ffb0c8"}],["au2_lan_y",1,"Đèn Trời Ước Nguyện",null,null,{"xp":0.5,"coin":0.5},{"aura":"lantern","cols":["#fff0c0","#ffb040","#c06010"],"rb":0,"col":"#ffb040"}],["au2_ring_p",1,"Vòng Sáng Tím",null,null,{"atk":0.5,"def":0.5},{"aura":"ringp","cols":["#f0d8ff","#b07aff","#6a3ad8"],"rb":0,"col":"#b07aff"}],["au2_gl_g",1,"Bụi Vàng Lấp Lánh",null,null,{"coin":0.7,"crit":0.3},{"aura":"glitter","cols":["#ffffff","#fff3a0","#f4c430"],"rb":0,"col":"#fff3a0"}],["au2_fea_k",1,"Lông Quạ Đen",null,null,{"atk":0.5,"crit":0.5},{"aura":"featherF","cols":["#8a8aa0","#3a3a4a","#1a1a24"],"rb":0,"col":"#3a3a4a"}],["au2_moon_b",1,"Trăng Lam Huyền Bí",null,null,{"xp":0.5,"def":0.5},{"aura":"moon","cols":["#e8f8ff","#9fd8ff","#5aa0e0"],"rb":0,"col":"#9fd8ff"}],["au2_snow_p",1,"Tuyết Hồng Lãng Mạn",null,null,{"hp":0.5,"def":0.5},{"aura":"snowC","cols":["#ffffff","#ffd8ec","#ffa8d0"],"rb":0,"col":"#ffd8ec"}],["au2_orb_g",2,"Vành Đai Hoàng Kim",null,null,{"coin":0.4,"def":0.3,"hp":0.3},{"aura":"orbit","cols":["#fffbe0","#ffd84a","#c09010"],"rb":0,"col":"#ffd84a","px":{"shield":0.03}}],["au2_ff_m",2,"Đom Đóm Thần Rừng",null,null,{"hp":0.5,"xp":0.3},{"aura":"firefly","cols":["#f0ffe0","#a8ff7a","#4ad05a"],"rb":0,"col":"#a8ff7a","px":{"regen":0.01}}],["au2_note_g",2,"Bản Giao Hưởng Vàng",null,null,{"xp":0.4,"crit":0.4},{"aura":"note","cols":["#fff8d0","#ffd84a","#c09010"],"rb":0,"col":"#ffd84a","px":{"cdmg":0.1}}],["au2_emb_v",2,"Hỏa Diễm Tím",null,null,{"atk":0.6,"crit":0.2},{"aura":"ember","cols":["#ffe0ff","#d070ff","#7a2ad0"],"rb":0,"col":"#d070ff","px":{"burnHit":0.02}}],["au2_bf_r",2,"Bướm Lửa Đêm Hè",null,null,{"atk":0.5,"spd":0.3},{"aura":"bfly","cols":["#fff0a0","#ff8a2a","#d03a1a"],"rb":0,"col":"#ff8a2a","px":{"burnHit":0.02}}],["au2_sf_b",2,"Mưa Sao Băng Xanh",null,null,{"crit":0.5,"spd":0.3},{"aura":"starfall","cols":["#ffffff","#bfe8ff","#5ab0ff"],"rb":0,"col":"#bfe8ff","px":{"cdmg":0.1}}],["au2_ring_r",2,"Vòng Phù Văn Đỏ",null,null,{"atk":0.6,"def":0.2},{"aura":"ringp","cols":["#ffd0d0","#ff5a5a","#a01a2a"],"rb":0,"col":"#ff5a5a","px":{"thorns":0.04}}],["au2_lan_g",2,"Đèn Lồng Ngọc Bích",null,null,{"hp":0.5,"def":0.3},{"aura":"lantern","cols":["#e8ffe8","#5ad08a","#2a8a5a"],"rb":0,"col":"#5ad08a","px":{"regen":0.01}}],["au2_bub_g",2,"Bong Bóng Thiên Hà",null,null,{"xp":0.5,"crit":0.3},{"aura":"bubbleC","cols":["#f0e0ff","#b08aff","#6a4ad8"],"rb":0,"col":"#b08aff","px":{"eva":0.02}}],["au2_orb_r",3,"Thất Tinh Hộ Thể",null,null,{"atk":0.4,"def":0.3,"crit":0.2},{"aura":"orbit","cols":["#ffffff","#ffe066","#ff8a2a"],"rb":0,"col":"#ffe066","px":{"shield":0.05},"n":7}],["au2_gl_rb",3,"Dải Ngân Hà Lấp Lánh",null,null,{"crit":0.4,"spd":0.3,"xp":0.3},{"aura":"glitter","cols":null,"rb":1,"col":"#ff9ef0","px":{"eva":0.03}}],["au2_bf_rb",3,"Đàn Bướm Thiên Đường",null,null,{"hp":0.4,"spd":0.3,"xp":0.3},{"aura":"bfly","cols":null,"rb":1,"col":"#ff9ef0","px":{"regen":0.012}}],["au2_moon_s",3,"Nguyệt Quang Bạc",null,null,{"def":0.4,"hp":0.4},{"aura":"moon","cols":["#ffffff","#e8f0ff","#b8c8e0"],"rb":0,"col":"#e8f0ff","px":{"shield":0.05}}],["au2_sf_p",3,"Sao Chổi Hồng",null,null,{"crit":0.5,"atk":0.3},{"aura":"starfall","cols":["#ffffff","#ffb0d8","#ff5aa8"],"rb":0,"col":"#ffb0d8","px":{"cdmg":0.15}}],["au2_phx",4,"Lông Phượng Rực Cháy",null,null,{"atk":0.4,"hp":0.3,"crit":0.2},{"aura":"featherF","cols":["#fff3a0","#ffa020","#e03a1a"],"rb":0,"col":"#ffa020","px":{"burnHit":0.03,"regen":0.01}}],["au2_ring_rb",4,"Pháp Trận Vạn Tượng",null,null,{"atk":0.3,"def":0.3,"hp":0.3},{"aura":"ringp","cols":null,"rb":1,"col":"#ff9ef0","px":{"shield":0.06,"regen":0.01}}],["au2_hoadang",5,"Hoa Đăng Thả Sông",null,null,{"hp":0.3,"atk":0.3,"def":0.3,"xp":0.2},{"aura":"lantern","cols":["#fff8d0","#ffd84a","#e08a10"],"rb":0,"col":"#ffd84a","px":{"regen":0.02,"shield":0.06},"many":1,"d":"Muôn ngọn hoa đăng trôi trên sông, mỗi ngọn mang theo một lời ước."}]]};
+for(const slot in NEWGEAR2)NEWGEAR2[slot].forEach(([id,r,name,ic,pal,fr,o])=>{const k=COSSLOT[slot]?0.5:1;
+  const it=Object.assign({id,slot,r,name,st:bst(r,fr,k)},o||{});if(it.cols===null)delete it.cols;if(ic){it.ico='i_'+ic;it.pal=pal;}ITEMS.push(it);IT[id]=it;});
 
 // ================= ÂM THANH 8-BIT (WebAudio, không cần tệp) =================
 const SFX={on:true,ctx:null};
@@ -4823,7 +4987,7 @@ function pull(n){if(G.phase==='crank'||G.phase==='drop'||G.phase==='shake')retur
   G.asc=G.res.some(r=>r.asc&&r.it.r===5)&&best===5;G.ascFx=0;S.wish=(S.wish||0)+n;
   S.pulls=(S.pulls||0)+n;mission('gacha',n);G.best=best;G.t=0;G.phase='crank';$('g-res').innerHTML='';$('g-res').className='g-res';$('g-rare').hidden=true;$('g-1').disabled=$('g-10').disabled=true;save();hud();gachaUI();sfx('coin');}
 function openGacha(){if(!G.caps)initCaps();G.phase='idle';G.t=0;$('g-res').innerHTML='';$('g-res').className='g-res';$('g-rare').hidden=true;
-  $('g-rates').innerHTML=RAR.map((r,i)=>'<span class="rr r'+i+'">'+r+' '+RARN[i]+' '+(RATES[i]*100).toFixed(1).replace('.0','')+'%</span>').join('')+'<p>Từ lượt '+SOFT+' tỉ lệ SSR tăng 6% mỗi lượt, lượt '+PITY+' chắc chắn SSR trở lên. Từ lượt '+USOFT+' tỉ lệ Huyền thoại tăng dần, lượt '+UPITY+' chắc chắn Huyền thoại. Mỗi món Huyền thoại có '+(MRUP*100)+'% cơ hội THĂNG HOA thành Thần Khí. Quay 10 chắc chắn có ít nhất 1 SR và giảm 10% giá xu/đá. Mỗi lượt quay +1 Điểm Ước Nguyện.</p>';
+  $('g-rates').innerHTML=RAR.map((r,i)=>'<span class="rr r'+i+'">'+r+' '+RARN[i]+' '+(RATES[i]*100).toFixed(2).replace(/\.?0+$/,'')+'%</span>').join('')+'<p>Từ lượt '+SOFT+' tỉ lệ SSR tăng 6% mỗi lượt, lượt '+PITY+' chắc chắn SSR trở lên. Từ lượt '+USOFT+' tỉ lệ Huyền thoại tăng dần, lượt '+UPITY+' chắc chắn Huyền thoại. Mỗi món Huyền thoại có '+(MRUP*100)+'% cơ hội THĂNG HOA thành Thần Khí. Quay 10 chắc chắn có ít nhất 1 SR và giảm 10% giá xu/đá. Mỗi lượt quay +1 Điểm Ước Nguyện.</p>';
   gachaUI();showModal('gacha');if(!G.run){G.run=true;G.last=0;requestAnimationFrame(gachaLoop);}}
 function stopGacha(){G.run=false;if(G.phase!=='idle'&&G.phase!=='open'&&G.res.length){G.phase='open';showGachaRes();}}
 
@@ -5046,9 +5210,10 @@ function M4(P,c){const L=[],b=P.bob,p=palOf(c),o=olOf(c);
   for(const s of[-1,1])L.push(pRR(s*6,-6+b,3,4,1,PAL.dark,OLC.dark));return L;}
 const MBUILD=[M0,M1,M2,M3,M4];
 const MSPR=new Map();
-function monSprite(type,col,P){const k=type+'|'+col+'|'+P.expr+'|'+P.bob+'|'+P.f;let e=MSPR.get(k);if(!e){e=renderLayers(MBUILD[type](P,col));MSPR.set(k,e);if(MSPR.size>120)MSPR.delete(MSPR.keys().next().value);}return e;}
+function monSprite(type,col,P){const k=type+'|'+col+'|'+P.expr+'|'+P.bob+'|'+P.f+'|'+(P.elite?1:0)+'|'+(P.glint||0);let e=MSPR.get(k);if(!e){const L=type==='guard'?MG(P):MBUILD[type](P,col);if(P.elite){const a=MCROWN[type];if(a)monCrown(L,a[0],a[1]+P.bob);else{let t=1e9;for(const l of L)if(!l.face&&l.ol&&l.bb&&l.bb[0]<3&&l.bb[2]>-3)t=Math.min(t,l.bb[1]);monCrown(L,0,t+2.5);}}e=renderLayers(L);MSPR.set(k,e);if(MSPR.size>140)MSPR.delete(MSPR.keys().next().value);}return e;}
 const TRAIT_COL=['#9aa6b6','#3fc7c0','#5ab84a','#e0472a','#7a4fe0','#ff7a1a'];
-function makeMon(f){const boss=f%5===0,tr=floorTraits(f),type=boss?4:(f*7+3)%4,bb=bigBoss(f);if(bb)return{name:bb.n+' · Tầng '+f,type:4,boss:true,big:f/10-1,traits:tr,col:bb.col,base:monBase(f)};return{big:-1,name:(boss?'Boss Mã Độc':MON_TYPES[type])+' · Tầng '+f,type,boss,traits:tr,col:TRAIT_COL[tr[0]],base:monBase(f)};}
+function makeMon(f){const tr=floorTraits(f),bb=bigBoss(f);if(bb)return{name:bb.n+' · Tầng '+f,type:4,boss:true,big:f/10-1,traits:tr,col:bb.col,base:monBase(f)};const kd=monKind(f),sp=MSPEC[kd.sp];
+  return{big:-1,name:(kd.elite?'Thủ Lĩnh ':'')+sp.n+' · Tầng '+f,sn:sp.n,type:kd.sp,elite:kd.elite,boss:kd.elite,traits:tr,col:kd.sp<4?TRAIT_COL[tr[0]]:sp.col,sk:sp.sk,kit:sp.k,base:monBase(f,kd)};}
 function floorReward(f,first){const boss=f%5===0,bb=bigBoss(f);if(!first)return{coin:bonusCoin(Math.round((20+f*8)*(bb?0.8:0.5)))};
   if(bb){const i=f/10-1;return{coin:bonusCoin(200+f*25),gem:30+i*15,ticket:2+Math.floor(i/2)};}
   const r={coin:bonusCoin(20+f*8),gem:2};if(boss){r.gem+=10;r.ticket=1;}return r;}
@@ -5062,16 +5227,16 @@ function winChance(f,n){const st=stats(),ps=battlePetStats();let w=0;for(let k=0
 // ---------- trận đấu ----------
 const BW2=200,BH2=112,BPARTS=[];
 const BT={run:false,last:0,speed:1};
-function newBattle(f){const st=stats(),m=makeMon(f);BFX.length=0;BX.length=0;if(m.big>=0){bossSprite(m.big,{f:0,atk:0,ph:0});S.bossSeen=S.bossSeen||{};S.bossSeen[f]=1;}Object.assign(BT,{bcut:null,intro:m.big>=0?{t:0,d:m.big>=5?3.0:2.4}:null,cut:null,quake:0,ghost:0,lungeK:0,floor:f,mon:m,pet:petById(S.battlePet)||null,B:newFight(st,PET.F,f,battlePetStats()),t:0,next:0.5,phase:m.big>=0?'intro':'fight',act:null,flash:[0,0],shake:[0,0],res:null,endT:0,fq:0});BPARTS.length=0;}
+function newBattle(f){const st=stats(),m=makeMon(f);BFX.length=0;BX.length=0;if(m.big>=0){bossSprite(m.big,{f:0,atk:0,ph:0});S.bossSeen=S.bossSeen||{};S.bossSeen[f]=1;}Object.assign(BT,{prevMon:null,gi:null,guardDone:0,guarded:0,bcut:null,intro:m.big>=0?{t:0,d:m.big>=5?3.0:2.4}:null,cut:null,quake:0,ghost:0,lungeK:0,floor:f,mon:m,pet:petById(S.battlePet)||null,B:newFight(st,PET.F,f,battlePetStats()),t:0,next:0.5,phase:m.big>=0?'intro':'fight',act:null,flash:[0,0],shake:[0,0],res:null,endT:0,fq:0});BPARTS.length=0;}
 function bFloat(side,txt,cls){const k=BT.fq++,box=$('b-float');setTimeout(()=>{const d=document.createElement('div');d.className='bfl '+(cls||'');d.textContent=txt;
   d.style.left=(side==='me'?26:74)+(((k%3)-1)*6)+'%';d.style.top=(30-(k%3)*7)+'%';box.appendChild(d);setTimeout(()=>d.remove(),900);},(k%4)*90);}
 function bspawn(o){const PC=PCUR;PCUR=BPARTS;spawn(o);PCUR=PC;}
 function bburst(x,y,n,o){const PC=PCUR;PCUR=BPARTS;burst(x,y,n,o);PCUR=PC;}
-const SNAME={shatter:'Vỡ khiên!',drain:'Chậm lượt!',lock:'Khóa hồi máu!',guard:'Dựng giáp!',enrage:'Cuồng nộ!',slow:'Chậm lại!',barrier:'Lá chắn!',echo:'Thêm lượt!',pshield:'Khiên thú',fear:'Run sợ!',roar:'Thú bị gầm choáng',burn:'Bỏng!',stun:'Choáng!',break:'Phá giáp!',dodge:'Ẩn thân!',purge:'Cấm hồi máu!'};
+const SNAME={shatter:'Vỡ khiên!',drain:'Chậm lượt!',lock:'Khóa hồi máu!',guard:'Dựng giáp!',enrage:'Cuồng nộ!',slow:'Chậm lại!',barrier:'Lá chắn!',echo:'Thêm lượt!',pshield:'Khiên thú',fear:'Run sợ!',roar:'Thú bị gầm choáng',burn:'Bỏng!',stun:'Choáng!',break:'Phá giáp!',dodge:'Ẩn thân!',purge:'Cấm hồi máu!',curse:'Suy yếu!',cleanse:'Thanh tẩy!'};
 function doTurn(){BT.fq=0;const ev=stepFight(BT.B,R),col=FXC[PET.F],kit=KIT[PET.F];
   for(const e of ev){const tx=e.to==='me'?52:150;
     switch(e.k){
-      case'act':BT.act={who:e.who,t:0,skill:e.skill};if(e.who==='ally'){BT.pact=0;bspawn({type:'orb',cols:FXC[0],size:2,x:30,y:72,vx:240,vy:-10,life:0.5});}else if(e.who==='me'){playAttack(PET.F,e.skill);if(e.skill){BT.next=Math.max(BT.next,1.0);sfx('evolve');}}else if(e.who==='mon'){if(BT.B.big>=0){if(e.skill){bossSkillFX(BT.B.big);BT.next=Math.max(BT.next,BT.B.big>=5?2.2:1.3);}else bossHitFX(BT.B.big);}else monAttackFX(e.skill);}
+      case'act':BT.act={who:e.who,t:0,skill:e.skill};if(e.who==='ally'){BT.pact=0;bspawn({type:'orb',cols:FXC[0],size:2,x:30,y:72,vx:240,vy:-10,life:0.5});}else if(e.who==='me'){playAttack(PET.F,e.skill);if(e.skill){BT.next=Math.max(BT.next,1.0);sfx('evolve');}}else if(e.who==='mon'){if(BT.B.big>=0){if(e.skill){bossSkillFX(BT.B.big);BT.next=Math.max(BT.next,BT.B.big>=5?2.2:1.3);}else bossHitFX(BT.B.big);}else{monAttackFX(e.skill);if(e.skill&&!BT.mon.guard&&BT.mon.sk)bFloat('mon',BT.mon.sk,'sk');}}
         break;
       case'dmg':{const i=e.to==='me'?0:1;BT.flash[i]=0.22;BT.shake[i]=0.22;
         const cls=e.tag==='pet'||e.tag==='h2'?'skill':e.tag==='poison'?'poi':e.tag==='burn'?'brn':e.tag==='thorns'?'thn':e.crit?'crit':(e.tag==='summon'?'skill':'');
@@ -5087,15 +5252,16 @@ function doTurn(){BT.fq=0;const ev=stepFight(BT.B,R),col=FXC[PET.F],kit=KIT[PET.
       case'revive':bFloat('me','HỒI SINH!','sk');sfx('big');break;
       case'phase2':bFloat('mon','GIAI ĐOẠN 2!','sk');bossPhase2FX();BT.next=Math.max(BT.next,1.8);break;
       case'end':endBattle(e.r==='win');break;}}
-  bHud();}
+  guardCheck();bHud();}
 function endBattle(win){BT.phase=win?'win':'lose';BT.endT=BT.t;const f=BT.floor;
   hb(win?'win':'lose');if(win){const first=f>S.floor,bb=bigBoss(f);const r=floorReward(f,first);if(first){S.floor=f;S.floorT=Date.now();}giveBundle(r);mission('win',1);
-    let extra='';if(f%5===0&&first){const i=f/10-1,it=rollItem(bb?(i>=8?4:i>=4?3:2):1),g=grantItem(it);extra=' + '+RAR[it.r]+' '+it.name;}
+    let extra='';if(f%5===0&&first){const i=f/10-1,it=rollItem(bb?(i>=9?4:i>=6?3:2):1),g=grantItem(it);extra=' + '+RAR[it.r]+' '+it.name;}
     if(bb&&first){S.bossWin=S.bossWin||{};S.bossWin[f]=Date.now();}
     BT.res=(bb?(first?'HẠ GỤC TRÙM '+bb.n.toUpperCase()+'! ':'Lại hạ '+bb.n+'! '):'Thắng tầng '+f+'! ')+'Nhận '+bundleText(r)+extra;
     if(f===TOWER_TOP&&first&&!S.towerDone)towerComplete();BT.fact=nextFact();sfx('win');gainXP(bonusXP(10+f*2));BT.enc=rollEncounter(f);}
   if(BT.pet){const p=BT.pet;p.fights=(p.fights||0)+1;if(win)p.bond=Math.min(100,(p.bond||0)+2);petGainXP(p,win?15+f*2:5);BT.res2=SPEC[p.sp].n+' +'+(win?15+f*2:5)+' XP';}
-  if(!win){const sw=strongWeak(PET.F),bb=bigBoss(f);BT.res=bb?'Trùm '+bb.n+' quá mạnh. Xem điểm yếu ở sảnh tháp, nâng trang bị, luyện thú chiến rồi quay lại.':'Thua ở tầng '+f+'. Nâng trang bị, chăm Bahi đủ no và sạch, hoặc luyện thêm cấp rồi thử lại.';sfx('lose');}
+  if(!win){const sw=strongWeak(PET.F),bb=bigBoss(f);BT.res=bb?'Trùm '+bb.n+' quá mạnh. Xem điểm yếu ở sảnh tháp, nâng trang bị, luyện thú chiến rồi quay lại.':'Thua ở tầng '+f+'. Nâng trang bị, chăm Bahi đủ no và sạch, hoặc luyện thêm cấp rồi thử lại.';const lx=bonusXP(Math.round((10+f*2)*0.3));gainXP(lx);BT.res+=' (Vẫn học được +'+lx+' XP)';sfx('lose');}
+  if(BT.guarded)guardResult(win);
   save();hud();if(win)setTimeout(()=>rankSync(true),800);setTimeout(()=>{$('b-res').textContent=BT.res+(BT.pet?' · '+BT.res2:'')+(BT.res2x||'');BT.res2x='';$('b-res').className='b-res '+(win?'ok':'bad');if(win){$('b-facttx').textContent=BT.fact;$('b-fact').hidden=false;}$('b-next').hidden=!(win&&!BT.enc&&S.floor<TOWER_TOP);towerUI();if(win&&BT.enc){const e=BT.enc;BT.enc=null;$('b-res').textContent+=' · Bụi rậm đang rung động... có gì đó!';sfx('rare',e.r);vib([40,60,40]);setTimeout(()=>{BT.run=false;$('b-fact').hidden=true;openCatch(e);},1800);}},500);}
 function drawBattle(){const cv=$('b-cv'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
   const big=BT.B.big;drawTowerBG(g,BT.floor,BT.t,big);drawBX(g,true);
@@ -5115,43 +5281,46 @@ function drawBattle(){const cv=$('b-cv'),g=cv.getContext('2d');g.imageSmoothingE
   const rr=FRAR[baseOf(PET.F)];if(rr&&BT.phase!=='lose')drawAuraBack(g,52,98,rr,t,-(pe.A.top?pe.A.top[1]:-40),STAGE_SCALE[STAGE_OF[PET.F]]);
   if(BT.ghost>0){g.save();for(let i=1;i<=2;i++){g.globalAlpha=0.25/i;blit(g,silhouette(pe,(FXC[PET.F]||FX.gold)[1]),52+me*(1-i*0.3),98,{ax:AX/SW,ay:AY/SH});}g.restore();}
   const meImg=BT.flash[0]>0&&Math.floor(t*30)%2?silhouette(pe,'#ffffff'):pe.c;blit(g,meImg,52+me+sx,98,{ax:AX/SW,ay:AY/SH});
-  const mP={expr:BT.phase==='win'?'sad':BT.phase==='lose'?'happy':(BT.act&&BT.act.who==='mon'&&BT.act.t<0.35?'roar':'focus'),bob:sq(t,1.3),f:Math.floor(t*4)%4};
+  const mP={expr:BT.phase==='win'?'sad':BT.phase==='lose'?'happy':(BT.act&&BT.act.who==='mon'&&BT.act.t<0.35?'roar':'focus'),bob:sq(t,1.3),f:Math.floor(t*4)%4,elite:BT.mon.elite};
+  if(BT.prevMon&&BT.phase!=='guard'){g.save();g.globalAlpha=BT.phase==='win'?0.9:0.55;blit(g,monSprite(BT.prevMon.type,BT.prevMon.col,{expr:BT.phase==='win'?'surprised':'sad',bob:sq(t,0.8),f:0,elite:BT.prevMon.elite}),176,98,{ax:AX/SW,ay:AY/SH,flip:true});g.restore();}
   const ip=BT.phase==='intro'?BT.intro.t/BT.intro.d:1,matk=BT.act&&BT.act.who==='mon'&&BT.act.t<0.45;
   const ms=big>=0?bossSprite(big,{f:Math.floor(t*2)%2,atk:matk,ph:BT.B.mon.p2}):monSprite(BT.mon.type,BT.mon.col,mP),msx=(BT.shake[1]>0?(Math.floor(t*40)%2?1:-1):0)+(big>=0?Math.round((1-Math.min(1,ip*2.2))*70):0),mby=big>=0?sq(t,1.1):0;
   if(BT.B.mon.block>0){g.save();g.globalAlpha=0.3;if(big>=0)pxEllipse(g,150,98-(24+big*2.6),30+big,26+big*2.6,'#c8a0ff');else pxEllipse(g,150,72,22,28,'#c8a0ff');g.restore();}
   const dead=BT.phase==='win',dt2=t-(BT.endT||0);
-  if(!dead||(dt2<1&&Math.floor(t*10)%2)){let w=_silCache.get(ms);if(!w){w={c:ms};_silCache.set(ms,w);}const img=BT.flash[1]>0&&Math.floor(t*30)%2?silhouette(w,'#ffffff'):ms;
+  if(BT.phase!=='guard'&&(!dead||(dt2<1&&Math.floor(t*10)%2))){let w=_silCache.get(ms);if(!w){w={c:ms};_silCache.set(ms,w);}const img=BT.flash[1]>0&&Math.floor(t*30)%2?silhouette(w,'#ffffff'):ms;
     const img2=big>=0&&ip<0.42?silhouette(w,'#000000'):img;blit(g,img2,150-mo+msx,98+mby,{ax:AX/SW,ay:AY/SH,flip:true});
     if(big>=0&&ip>=0.42&&ip<0.55){g.globalAlpha=1-(ip-0.42)/0.13;g.fillStyle='#ffffff';g.fillRect(0,0,BW2,BH2);g.globalAlpha=1;}
     const sy=big>=0?Math.max(8,48-big*5):40;
     if(BT.B.mon.poison>0)for(let k=0;k<BT.B.mon.poison;k++){g.fillStyle='#8ae05a';g.fillRect(138+k*4,sy+Math.round(Math.sin(t*4+k)*1),2,2);}
     if(BT.B.mon.burnT>0&&Math.floor(t*8)%2){g.fillStyle='#ffb347';g.fillRect(146,sy-4,3,3);g.fillRect(152,sy-2,2,2);}}
-  drawBFX(g);drawBX(g,false);drawParts(g,true,BPARTS);g.restore();drawCutIn(g);drawBossCut(g);if(BT.phase==='intro')drawBossIntro(g);if(BT.phase==='win'&&BT.floor===TOWER_TOP)drawCrown(g,t-(BT.endT||0));}
+  drawBFX(g);drawBX(g,false);drawParts(g,true,BPARTS);g.restore();drawCutIn(g);drawBossCut(g);if(BT.phase==='intro')drawBossIntro(g);if(BT.phase==='guard')drawGuardIntro(g);if(BT.phase==='win'&&BT.floor===TOWER_TOP)drawCrown(g,t-(BT.endT||0));}
 const _silCache=new WeakMap();
 function bLoop(ts){if(!BT.run)return;requestAnimationFrame(bLoop);const d0=Math.min(0.05,(ts-(BT.last||ts))/1000);BT.last=ts;const d=d0*(BT.phase==='fight'?BT.speed:1);
   BT.t+=d;if(BT.act)BT.act.t+=d;updBFX(d);updBX(d);if(BT.phase==='intro'){bossWarmStep(BT.B.big);BT.intro.t+=d;if(BT.intro.t>=BT.intro.d){BT.phase='fight';BT.next=0.3;}}BT.flash=BT.flash.map(v=>Math.max(0,v-d));BT.shake=BT.shake.map(v=>Math.max(0,v-d));
+  if(BT.phase==='guard')guardTick(d0);
   if(BT.phase==='fight'){BT.next-=d;if(BT.next<=0){BT.next=0.6;doTurn();}}
   updParts(d,BPARTS);drawBattle();}
 function bHud(){const me=BT.B.me,m=BT.B.mon;$('b-mehp').style.width=(Math.max(0,me.hp)/me.max*100)+'%';$('b-monhp').style.width=(Math.max(0,m.hp)/m.max*100)+'%';
-  $('b-metx').textContent=Math.max(0,me.hp)+'/'+me.max+(me.shield>0?' · khiên '+me.shield:'');$('b-montx').textContent=Math.max(0,m.hp)+'/'+m.max+(m.block>0?' · chặn '+m.block:'');}
+  $('b-metx').textContent=Math.max(0,me.hp)+'/'+me.max+(me.shield>0?' · khiên '+me.shield:'');$('b-montx').textContent=m.guard?'? ? ?':Math.max(0,m.hp)+'/'+m.max+(m.block>0?' · chặn '+m.block:'');}
 function startFight(sweep){regenEnergy();if(S.energy<1){toast('Hết năng lượng. Chờ hồi hoặc dùng Pin Năng Lượng.');return;}
-  if(sweep){if(S.floor<1){toast('Chưa có tầng nào để quét');return;}S.energy--;const r=floorReward(S.floor,false);giveBundle(r);mission('win',1);sfx('coin');toast('Quét tầng '+S.floor+': +'+bundleText(r));save();hud();towerUI();return;}
+  if(sweep){if(S.floor<1){toast('Chưa có tầng nào để quét');return;}S.energy--;const r=floorReward(S.floor,false);giveBundle(r);mission('win',1);const sx=bonusXP(Math.round((10+S.floor*2)*0.4));gainXP(sx);sfx('coin');toast('Quét tầng '+S.floor+': +'+bundleText(r)+' + '+sx+' XP');save();hud();towerUI();return;}
   S.energy--;if(S.energy===S.emax-1)S.eT=Date.now()/1000;save();hud();newBattle(Math.min(TOWER_TOP,S.floor+1));if(BT.intro){sfx('rare',Math.min(4,1+Math.floor(BT.B.big/3)));vib([30,50,30]);}$('b-res').textContent='';$('b-res').className='b-res';$('b-fact').hidden=true;$('b-next').hidden=true;$('b-float').innerHTML='';
   $('b-view').hidden=false;$('t-lobby').hidden=true;bHead();bHud();if(!BT.run){BT.run=true;BT.last=0;requestAnimationFrame(bLoop);}}
 function bHead(){const m=BT.mon,F=PET.F;$('b-mename').textContent=FORMS[F].name;$('b-meel').textContent=DTYPE[KIT[F].t].n;$('b-meel').style.background=DTYPE[KIT[F].t].c;
-  $('b-monname').textContent=m.name;$('b-monel').textContent=m.traits.map(i=>TRAITS[i].n).join(' + ');$('b-monel').style.background=m.col;}
+  $('b-monname').textContent=m.name;$('b-monel').textContent=m.guard?'???':m.traits.map(i=>TRAITS[i].n).join(' + ');$('b-monel').style.background=m.guard?'#1a2040':m.col;}
 function towerUI(){regenEnergy();towerRoad();const st=stats(),f=Math.min(TOWER_TOP,S.floor+1),m=makeMon(f),F=PET.F;$('t-floor').textContent=f;$('t-best').textContent=S.floor;
   $('t-energy').textContent=S.energy+'/'+S.emax;$('t-cp').textContent=power(st).toLocaleString('vi-VN');
   const wc=Math.round(winChance(f,40)*100);$('t-mcp').textContent=wc+'%';$('t-mcp').style.color=wc>=70?'#3e7d38':wc>=40?'#d2620f':'#c0392b';
-  $('t-mon').innerHTML='';const head=document.createElement('b');const myst=m.big>=0&&!bossKnown(m.big);head.textContent=m.big>=0?'TRÙM: '+(myst?'? ? ?':TBOSS[m.big].n):(m.boss?'Boss Mã Độc':MON_TYPES[m.type]);head.style.color=m.col;$('t-mon').appendChild(head);
+  $('t-mon').innerHTML='';const head=document.createElement('b');const myst=m.big>=0&&!bossKnown(m.big);head.textContent=m.big>=0?'TRÙM: '+(myst?'? ? ?':TBOSS[m.big].n):(m.elite?'THỦ LĨNH: ':'')+m.sn;head.style.color=m.col;$('t-mon').appendChild(head);
+  if(m.big<0){const d=document.createElement('div');d.className='trait';d.innerHTML='<span></span> <small></small>';d.querySelector('span').textContent=m.sk;d.querySelector('span').style.background='#3a2a40';d.querySelector('small').textContent='Chiêu riêng: '+kitDesc(m.kit)+(m.elite?'. Thủ lĩnh: chiêu mạnh hơn 15%':'')+'.';$('t-mon').appendChild(d);}
   if(myst){const d=document.createElement('div');d.className='trait';d.innerHTML='<small>Một bóng đen khổng lồ chắn lối. Đặc tính và cách khắc chế chưa rõ.</small>';$('t-mon').appendChild(d);}
   else m.traits.forEach(i=>{const d=document.createElement('div');d.className='trait';d.innerHTML='<span></span> <small></small>';d.querySelector('span').textContent=TRAITS[i].n;d.querySelector('span').style.background=TRAIT_COL[i];
     d.querySelector('small').textContent=TRAITS[i].d+'. Khắc chế bằng: '+TRAITS[i].good+'.';$('t-mon').appendChild(d);});
   const adv=m.traits.reduce((a,i)=>a+traitAdv(F,i),0)/m.traits.length;
   $('t-adv').textContent=myst?'Chưa thể đánh giá ưu thế khi chưa từng gặp trùm này.':adv>0.05?'Nhánh '+FORMS[F].name+' có ưu thế ở tầng này.':adv<-0.05?'Nhánh '+FORMS[F].name+' gặp bất lợi ở tầng này, nên tăng trang bị.':'Nhánh '+FORMS[F].name+' đánh tầng này ở mức trung bình.';
-  const r=floorReward(f,S.floor<f),bbf=bigBoss(f);$('t-rew').textContent=S.floor>=f?'Đã nhận (tái đấu chỉ được xu)':bundleText(r)+(bbf?' + vật phẩm '+['SR','SR','SR','SR','SSR','SSR','SSR','SSR','UR','UR'][f/10-1]+' trở lên'+(f===TOWER_TOP?' + PHẦN THƯỞNG CHINH PHỤC':''):f%5===0?' + vật phẩm R trở lên':'');
+  const r=floorReward(f,S.floor<f),bbf=bigBoss(f);$('t-rew').textContent=S.floor>=f?'Đã nhận (tái đấu chỉ được xu)':bundleText(r)+(bbf?' + vật phẩm '+['SR','SR','SR','SR','SR','SR','SSR','SSR','SSR','UR'][f/10-1]+' trở lên'+(f===TOWER_TOP?' + PHẦN THƯỞNG CHINH PHỤC':''):f%5===0?' + vật phẩm R trở lên':'');
   $('t-go').firstChild.textContent=S.towerDone?'Tái đấu Đế Vương':bbf?'Khiêu chiến TRÙM':'Khiêu chiến';
-  const bpp=petById(S.battlePet);$('t-pet').textContent=bpp?'Thú ra trận: '+petName(bpp)+' Lv '+bpp.lv+' ('+SPEC[bpp.sp].role+')':'Chưa có thú ra trận. Quái giờ mạnh hơn 12%, nên có thú hỗ trợ sẽ dễ leo hơn.';
+  const bpp=petById(S.battlePet);$('t-pet').textContent=bpp?'Thú ra trận: '+petName(bpp)+' Lv '+bpp.lv+' ('+SPEC[bpp.sp].role+')':'Chưa có thú ra trận. Quái trong tháp rất mạnh, nên có thú hỗ trợ sẽ dễ leo hơn.';
   $('t-debuff').textContent=st.debuff.length?'Đang bị: '+st.debuff.join(', '):'';
   $('t-next').textContent=S.energy>=S.emax?'Năng lượng đầy':'Hồi +1 sau '+fmtTime(ENERGY_SEC-(Date.now()/1000-S.eT));}
 function openTower(){$('b-view').hidden=true;$('c-view').hidden=true;$('t-lobby').hidden=false;showModal('tower');towerUI();}
@@ -5182,6 +5351,257 @@ const FACTS=[
  'Nguyên tắc thế quyền: sau khi bồi thường cho bạn, doanh nghiệp bảo hiểm được quyền đòi người gây ra thiệt hại hoàn trả.',
  'Phí bảo hiểm nhân thọ thường thấp hơn khi mua lúc còn trẻ và khỏe, vì xác suất rủi ro thấp hơn.'];
 function nextFact(){S.factIdx=((S.factIdx==null?Math.floor(R()*FACTS.length):S.factIdx)+1)%FACTS.length;return FACTS[S.factIdx];}
+
+// ================= 20 LOÀI QUÁI MỚI + HỘ VỆ BÍ ẨN (vẽ bằng rig, nhỏ gọn, dễ thương) =================
+// quy ước: chân chạm y=0, quay mặt theo +x (khi đánh sẽ lật quay về phía Bahi)
+const MP3=h=>[mix(h,'#ffffff',0.42),h,mix(h,'#000000',0.35)],MO3=h=>mix(h,'#000000',0.68);
+// mắt phát sáng dạng điểm ảnh (vẽ đè sau cùng)
+function glowEyes(L,cx,cy,sep,col,o={}){const w=o.w||1.6,h=o.h||1.4,core=o.core||'#ffffff';
+  L.push(pFn(bbx(cx-sep-w-1,cy-h-1,cx+sep+w+1,cy+h+1),(x,y)=>{for(const s of(o.one?[0]:[-1,1])){const ex=cx+s*sep;if(Math.abs(x-ex)<=w&&Math.abs(y-cy)<=h)return(Math.abs(x-ex)<w*0.45&&y<cy)?core:col;}return null;},null,{face:true}));}
+function monCrown(L,x,y){L.push(pPoly([[x-5,y],[x+5,y],[x+5.5,y-5],[x+2.5,y-2.5],[x,y-6.5],[x-2.5,y-2.5],[x-5.5,y-5]],PAL.gold,OLC.gold));
+  L.push(pEl(x,y-3,1.1,1.1,PAL.crimson,OLC.crimson));}
+const MCROWN={6:[12,-19],8:[8,-10.5],22:[0,-28.5]}; // vị trí vương miện thủ lĩnh cho loài có đầu lệch tâm
+function legsBot(L,b,pal,ol,sep,h){for(const s of[-1,1]){L.push(pRR(s*sep,-h/2,1.8,h/2,0.8,pal,ol));L.push(pRR(s*sep+s*0.4,-1.2,2.6,1.3,0.8,pal,ol));}}
+
+// 4 · Lính Robot Tí Hon
+function MN4(P,c){const L=[],b=P.bob,bl=MP3('#5b8fd8'),st=PAL.steel,ds=PAL.dsteel;
+  legsBot(L,b,ds,OLC.steel,3.2,6);
+  L.push(pCap(-7,-12+b,-9,-6+b,1.6,1.5,ds,OLC.steel));L.push(pEl(-9.2,-5.5+b,1.8,1.8,st,OLC.steel));
+  L.push(pRR(0,-11+b,7,5.5,2,bl,MO3('#5b8fd8'),{col:(x,y,nx,ny,cc)=>Math.abs(nx)<0.25&&Math.abs(ny)<0.35?(P.f%2?'#ffe066':'#ffb020'):cc}));
+  L.push(pCap(7,-12+b,13,-12+b,2.2,2,ds,OLC.steel));L.push(pRR(14,-12+b,1.6,2.2,0.6,PAL.dark,OLC.dark));
+  L.push(pCap(0,-26+b,0,-30+b,0.5,0.5,ds,OLC.steel));L.push(pEl(0,-31+b,1.4,1.4,P.f%2?PAL.crimson:['#ffe0e0','#ff7a7a','#c0303a'],OLC.crimson));
+  L.push(pRR(0,-21+b,8,5.5,2.5,st,OLC.steel));L.push(pRR(0,-21+b,6,3,1.4,['#3a4a6a','#22304a','#141c2a'],'#0a0e18'));
+  glowEyes(L,0,-21+b,2.6,P.expr==='roar'?'#ff5a5a':P.expr==='sad'?'#7a8aa0':'#7ff0ff');return L;}
+// 5 · Hiệp Sĩ Thiếc
+function MN5(P,c){const L=[],b=P.bob,st=PAL.steel,ds=PAL.dsteel;
+  legsBot(L,b,ds,OLC.steel,3,5);
+  L.push(pCap(-6,-12+b,-11,-25+b,0.8,0.8,['#ffffff','#dde6ee','#9aa6b6'],OLC.steel));L.push(pRR(-7,-12+b,2.6,0.9,0.4,PAL.gold,OLC.gold));L.push(pEl(-6,-11+b,1.4,1.4,PAL.wood,OLC.wood));
+  L.push(pRR(0,-10+b,6.5,5,2,st,OLC.steel,{col:(x,y,nx,ny,cc)=>Math.abs(nx)<0.12?PAL.gold[1]:cc}));
+  L.push(pCurve(bez([0,-27+b],[-4,-33+b],[-9,-30+b],6),1.6,0.8,PAL.crimson,OLC.crimson));
+  L.push(pEl(0,-20+b,7,6.5,st,OLC.steel));L.push(pRR(0,-20+b,5,1.2,0.5,['#2a2f3a','#141820','#0a0c10'],'#000000'));
+  glowEyes(L,0,-20+b,2.4,P.expr==='roar'?'#ff7a3a':'#ffe066',{h:0.7});
+  L.push(pEl(9,-11+b,5,6.2,PAL.crimson,OLC.crimson,{col:(x,y,nx,ny,cc)=>(Math.abs(nx)<0.18||Math.abs(ny)<0.15)&&nx*nx+ny*ny<0.7?PAL.gold[0]:nx*nx+ny*ny>0.78?PAL.gold[1]:cc}));return L;}
+// 6 · Chó Săn Cơ Khí
+function MN6(P,c){const L=[],b=P.bob,m=MP3('#d2620f'),ds=PAL.dsteel,o=MO3('#d2620f'),run=P.f%2;
+  for(const[x,s]of[[-7,run],[-3,1-run],[4,run],[8,1-run]])L.push(pCap(x,-7+b,x+(s?1.5:-1),-1.2,1.3,1.1,ds,OLC.steel));
+  L.push(pCurve(bez([-10,-11+b],[-15,-14+b],[-15,-20+b],5),0.8,0.5,ds,OLC.steel));L.push(pEl(-15,-20.5+b,1.2,1.2,PAL.crimson,OLC.crimson));
+  L.push(pRR(0,-10+b,10,4.2,3,m,o,{col:(x,y,nx,ny,cc)=>Math.abs(nx-0.1)<0.08||Math.abs(nx+0.35)<0.08?ds[1]:cc}));
+  for(const s of[-1,1])L.push(pPoly([[8+s*2,-18+b],[10+s*2,-18+b],[9+s*2.6,-24+b]],ds,OLC.steel));
+  L.push(pRR(11,-15+b,5,4,1.8,m,o));L.push(pRR(15,-13+b,2.4,1.6,0.6,ds,OLC.steel,{col:(x,y,nx,ny,cc)=>ny>0.2&&Math.floor(x*2)%2?'#ffffff':cc}));
+  glowEyes(L,12,-16.5+b,0,P.expr==='sad'?'#ffb0a0':'#ff3a3a',{one:1,w:1.2,h:1});return L;}
+// 7 · Ninja Máy Lỗi
+function MN7(P,c){const L=[],b=P.bob,dk=['#5a6478','#3a4352','#222a36'],gl=P.f;
+  legsBot(L,b,dk,'#0a0e14',2.8,5);
+  L.push(pCurve(bez([-3,-17+b],[-12,-16+b+(gl%2)],[-17,-12+b+(gl%2?1:-1)],6),1.5,0.9,PAL.crimson,OLC.crimson));
+  L.push(pCap(7,-12+b,12,-17+b,1,0.6,PAL.steel,OLC.steel));L.push(pPoly([[12,-19+b],[14,-17+b],[11.5,-16+b]],PAL.steel,OLC.steel));
+  L.push(pRR(0,-10+b,6,5,2,dk,'#0a0e14',{col:(x,y,nx,ny,cc)=>hash(Math.floor(x+gl*3),Math.floor(y))<0.06?'#3fe8ff':cc}));
+  L.push(pEl(0,-20+b,7,6.3,dk,'#0a0e14'));L.push(pRR(0,-17+b,7.2,1.3,0.5,PAL.crimson,OLC.crimson));
+  L.push(pRR(0,-21+b,5,1.6,0.7,['#123040','#0a1a24','#05101a'],'#000'));
+  glowEyes(L,1,-21+b,0,'#3fe8ff',{one:1,w:3.6,h:0.6});
+  if(gl===3)L.push(pRR(-5,-8+b,2,1,0,['#3fe8ff','#3fe8ff','#3fe8ff'],null));return L;}
+// 8 · Bọ Cạp Thép
+function MN8(P,c){const L=[],b=P.bob,g=PAL.gold,o=OLC.gold,ds=PAL.dsteel;
+  for(const x of[-6,-2,2])for(const s of[-1,1])L.push(pCap(x,-5+b,x+s*2.5,-1,0.9,0.7,ds,OLC.steel));
+  const tl=bez([-9,-7+b],[-18,-14+b],[-10,-25+b],7);tl.forEach((p,i)=>{if(i)L.push(pEl(p[0],p[1],2.6-i*0.2,2.3-i*0.2,g,o));});
+  L.push(pPoly([[-8,-25+b],[-4,-27+b+(P.f%2)],[-6,-23+b]],['#d8ffb0','#7ae04a','#3a8a1a'],'#1a4a0a'));
+  L.push(pEl(0,-7+b,9,4.2,g,o,{col:(x,y,nx,ny,cc)=>Math.abs(Math.sin(x*0.9))<0.2?g[2]:cc}));
+  for(const s of[-1,1]){L.push(pCap(6,-7+b,11,-10+b+s*3,1.1,1,g,o));L.push(pEl(13,-10+b+s*3.5,2.6,1.8,g,o));L.push(pPoly([[13,-10+b+s*3.5],[16.5,-10+b+s*2],[15.5,-10+b+s*4.5]],g,o));}
+  glowEyes(L,7,-9+b,1.3,'#7ae04a',{w:0.7,h:0.7});return L;}
+// 9 · Nhện Máy Giăng Tơ
+function MN9(P,c){const L=[],b=P.bob,m=MP3('#7a4fc0'),o=MO3('#7a4fc0'),ds=PAL.dsteel,lg=P.f%2?1:-1;
+  L.push(pCap(0,-38,0,-20+b,0.3,0.3,['#ffffff','#e0e8ff','#a8b8e0'],null));
+  for(let i=0;i<3;i++)for(const s of[-1,1]){const kx=s*(8+i*2),ky=-15+b-i*1.5+(i%2?lg:-lg);L.push(pCap(s*4,-11+b,kx,ky,1,0.9,ds,OLC.steel));L.push(pCap(kx,ky,s*(10+i*3),-1,0.9,0.6,ds,OLC.steel));}
+  L.push(pEl(0,-12+b,8,6.5,m,o,{col:(x,y,nx,ny,cc)=>Math.abs(nx)<0.12&&ny<0.3?'#ffd84a':cc}));
+  L.push(pEl(0,-6+b,5,3.5,ds,OLC.steel));
+  L.push(pFn(bbx(-5,-16+b,5,-8+b),(x,y)=>{for(const[ex,ey,r]of[[-2.5,-13,1.3],[2.5,-13,1.3],[-4.3,-11.2,0.8],[4.3,-11.2,0.8]])if((x-ex)**2+(y-ey-b)**2<=r*r)return P.expr==='sad'?'#c8b8ff':'#ff3a5a';return null;},null,{face:true}));return L;}
+// 10 · Cú Radar
+function MN10(P,c){const L=[],b=P.bob,m=MP3('#3fc7c0'),o=MO3('#3fc7c0'),rf=P.f%2;
+  for(const s of[-1,1])L.push(pCap(s*2.5,-3+b,s*3,-0.8,0.8,0.8,PAL.gold,OLC.gold));
+  L.push(pCap(0,-26+b,0,-29+b,0.6,0.6,PAL.dsteel,OLC.steel));L.push(pRR(0,-29.5+b,rf?9:4,0.8,0.4,PAL.steel,OLC.steel));
+  for(const s of[-1,1])L.push(rEl(s*8,-12+b,3,6,s*0.3,MP3('#238891'),MO3('#238891')));
+  L.push(pEl(0,-14+b,8,10.5,m,o,{col:(x,y,nx,ny,cc)=>ny>0.25&&Math.abs(nx)<0.6&&Math.floor(y)%2?'#c8fff8':cc}));
+  for(const s of[-1,1])L.push(pPoly([[s*3,-24+b],[s*7,-24+b],[s*7,-28+b]],m,o));
+  for(const s of[-1,1])L.push(pFn(bbx(s*3.6-3.5,-21.5+b,s*3.6+3.5,-14.5+b),(x,y)=>{const d=Math.hypot(x-s*3.6,y+18+-b);if(d>3.3)return null;return d>2.5?'#e8eef4':d>1.6?(P.expr==='roar'?'#ff3a3a':'#2a3a5a'):d>0.8?'#7ff0ff':'#ffffff';},null,{face:true}));
+  L.push(pPoly([[-1,-15+b],[1,-15+b],[0,-13+b]],PAL.gold,OLC.gold));return L;}
+// 11 · Pháp Sư Bóng Tối
+function MN11(P,c){const L=[],b=P.bob,rb=MP3('#5649b2'),o=MO3('#5649b2'),fl=P.f;
+  L.push(pCap(9,-4+b,9,-24+b,0.8,0.8,PAL.wood,OLC.wood));
+  L.push(pEl(9,-27+b,2.8,2.8,['#ffd6ff','#c070ff','#6a2aa0'],'#2a0a40'));L.push(pPoly([[7.5,-29+b],[10.5,-29+b],[9+(fl%2?1:-1),-34+b]],['#f0d0ff','#b060ff','#7a2ac0'],null));
+  L.push(pPoly([[-8,-2+b],[8,-2+b],[6,-14+b],[-6,-14+b]],rb,o,{col:(x,y,nx,ny,cc)=>y>-3+b&&Math.floor(x+fl)%3===0?null:cc}));
+  L.push(pCap(5,-12+b,9,-14+b,1.5,1.4,rb,o));
+  L.push(pPoly([[-7.5,-14+b],[7.5,-14+b],[5,-26+b],[0,-30+b],[-5,-26+b]],rb,o));
+  L.push(pEl(0,-18.5+b,4.8,4,['#2a2050','#140c2a','#0a0614'],'#000'));
+  glowEyes(L,0,-19+b,1.8,P.expr==='roar'?'#ff5aff':'#ffe066',{w:1,h:0.8});
+  L.push(pPoly([[-1.5,-11+b],[1.5,-11+b],[0,-7+b]],PAL.gold,OLC.gold));return L;}
+// 12 · Phù Thủy Rút Hồn
+function MN12(P,c){const L=[],b=P.bob,dr=MP3('#a71b9d'),o=MO3('#a71b9d'),hat=['#5a3a6a','#3a2050','#221030'];
+  legsBot(L,b,PAL.dark,OLC.dark,2.5,4);
+  L.push(pPoly([[-7,-3+b],[7,-3+b],[4,-13+b],[-4,-13+b]],dr,o));
+  L.push(pCap(-5,-11+b,-9,-8+b,1.3,1.2,dr,o));
+  L.push(pCap(5,-11+b,9,-9+b,1.3,1.2,dr,o));L.push(pCap(10,-9+b,10,-14+b,0.4,0.4,PAL.dsteel,OLC.steel));
+  L.push(pRR(10,-6.5+b,2.8,3.4,1.2,['#e8faff','#9fe8ff','#4ab0e0'],'#1a4a6a',{col:(x,y,nx,ny,cc)=>(nx*nx+(ny+0.1)**2<0.3)?(P.f%2?'#ffffff':'#c8f8ff'):cc}));
+  L.push(pEl(0,-17+b,6,5.5,PAL.skin,OLC.skin));L.push(faceLayer(0,-16.5+b,0.62,P,{blush:'#ff9ad0',eye:'#5a1060'}));
+  L.push(pRR(0,-21.5+b,9,1.3,0.6,hat,'#120818'));
+  L.push(pPoly([[-5,-22+b],[5,-22+b],[1,-30+b],[-3,-33+b],[-2,-29+b]],hat,'#120818',{col:(x,y,nx,ny,cc)=>y>-24.3+b?PAL.magenta[1]:cc}));return L;}
+// 13 · Đạo Sĩ Hắc Phù
+function MN13(P,c){const L=[],b=P.bob+(P.f%2?-1:0),rb=['#5a4a6a','#3a2a40','#221828'],o='#0e0814';
+  for(const s of[-1,1])L.push(pRR(s*2.5,-2+b,2.2,2,0.6,PAL.dark,OLC.dark));
+  L.push(pRR(0,-9+b,6.5,6,2,rb,o,{col:(x,y,nx,ny,cc)=>Math.abs(nx)<0.12?'#c0303a':Math.abs(ny-0.2)<0.1?'#ffd84a':cc}));
+  for(const s of[0,1])L.push(pCap(3,-12+b-s*2.5,13,-12+b-s*2.5,1.6,1.6,rb,o));
+  for(const s of[0,1])L.push(pEl(13.5,-12+b-s*2.5,1.4,1.3,['#d8f0d0','#b0d8a8','#88b080'],'#3a5a30'));
+  L.push(pEl(0,-19+b,6,5.5,['#e8fff0','#c8e8d0','#98c0a8'],'#3a5a40'));L.push(faceLayer(0,-18+b,0.6,P,{blush:'#c8a0ff',eye:'#2a1a3a'}));
+  L.push(pRR(0,-25+b,6.5,2.6,1,['#4a4a5a','#2a2a38','#14141c'],'#000'));L.push(pRR(0,-27.5+b,4,1.4,0.6,['#4a4a5a','#2a2a38','#14141c'],'#000'));
+  L.push(pPoly([[-1.5,-24+b],[1.5,-24+b],[1.8,-14.5+b],[-1.8,-14.5+b]],['#fff8c0','#ffe066','#d8b020'],'#6a4a00',{col:(x,y,nx,ny,cc)=>Math.abs(nx)<0.35&&Math.floor(y)%3===0?'#c0303a':cc}));return L;}
+// 14 · Thiên Sứ Sa Ngã
+function MN14(P,c){const L=[],b=P.bob+(P.f%2?-1:0),wg=['#4a3a5a','#2a1a3a','#140a1e'],fl=P.f;
+  for(const s of[-1,1])L.push(pPoly([[s*3,-16+b],[s*16,-27+b-(fl%2)],[s*14,-20+b],[s*17,-17+b],[s*12,-14+b],[s*14,-9+b],[s*7,-11+b]],wg,'#05020a',{col:(x,y,nx,ny,cc)=>hash(Math.floor(x),Math.floor(y))<0.08?null:cc}));
+  L.push(pPoly([[-6,-1+b],[6,-1+b],[3.5,-13+b],[-3.5,-13+b]],['#5a4a6a','#2a1a3a','#140a1e'],'#05020a',{col:(x,y,nx,ny,cc)=>y>-2.5+b&&Math.floor(x)%2?null:cc}));
+  L.push(pEl(0,-18+b,6,5.5,['#fff4f0','#f0dcd8','#c8a8b0'],'#5a3a4a'));L.push(faceLayer(0,-17.5+b,0.6,P,{blush:'#c8a0d8',eye:'#3a1030'}));
+  L.push(pCurve(bez([-6,-21+b],[-7,-14+b],[-5,-11+b],5),1.4,1,['#e8e8f0','#c8c8d8','#9898b0'],'#3a3a50'));L.push(pCurve(bez([6,-21+b],[7,-14+b],[5,-11+b],5),1.4,1,['#e8e8f0','#c8c8d8','#9898b0'],'#3a3a50'));
+  L.push(pEl(0,-22+b,6.3,2.8,['#e8e8f0','#c8c8d8','#9898b0'],'#3a3a50'));
+  L.push(pFn(bbx(-7,-31+b,7,-25+b),(x,y)=>{const a=(x)/6,bb=(y+28-b)/1.8,d=Math.sqrt(a*a+bb*bb);if(Math.abs(d-1)>0.28)return null;if(x>1.5&&x<3)return null;return x<0?'#8a7a6a':'#5a4a3a';},'#1a1008'));return L;}
+// 15 · Kỵ Sĩ Thiên Giới Sa Đọa
+function MN15(P,c){const L=[],b=P.bob,ar=['#f0e0a0','#c8a040','#7a5a10'],dk=PAL.dark;
+  L.push(pPoly([[-4,-17+b],[-15,-28+b],[-13,-20+b],[-16,-15+b],[-9,-13+b]],['#4a3a5a','#2a1a3a','#140a1e'],'#05020a'));
+  legsBot(L,b,dk,OLC.dark,3,5);
+  L.push(pCap(9,-1+b,9,-30+b,0.7,0.7,PAL.dsteel,OLC.steel));L.push(pPoly([[7.5,-30+b],[10.5,-30+b],[9,-37+b]],['#ffe0e0','#ff5a5a','#a01a2a'],'#3a0008'));
+  L.push(pRR(0,-10+b,6.5,5.5,2,ar,'#3a2a00',{col:(x,y,nx,ny,cc)=>Math.abs(nx)<0.15&&ny<0.2?'#5a1a2a':cc}));
+  L.push(pCap(6,-12+b,9,-14+b,1.6,1.5,ar,'#3a2a00'));
+  L.push(pEl(0,-20+b,6.8,6.3,ar,'#3a2a00'));L.push(pRR(1,-20+b,4.6,1.1,0.5,['#2a0a10','#140008','#000'],'#000'));
+  glowEyes(L,1,-20+b,2.2,'#ff3a5a',{h:0.6,w:1.1});
+  for(const s of[-1,1])L.push(pPoly([[s*5,-24+b],[s*10,-30+b],[s*8,-24+b]],['#ffffff','#e8e0d0','#a8987a'],'#3a2a1a'));return L;}
+// 16 · Hồn Ma Đèn Lồng
+function MN16(P,c){const L=[],b=P.bob+(P.f%2?-1:0),w=['#fff4e8','#ffe0c0','#e8b890'],o='#7a4a2a',fl=P.f;
+  L.push(pFn(bbx(-10,-30+b,10,-1+b),(x,y)=>{const yy=y-b;if(yy<-18){if(!inEl(x,y,0,-18+b,9,11))return null;}else{if(Math.abs(x)>9)return null;if(yy>-4+Math.sin(x*0.9+fl)*2)return null;}return sh3(w,x/9,(yy+16)/12);},o));
+  L.push(faceLayer(0,-18+b,0.75,P,{blush:'#ffb070'}));
+  L.push(pCap(8,-15+b,12,-13+b,1.5,1.3,w,o));L.push(pCap(13,-13+b,13,-10+b,0.3,0.3,PAL.dark,OLC.dark));
+  L.push(pEl(13,-6+b,3.6,4,['#ffe0a0','#ff6a3a','#b0201a'],'#4a0a00',{col:(x,y,nx,ny,cc)=>Math.abs(ny)>0.75?'#2a1a10':Math.floor(y)%2&&Math.abs(nx)<0.8?(fl%2?'#ffe066':'#ffb020'):cc}));
+  L.push(pRR(13,-1.5+b,1,1,0.3,PAL.dark,OLC.dark));return L;}
+// 17 · Oan Hồn Tóc Dài
+function MN17(P,c){const L=[],b=P.bob+(P.f%2?-1:0),w=['#ffffff','#f0f4ff','#c8d0e8'],hr=['#3a3a4a','#1a1a24','#08080e'],fl=P.f;
+  L.push(pFn(bbx(-8,-22+b,8,-1+b),(x,y)=>{const yy=y-b;if(Math.abs(x)>7-((yy+22)/22)*-1)return null;if(yy>-3+Math.sin(x+fl)*1.5)return null;if(yy<-21)return null;return sh3(w,x/7,(yy+11)/11);},'#5a6078'));
+  L.push(pEl(0,-23+b,6,5.8,['#fbfbff','#e8ecf8','#c0c8e0'],'#5a6078'));L.push(faceLayer(0,-22.5+b,0.6,P,{blush:'#b8c8ff',eye:'#1a1a3a'}));
+  L.push(pFn(bbx(-9,-31+b,9,-7+b),(x,y)=>{const yy=y-b;if(!inEl(x,y,0,-24+b,8.5,7.5)&&!(yy>-24&&Math.abs(x)>3.8&&Math.abs(x)<8.5-((yy+24)*0.05)&&yy<-8+Math.sin(x*1.3+fl)))return null;
+    if(yy>-28&&yy<-17&&Math.abs(x)<4)return null;if(yy>-17&&Math.abs(x)<4.6)return null;return sh3(hr,x/8,(yy+22)/10);},'#000000'));return L;}
+// 18 · Bóng Ma Dữ Liệu
+function MN18(P,c){const L=[],b=P.bob+(P.f%2?-1:0),fl=P.f,cy=['#e8ffff','#7ff0ff','#2aa8d8'];
+  L.push(pFn(bbx(-11,-30+b,11,-1+b),(x,y)=>{const yy=y-b,bx=Math.floor(x/2),by=Math.floor(yy/2);let inside=yy<-16?inEl(x,y,0,-16+b,10,13):(Math.abs(x)<10&&yy<-3+((bx+fl)%2?-2:0));
+    if(!inside)return null;if(hash(bx+fl*7,by)<0.05)return null;if(((Math.floor(yy)+fl)%4)===0)return'#c8ffff';return sh3(cy,x/10,(yy+15)/13);},'#0a4a6a'));
+  L.push(pRR(0,-16+b,6.5,4.5,1.5,['#0a2a3a','#061a24','#020c12'],null,{inner:false}));
+  L.push(pFn(bbx(-6,-20+b,6,-12+b),(x,y)=>{const yy=y-b;for(const s of[-1,1])if(Math.abs(x-s*2.6)<0.6&&Math.abs(yy+17.5)<1.2)return'#7ff0ff';
+    if(P.expr==='roar'||P.expr==='happy'){if(Math.abs(yy+14)<0.5&&Math.abs(x)<2.6)return'#7ff0ff';}else if(Math.abs(yy+13.6+(Math.abs(x)<1.5?0.6:0))<0.5&&Math.abs(x)<2.4)return'#7ff0ff';return null;},null,{face:true}));return L;}
+// 19 · Kỹ Nữ U Sầu
+function MN19(P,c){const L=[],b=P.bob,km=MP3('#c0405a'),o=MO3('#c0405a'),hr=['#3a3040','#1a1420','#08060c'];
+  L.push(pPoly([[-7,-1+b],[7,-1+b],[4.5,-13+b],[-4.5,-13+b]],km,o,{col:(x,y,nx,ny,cc)=>hash(Math.floor(x/2.5)+9,Math.floor((y-b)/2.5)+9)<0.15?'#ffd8e0':cc}));
+  L.push(pRR(0,-9+b,5.2,1.6,0.5,PAL.gold,OLC.gold));
+  L.push(pCap(-4,-11+b,-7,-7+b,1.4,1.3,km,o));
+  L.push(pCap(4,-11+b,8,-12+b,1.3,1.2,km,o));
+  L.push(pPoly([[8,-12+b],[14,-17+b],[15,-12+b],[14,-8+b]],['#fff0f4','#ffc0d0','#e08098'],'#5a1a2a',{col:(x,y,nx,ny,cc)=>Math.floor(Math.atan2(y+12-b,x-8)*6)%2?cc:'#ffffff'}));
+  L.push(pEl(0,-18+b,5.8,5.4,['#ffffff','#f8f0f4','#e0d0d8'],'#6a5060'));
+  L.push(faceLayer(0,-17.5+b,0.58,Object.assign({},P,{expr:P.expr==='roar'?'focus':P.expr==='happy'?'think':'sad'}),{blush:'#ff8aa0',eye:'#2a1020'}));
+  L.push(pEl(0,-24.5+b,6.5,3.4,hr,'#000'));L.push(pEl(0,-28.5+b,4,3,hr,'#000'));
+  L.push(pCap(3,-27+b,9,-30+b,0.4,0.4,PAL.gold,OLC.gold));L.push(pEl(9.5,-30.5+b,1.5,1.5,['#ffe0ec','#ff8ab8','#c04a7a'],'#5a0a2a'));
+  L.push(pEl(-4.5,-27+b,1.8,1.8,['#fff0f0','#ff5a6a','#a0202a'],'#4a0008'));return L;}
+// 20 · Ca Nương Tỳ Bà
+function MN20(P,c){const L=[],b=P.bob,dr=MP3('#8a5ad8'),o=MO3('#8a5ad8'),hr=['#4a3a4a','#2a1a24','#140a10'];
+  L.push(pPoly([[-7,-1+b],[7,-1+b],[4.5,-13+b],[-4.5,-13+b]],dr,o,{col:(x,y,nx,ny,cc)=>Math.abs(ny-0.55)<0.07?'#ffd84a':cc}));
+  L.push(pEl(0,-18+b,5.8,5.4,['#fff8f0','#f8e0d0','#e0b8a0'],'#7a4a3a'));L.push(faceLayer(0,-17.5+b,0.58,P,{blush:'#ff9ab0',eye:'#2a1020'}));
+  for(const s of[-1,1])L.push(pEl(s*5.5,-24+b,2.6,2.6,hr,'#000'));L.push(pEl(0,-23+b,6,2.6,hr,'#000'));
+  for(const s of[-1,1])L.push(pCurve(bez([s*5.5,-22+b],[s*7.5,-18+b],[s*6.5,-14+b],4),0.6,0.4,PAL.crimson,OLC.crimson));
+  L.push(pCap(2,-10+b,13,-24+b,0.8,0.6,PAL.wood,OLC.wood));L.push(pRR(13,-25+b,1.6,1.4,0.5,PAL.wood,OLC.wood));
+  L.push(pEl(4,-8+b,4.6,5.6,['#f0c890','#c98a4f','#8f5a2e'],OLC.wood,{col:(x,y,nx,ny,cc)=>nx*nx+ny*ny<0.08?'#3e230e':Math.abs(nx+ny*0.4)<0.06?'#fff0d0':cc}));
+  L.push(pCap(-4,-11+b,1,-9+b,1.3,1.2,dr,o));L.push(pEl(1.5,-9+b,1.2,1.2,PAL.skin,OLC.skin));return L;}
+// 21 · Bù Nhìn Ma Ám
+function MN21(P,c){const L=[],b=P.bob,str=['#fff0a0','#e8c860','#b0902a'],sk=['#f0dcb0','#d8b880','#a8885a'],fl=P.f;
+  L.push(pCap(0,0,0,-14+b,1,1,PAL.wood,OLC.wood));
+  L.push(pCap(-12,-14+b,12,-14+b,1,1,PAL.wood,OLC.wood));
+  for(const s of[-1,1])for(let k=0;k<3;k++)L.push(pCap(s*12,-14+b,s*(13.5+k*0.6),-11+b+k*1.5,0.5,0.3,str,'#6a5010'));
+  L.push(pPoly([[-6,-16+b],[6,-16+b],[7,-6+b],[3,-5+b+(fl%2)],[0,-6+b],[-3,-5+b+(1-fl%2)],[-7,-6+b]],MP3('#6a8a4a'),MO3('#6a8a4a'),{col:(x,y,nx,ny,cc)=>Math.abs(x-2.5)<0.6||Math.abs(y+11-b)<0.5?'#3a4a2a':cc}));
+  L.push(pEl(0,-21+b,6,5.5,sk,'#6a4a2a',{col:(x,y,nx,ny,cc)=>Math.abs(nx+0.2)<0.05&&ny>-0.3?'#6a4a2a':cc}));
+  L.push(pFn(bbx(-5,-25+b,5,-17+b),(x,y)=>{const yy=y-b;for(const s of[-1,1]){const dx=x-s*2.4,dy=yy+22;if(Math.abs(Math.abs(dx)-Math.abs(dy))<0.5&&Math.abs(dx)<1.2)return'#3a1a10';}
+    if(Math.abs(yy+18.6)<0.5&&Math.abs(x)<2.8)return Math.floor(x+3)%2?'#3a1a10':null;return null;},null,{face:true}));
+  L.push(pEl(0,-25.5+b,9,1.7,str,'#6a5010'));L.push(pPoly([[-4.5,-26+b],[4.5,-26+b],[2.5,-31+b],[-2.5,-31+b]],str,'#6a5010',{col:(x,y,nx,ny,cc)=>Math.abs(y+27-b)<0.6?PAL.crimson[1]:cc}));
+  L.push(pEl(9,-17.5+b,2.6,2,['#5a5a6a','#2a2a38','#14141c'],'#000'));L.push(pPoly([[11,-18+b],[13.5,-17.5+b],[11,-17+b]],PAL.gold,OLC.gold));L.push(pRR(9.6,-18.4+b,0.4,0.4,0,['#fff','#fff','#fff'],null));return L;}
+// 22 · Rối Gỗ Dây Tơ
+function MN22(P,c){const L=[],b=P.bob,wd=['#f0d0a0','#d8a868','#a0683a'],o='#5e3a1a',sw=P.f%2?1:-1;
+  L.push(pRR(0,-37,8,0.8,0.4,PAL.wood,OLC.wood));L.push(pRR(0,-37,0.8,3,0.4,PAL.wood,OLC.wood));
+  for(const x of[-7,-3,3,7])L.push(pCap(x*1.05,-36,x*1.2+sw*0.5,-13+b,0.2,0.2,['#ffffff','#e8e8f0','#c0c0d0'],null));
+  for(const s of[-1,1]){L.push(pCap(s*2.5,-6+b,s*3+(s===sw?1:0),-1.5,1,1,wd,o));L.push(pEl(s*3+(s===sw?1:0),-1.2,1.6,1,PAL.crimson,OLC.crimson));}
+  L.push(pEl(0,-6.5+b,4,1.5,wd,o));
+  for(const s of[-1,1]){L.push(pEl(s*6,-12+b,1.2,1.2,wd,o));L.push(pCap(s*6,-12+b,s*8.4,-9+b+s*sw,0.9,0.8,wd,o));L.push(pEl(s*8.4,-9+b+s*sw,1.3,1.3,PAL.cream,o));}
+  L.push(pRR(0,-11+b,5,4.5,1.5,MP3('#3a6ae0'),MO3('#3a6ae0'),{col:(x,y,nx,ny,cc)=>Math.abs(nx)<0.15&&Math.floor(y)%2?'#ffd84a':cc}));
+  L.push(pEl(0,-20+b,5.5,5,wd,o));L.push(faceLayer(0,-19.5+b,0.55,P,{blush:'#ff5a5a',eye:'#2a1008'}));
+  L.push(pPoly([[-5,-23.5+b],[5,-23.5+b],[0,-29+b]],PAL.crimson,OLC.crimson));L.push(pEl(0,-29.5+b,1.1,1.1,PAL.gold,OLC.gold));return L;}
+// 23 · Hề Hộp Ác Mộng
+function MN23(P,c){const L=[],b=P.bob,fl=P.f,ex=P.expr==='roar'?3:0;
+  L.push(pRR(0,-5,8,5,1.2,['#ffe0a0','#ffb020','#c07010'],'#4a2a00',{col:(x,y,nx,ny,cc)=>(Math.floor((x+20)/4)+Math.floor((y+20)/4))%2?'#e0472a':cc}));
+  L.push(pPoly([[-8.5,-10],[8.5,-10],[10,-12],[-6,-13]],PAL.crimson,OLC.crimson));
+  for(let k=0;k<4;k++)L.push(pEl((k%2?1.5:-1.5),-11.5-k*1.6-ex*0.4+b*0.5,2.6,0.7,PAL.steel,OLC.steel));
+  L.push(pRR(0,-21+b-ex,6,3,1.5,['#ffffff','#f0e0ff','#c8b0e0'],'#4a2a5a',{col:(x,y,nx,ny,cc)=>Math.abs(nx)<0.2?PAL.crimson[1]:cc}));
+  L.push(pEl(0,-27+b-ex,6,5.5,['#ffffff','#fff4f4','#e8d0d8'],'#5a3a4a'));L.push(faceLayer(0,-26.5+b-ex,0.6,Object.assign({},P,{expr:P.expr==='focus'?'happy':P.expr}),{blush:'#ff5a7a',eye:'#3a0a2a'}));
+  L.push(pEl(0,-25+b-ex,1.3,1.3,PAL.crimson,OLC.crimson));
+  for(const s of[-1,1]){L.push(pCurve(bez([s*2,-31+b-ex],[s*8,-36+b-ex],[s*10,-31+b-ex+(fl%2)],5),1.5,0.8,s<0?['#c8a0ff','#8a5ad8','#4a2a8a']:['#ffe0a0','#ffb020','#c07010'],'#2a1030'));L.push(pEl(s*10,-30.5+b-ex+(fl%2),1.2,1.2,PAL.gold,OLC.gold));}return L;}
+// ---- Samurai áo xanh: hộ vệ bí ẩn của tháp (nhỏ, tròn trịa, dễ thương) ----
+function MG(P){const L=[],b=P.bob,bl=['#8ab8ff','#3a6ae0','#22408a'],o='#0e1a3a',hk=['#f4f4ff','#d8dcf0','#a8b0d0'],dash=P.dash||0;
+  for(const s of[-1,1])L.push(pRR(s*2.6,-2.6,2.4,2.4,1,hk,'#3a4060'));
+  for(const s of[-1,1])L.push(pRR(s*2.8,-0.8,2.3,0.9,0.4,['#5a4a3a','#3a2a1a','#1a1008'],'#000'));
+  L.push(pPoly([[-6.5,-5],[6.5,-5],[5,-14+b],[-5,-14+b]],bl,o,{col:(x,y,nx,ny,cc)=>y>-6.4&&Math.floor((x+20)/2)%2?'#ffffff':cc}));
+  L.push(pRR(0,-8.5+b,5,1.1,0.5,['#ffe0e0','#ff5a6a','#a0202a'],'#3a0008'));
+  L.push(pPoly([[-1.8,-14+b],[1.8,-14+b],[0,-9+b]],hk,'#3a4060'));
+  L.push(pCap(-5,-12+b,-7.5,-8+b,1.6,1.5,bl,o));L.push(pEl(-7.6,-7.6+b,1.3,1.3,PAL.skin,OLC.skin));
+  // katana rút ra, mũi hướng về phía trước
+  L.push(pCap(4,-11+b,7,-11+b,1.6,1.5,bl,o));L.push(pEl(7.4,-11+b,1.3,1.3,PAL.skin,OLC.skin));
+  L.push(pRR(9.2,-11+b,1.6,0.9,0.3,['#5a4a3a','#3a2a1a','#1a1008'],'#000'));L.push(pRR(10.9,-11+b,0.5,1.7,0.2,PAL.gold,OLC.gold));
+  L.push(pCurve(bez([11.4,-11+b],[16,-11.5+b],[20,-13.5+b],6),0.75,0.4,['#ffffff','#e8f4ff','#a8c0d8'],'#2a3a5a',{col:(x,y,nx,ny,cc,t)=>P.glint&&Math.abs(t-P.glint)<0.12?'#ffffff':ny<-0.2?'#ffffff':cc}));
+  L.push(pEl(0,-19+b,6.3,5.8,PAL.cream,'#a8784a'));L.push(faceLayer(0,-18+b,0.66,Object.assign({},P,{expr:P.expr||'focus'}),{blush:'#ffa0b0'}));
+  L.push(pFn(bbx(-8,-28+b,8,-19+b),(x,y)=>{const yy=y-b;if(!inEl(x,y,0,-21.5+b,7.6,6.8))return null;if(yy>-21.2&&Math.abs(x)<6.2)return null;return sh3(bl,x/7.6,(yy+24)/5);},o));
+  for(const s of[-1,1])L.push(pPoly([[s*6.8,-21.5+b],[s*9.5,-19.5+b],[s*7.6,-18.6+b]],bl,o));
+  for(const s of[-1,1])L.push(pCurve(bez([s*1,-27+b],[s*5,-31+b],[s*7.5,-34+b],5),0.9,0.5,PAL.gold,OLC.gold));
+  L.push(pEl(0,-27.5+b,1.4,1.4,['#ffe0ec','#ff8ab8','#c04a7a'],'#5a0a2a'));return L;}
+MBUILD.length=4;MBUILD.push(MN4,MN5,MN6,MN7,MN8,MN9,MN10,MN11,MN12,MN13,MN14,MN15,MN16,MN17,MN18,MN19,MN20,MN21,MN22,MN23);
+
+// ================= HỘ VỆ BÍ ẨN: xuất hiện cực hiếm khi quái sắp gục =================
+const GUARD_P=0.012; // 1,2% mỗi trận (chỉ tung xúc xắc 1 lần, lúc quái tụt dưới 30% máu)
+function guardCheck(){if(BT.guardDone||BT.phase!=='fight'||!BT.B||BT.B.over||BT.B.big>=0||BT.floor<3||BT.mon.guard)return;const m=BT.B.mon;
+  if(m.hp>0&&m.hp<m.max*0.3){BT.guardDone=1;if(R()<GUARD_P||BT.forceGuard)startGuard();}}
+function startGuard(){BT.phase='guard';BT.gi={t:0,d:3.6,land:0,glint:0};BT.prevMon={type:BT.mon.type,col:BT.mon.col,elite:BT.mon.elite};BT.act=null;BFX.length=0;
+  S.guardSeen=(S.guardSeen||0)+1;sfx('rare',4);vib([30,60,30,60,120]);$('b-float').innerHTML='';
+  $('b-monname').textContent='! ! !';$('b-monel').textContent='???';$('b-monel').style.background='#1a2040';}
+function guardTick(d){const gi=BT.gi;gi.t+=d;const t=gi.t;
+  if(t>0.5&&t<3.1&&R()<0.55)bspawn({type:'px',x:rnd(0,BW2),y:-2,vx:rnd(-30,-8),vy:rnd(18,34),size:R()<0.3?2:1,life:2.2,col:pick(['#ffd0e8','#ffa8d0','#ffffff','#ff80b8']),k:rnd(0,6),upd(p,dd){p.k+=dd*5;p.vx+=Math.sin(p.k)*2;}});
+  if(!gi.land&&t>=1.5){gi.land=1;BT.quake=0.35;sfx('big');bburst(148,96,18,{type:'spark',life:0.5,col:['#ffffff','#9fc8ff','#3a6ae0'],smin:30,smax:90});
+    bspawn({type:'ring',x:148,y:96,r0:4,r1:34,flat:0.3,life:0.6,col:'#9fc8ff'});}
+  if(!gi.glint&&t>=2.15){gi.glint=1;sfx('crit');bburst(130,84,8,{type:'star',life:0.5,col:['#ffffff','#bfe0ff'],smin:10,smax:40});}
+  if(BT.quake>0)BT.quake=Math.max(0,BT.quake-d);
+  if(t>=gi.d)finishGuard();}
+function finishGuard(){const B=BT.B;B.mon=guardUnit();B.traits=[];B.turns=0;BT.guarded=1;
+  BT.mon={name:'? ? ?',guard:true,type:'guard',col:GUARD.col,traits:[],big:-1,boss:false};BT.phase='fight';BT.next=0.5;BT.gi=null;bHead();bHud();}
+function guardResult(win){if(win){S.gem+=100;S.ticket+=2;S.guardWin=(S.guardWin||0)+1;BT.res='Bạn đã đẩy lùi kẻ áo xanh bí ẩn! '+BT.res+' + 100 đá + 2 vé';}
+  else{S.energy=Math.min(99,S.energy+1);BT.res='Một bóng áo xanh lặng lẽ tra kiếm vào vỏ, rồi tan vào làn hoa anh đào... (hoàn lại 1 năng lượng)';}}
+function drawGuardIntro(g){const gi=BT.gi;if(!gi)return;const t=gi.t,T=BT.t,pm=BT.prevMon,out=t>gi.d-0.45?Math.max(0,(gi.d-t)/0.45):1;
+  // màn đêm buông, thời gian ngưng đọng
+  g.save();g.globalAlpha=Math.min(0.62,t/0.35*0.62)*out;g.fillStyle='#0a1030';g.fillRect(0,0,BW2,BH2);g.restore();
+  // quái gốc: giật mình, rồi lùi lại nấp sau lưng hộ vệ
+  const back=Math.max(0,Math.min(1,(t-1.55)/0.55)),mx=150+back*26,ms=monSprite(pm.type,pm.col,{expr:t<1.5?'surprised':'sad',bob:0,f:0,elite:pm.elite});
+  g.save();g.globalAlpha=1-back*0.45;blit(g,t<0.45&&Math.floor(t*14)%2?silhouette({c:ms},'#ffffff'):ms,mx,98,{ax:AX/SW,ay:AY/SH,flip:true});g.restore();
+  if(t<1.1){g.save();g.font='bold 12px monospace';g.textAlign='center';g.fillStyle='#ffe066';g.globalAlpha=Math.floor(t*8)%2?1:0.6;g.fillText('!',150,40);g.restore();}
+  // một đường kiếm xanh rạch dọc màn hình
+  if(t>0.5&&t<1.15){const p=(t-0.5)/0.65,w=Math.max(1,Math.round(Math.sin(p*Math.PI)*9));g.save();g.globalAlpha=0.85;g.fillStyle='#bfe0ff';g.fillRect(148-w,0,w*2,BH2);g.fillStyle='#ffffff';g.fillRect(148-Math.max(1,w>>2),0,Math.max(1,w>>1),BH2);g.restore();}
+  // hộ vệ giáng xuống, để lại tàn ảnh
+  if(t>0.9){const p=Math.min(1,(t-0.9)/0.6),e=1-(1-p)*(1-p),y=Math.round(-10+e*108),gs=monSprite('guard',GUARD.col,{expr:t>2.5?'focus':'focus',bob:0,f:0,glint:t>1.6&&t<2.2?Math.round((t-1.6)/0.6*5)/5:0});
+    if(p<1){g.save();for(let i=1;i<=3;i++){g.globalAlpha=0.28/i;blit(g,silhouette({c:gs},'#3a6ae0'),148,y-i*12,{ax:AX/SW,ay:AY/SH,flip:true});}g.restore();}
+    if(p>=1){g.save();g.globalAlpha=0.35+0.15*Math.sin(T*6);pxEllipse(g,148,80,18,24,'#3a6ae0');g.restore();}
+    blit(g,gs,148,y,{ax:AX/SW,ay:AY/SH,flip:true});}
+  // dải điện ảnh + dấu hỏi, không lộ bất kỳ thông tin nào
+  if(t>2.3){const p=Math.min(1,(t-2.3)/0.3),bar=Math.round(15*p*out);g.fillStyle='#000000';g.fillRect(0,0,BW2,bar);g.fillRect(0,BH2-bar,BW2,bar);
+    g.save();g.globalAlpha=p*out;g.textAlign='center';g.font='bold 11px monospace';g.fillStyle='#3a6ae0';for(const[dx,dy]of[[-1,0],[1,0],[0,-1],[0,1]])g.fillText('? ? ?',BW2/2+dx,BH2-4+dy);g.fillStyle='#ffffff';g.fillText('? ? ?',BW2/2,BH2-4);g.restore();}}
+// mô tả bộ kỹ năng quái cho sảnh tháp (tự sinh từ dữ liệu)
+function kitDesc(k){const a=[];a.push('mỗi '+(k.every||4)+' lượt'+((k.sh||1)>1?' tung '+k.sh+' đòn':' tung chiêu'));
+  if(k.dt==='magic')a.push('đòn phép xuyên né');if(k.dt==='ranged')a.push('bắn tầm xa');if(k.first)a.push('ra đòn đầu cực mạnh');
+  if(k.poison)a.push('gây độc');if(k.burn||k.burnHit)a.push('gây bỏng');if(k.stun)a.push('có thể làm choáng');if(k.drain)a.push('làm chậm lượt');if(k.mslow)a.push('giảm tốc');
+  if(k.curse)a.push('làm suy yếu Công');if(k.lock)a.push('khóa hồi máu');if(k.shatter)a.push('phá khiên');if(k.steal||k.ssteal)a.push('hút máu');if(k.heal)a.push('tự hồi máu');
+  if(k.guard||k.shield)a.push('dựng giáp');if(k.dodgeS||k.eva)a.push('né tránh');if(k.pierce)a.push('xuyên giáp');if(k.exe)a.push('đánh mạnh khi Bahi yếu máu');if(k.enr)a.push('cuồng nộ khi yếu máu');if(k.thorns)a.push('phản đòn');if(k.cleanse)a.push('tự thanh tẩy');
+  return a.join(', ');}
 
 // ================= 10 TRÙM THÁP: hình vẽ, hiệu ứng chiêu, màn ra mắt =================
 // mỗi hàm vẽ trả về các lớp rig; hướng mặt về +x (khi vẽ trận sẽ lật để nhìn về phía Bahi)
@@ -5584,7 +6004,7 @@ function petTrend(p){const st=p.br.length;let r=0.5;
 function petGainXP(p,n,silent){if(p.lv>=PMAXLV)return;const h=new Date().getHours();if(h>=6&&h<18)p.dayXP=(p.dayXP||0)+n;else p.nightXP=(p.nightXP||0)+n;
   p.xp+=n;while(p.lv<PMAXLV&&p.xp>=petNeed(p.lv)){p.xp-=petNeed(p.lv);p.lv++;}
   while(p.br.length<4&&p.lv>=PEVO_LV[p.br.length]){const b=R()<petTrend(p)?0:1;p.br.push(b);PSPR.clear();
-    const msg=SPEC[p.sp].n+' tiến hóa: '+PBR[p.br.length-1][b]+'!';S.petNews=(S.petNews||[]).concat([msg]).slice(-5);if(!silent){toast(msg,3500);sfx('evolve');}}}
+    const msg=SPEC[p.sp].n+' tiến hóa: '+PBR[p.br.length-1][b]+'!';S.petNews=(S.petNews||[]).concat([msg]).slice(-5);if(!silent)queuePetEvo(p,b);}}
 
 // ---------- gặp & bắt (thú hiện ra dưới dạng BÓNG BÍ ẨN, chỉ lộ diện khi bắt được) ----------
 // gặp thú: hoàn toàn ngẫu nhiên, không mồi, không bảo hiểm. Thú hiếm thật sự hiếm.
@@ -5709,7 +6129,7 @@ function petCanvas(p,expr,lock,lc){p=Object.assign({br:[]},p);const e=petSprite(
 function openPets(){renderPets();showModal('pets');if((S.petNews||[]).length){toast(S.petNews.join(' · '),4500);S.petNews=[];save();hud();}}
 function homeHas(id){return(S.home||['mochi']).includes(id);}
 function toggleHome(id){S.home=S.home||['mochi'];if(homeHas(id)){S.home=S.home.filter(x=>x!==id);}else{if(S.home.length>=2){toast('Phòng chỉ đủ chỗ cho 2 bạn. Hãy cho một bạn đi chơi trước.');return;}S.home.push(id);}
-  HR.clear();save();renderPets();}
+  HR.clear();save();if($('m-pets').classList.contains('show'))renderPets();if($('m-roompets').classList.contains('show'))renderRoomPets();roomBtnUI();}
 function el(tag,cls,txt){const d=document.createElement(tag);if(cls)d.className=cls;if(txt!=null)d.textContent=txt;return d;}
 function btn(t,cls,fn,dis){const b=el('button','mini'+(cls?' '+cls:''),t);b.onclick=fn;if(dis)b.disabled=true;return b;}
 function rarTag(r){const t=el('span','tag',PRAR[r]);t.style.background=PRCOL[r];t.style.color='#fff';return t;}
@@ -5983,6 +6403,55 @@ function claimDex(i){const m=DEXM[i],n=Object.keys(S.petCaught||{}).length;S.dex
   if(m.give)giveBundle(m.give);sfx('big');toast('Nhận thưởng sưu tầm: '+m.t);save();hud();renderPets();}
 function petsDot(){return freeRace()||dexClaimable()>=0||(S.petNews||[]).length>0;}
 setInterval(()=>{try{if($('m-pets').classList.contains('show')&&ptTab==='race'&&RC&&RC.phase==='pick')drawRace();}catch(e){}},1000);
+
+// ================= HOẠT CẢNH TIẾN HÓA THÚ CHIẾN =================
+// lộ nhánh vừa tiến hóa, nhánh còn lại vẫn là bí ẩn
+const PEVOQ=[],PBRC=[['#7ae07a','#ff5a3a'],['#ff8a2a','#7ad0ff'],['#fff3a0','#b07aff'],['#ffd84a','#9aa6b6']];
+let PEV=null;
+function queuePetEvo(p,b){PEVOQ.push({uid:p.uid,sp:p.sp,v:p.v||0,st:p.br.length-1,b,prev:p.br.slice(0,-1),now:p.br.slice()});setTimeout(showPetEvo,BT&&BT.run&&!$('b-view').hidden?1600:700);}
+function showPetEvo(){if(PEV||!PEVOQ.length)return;const e=PEVOQ.shift(),o=$('pevo');PEV=Object.assign({t:0,last:0,parts:[],rev:false},e);
+  o.hidden=false;o.classList.remove('show');$('pevo-k').textContent='TIẾN HÓA LẦN '+(e.st+1)+'/4';$('pevo-n').textContent=SPEC[e.sp].n+' đang tiến hóa...';$('pevo-br').innerHTML='';
+  sfx('evolve');vib([30,40,30]);requestAnimationFrame(pevoLoop);}
+function pevoSkip(){if(PEV&&!PEV.rev)PEV.t=Math.max(PEV.t,3.05);}
+function pevoClose(){if(!PEV||!PEV.rev)return;$('pevo').hidden=true;$('pevo').classList.remove('show');PEV=null;sfx('tap');if(typeof renderPets==='function'&&$('m-pets').classList.contains('show'))renderPets();setTimeout(showPetEvo,250);}
+function pevoReveal(){const e=PEV;e.rev=true;sfx('big');vib([60,40,120]);$('pevo-n').textContent=SPEC[e.sp].n+' đã tiến hóa!';
+  const col=PBRC[e.st][e.b],box=$('pevo-br');box.innerHTML='';
+  const card=(chosen)=>{const d=document.createElement('div');d.className='pevc'+(chosen?' on':' myst');const cv=document.createElement('canvas');cv.width=56;cv.height=50;
+    if(chosen){const pc=petCanvas({sp:e.sp,v:e.v,br:e.now},'happy');cv.getContext('2d').drawImage(pc,0,0);d.style.setProperty('--pc',col);d.appendChild(cv);}
+    else{const q=document.createElement('div');q.className='pq';q.textContent='?';d.appendChild(q);}const b=document.createElement('b'),s=document.createElement('small');
+    if(chosen){b.textContent='Nhánh '+PBR[e.st][e.b];s.textContent='ĐÃ THỨC TỈNH';}else{b.textContent='? ? ?';s.textContent='Nhánh còn lại vẫn là bí ẩn';}
+    d.appendChild(b);d.appendChild(s);return d;};
+  box.appendChild(card(true));box.appendChild(card(false));$('pevo').classList.add('show');}
+function pevoLoop(ts){const e=PEV;if(!e)return;requestAnimationFrame(pevoLoop);const d=Math.min(0.05,(ts-(e.last||ts))/1000);e.last=ts;e.t+=d;const t=e.t;
+  if(!e.rev&&t>=3.1)pevoReveal();
+  const cv=$('pevo-cv'),g=cv.getContext('2d'),W=cv.width,H=cv.height,cx=W/2,cy=H-18,col=PBRC[e.st][e.b];g.imageSmoothingEnabled=false;
+  g.fillStyle='#120a1e';g.fillRect(0,0,W,H);
+  // tia sáng xoay chậm, rực hơn khi lộ diện
+  drawRays(g,cx,cy-18,t*0.5,12,e.rev?col:'#ffffff',e.rev?0.22:0.06+Math.min(0.12,t*0.04));
+  const old={sp:e.sp,v:e.v,br:e.prev},nw={sp:e.sp,v:e.v,br:e.now},P={expr:e.rev?'happy':'focus',bob:Math.floor(t*2)%2,f:Math.floor(t*4)};
+  // hạt sáng hội tụ
+  if(!e.rev&&t<2.8&&R()<0.7){const a=R()*6.283,r=60;e.parts.push({x:cx+Math.cos(a)*r,y:cy-18+Math.sin(a)*r*0.7,tx:cx,ty:cy-18,l:0.8,c:R()<0.5?'#ffffff':col});}
+  if(e.rev&&!e.burst){e.burst=1;for(let k=0;k<40;k++){const a=R()*6.283,s=rnd(20,70);e.parts.push({x:cx,y:cy-18,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rnd(0.6,1.2),c:pick(['#ffffff',col,'#ffe066'])});}}
+  for(let i=e.parts.length-1;i>=0;i--){const p=e.parts[i];p.l-=d;if(p.l<=0){e.parts.splice(i,1);continue;}if(p.tx!=null){p.x+=(p.tx-p.x)*d*3.5;p.y+=(p.ty-p.y)*d*3.5;}else{p.x+=p.vx*d;p.y+=p.vy*d;p.vy+=30*d;}g.fillStyle=p.c;g.fillRect(Math.round(p.x),Math.round(p.y),p.tx!=null?1:2,p.tx!=null?1:2);}
+  g.save();g.globalAlpha=0.3;pxEllipse(g,cx,cy+1,14,3,'#000000');g.restore();
+  const sk=t>1.4&&t<3.1?[(Math.floor(t*40)%3)-1,0]:[0,0];
+  if(t<1.4){const sp=petSprite(old,P);g.save();g.globalAlpha=0.35+0.25*Math.sin(t*8);pxEllipse(g,cx,cy-16,20,22,col);g.restore();blit(g,sp.c,cx,cy,{ax:AX/SW,ay:AY/SH});}
+  else if(t<3.1){const fq=3+(t-1.4)*10,ph=Math.floor(t*fq)%2,sp=petSprite(ph?nw:old,P);blit(g,silhouette(sp,ph?'#ffffff':col),cx+sk[0],cy,{ax:AX/SW,ay:AY/SH});}
+  else{const sp=petSprite(nw,P);const rt=t-3.1;if(rt<0.9){g.save();g.globalAlpha=0.8*(1-rt/0.9);pxRing(g,cx,cy-16,8+rt*60,(8+rt*60)*0.8,col);g.restore();}
+    g.save();g.globalAlpha=0.25+0.1*Math.sin(t*4);pxEllipse(g,cx,cy-16,22,24,col);g.restore();blit(g,sp.c,cx,cy+(Math.floor(t*3)%2?-1:0),{ax:AX/SW,ay:AY/SH});}
+  if(t>2.95&&t<3.35){g.save();g.globalAlpha=1-Math.abs(t-3.1)/0.25;g.fillStyle='#ffffff';g.fillRect(0,0,W,H);g.restore();}}
+
+// ================= NÚT CHỌN BẠN TRONG PHÒNG (tối đa 2) =================
+function roomBtnUI(){const b=$('roompets');if(!b)return;const n=(S.home||['mochi']).filter(id=>id==='mochi'||petById(id)).length;$('rp-n').textContent=n+'/2';}
+function openRoomPets(){renderRoomPets();showModal('roompets');}
+function renderRoomPets(){const box=$('rp-list');if(!box)return;box.innerHTML='';
+  const row=(id,cv,name,sub)=>{const on=homeHas(id),d=el('div','rprow'+(on?' on':''));d.appendChild(cv);const inf=el('div','rpinfo');inf.appendChild(el('b',null,name));inf.appendChild(el('small',null,sub));d.appendChild(inf);
+    const t=el('button','rptog'+(on?' on':''),on?'Trong phòng':'Gọi vào');t.onclick=()=>{sfx('tap');toggleHome(id);};d.appendChild(t);box.appendChild(d);};
+  const dc=document.createElement('canvas');dc.width=56;dc.height=50;try{const g=dc.getContext('2d');g.imageSmoothingEnabled=false;const ic=sprIco('paw');g.drawImage(ic,(56-ic.width*4)/2,(50-ic.height*4)/2,ic.width*4,ic.height*4);}catch(e){}
+  row('mochi',dc,'Cún Mochi','Chó cưng của nhà');
+  myPets().slice().sort((a,b)=>(homeHas(b.uid)-homeHas(a.uid))||SPEC[b.sp].r-SPEC[a.sp].r||b.lv-a.lv).forEach(p=>row(p.uid,petCanvas(p),petName(p),PRAR[SPEC[p.sp].r]+' · Lv '+p.lv+(S.battlePet===p.uid?' · đang ra trận':'')));
+  if(!myPets().length)box.appendChild(el('p','hint','Chưa có thú chiến nào. Leo Tháp để gặp và bắt thú, rồi gọi chúng về phòng chơi cùng Bahi.'));
+  $('rp-cnt').textContent=(S.home||['mochi']).length+'/2';}
 
 // ================= GIAO DIỆN TIẾN HÓA: vòng quay hé lộ theo độ hiếm, sổ tiến hóa, Lò Tái Sinh, Chuyển Sinh =================
 Object.assign(MAPS,{charm:['.kkkkk.','kyyyyyk','kyrrryk','kyryryk','kyrryyk','kyyyyyk','kyrrryk','kyyyyyk','.kkkkk.','...k...','..kpk..','...k...']});
@@ -6350,7 +6819,7 @@ function petPose(T){
 // ---------- hào quang & đồng hành ----------
 const COMP={x:0,y:0,init:false};
 function auraTick(dt,T){const id=S.eq.aura;if(!id||!S.inv[id])return;const a=IT[id].aura,b=C.A('body'),hw=(PET.A.hw||12)+4;
-  const rate={dust:8,bubble:4,binary:3,heart:2,leaf:3,fire:14,bolt:6,aurora:10,petal:3,snow:6,rune:2.5,lotus:5,galaxy:9,divine:12}[a]||5;if(R()>rate*dt)return;
+  const rate={dust:8,bubble:4,binary:3,heart:2,leaf:3,fire:14,bolt:6,aurora:10,petal:3,snow:6,rune:2.5,lotus:5,galaxy:9,divine:12}[a]||AURA2[a]||5;if(R()>rate*dt)return;
   const side=pick([-1,1]),x=b[0]+side*rnd(hw*0.6,hw+4),y=b[1]+rnd(-14,10),front=R()<0.5;
   switch(a){case'dust':spawn({type:'spark',x,y,vy:-rnd(4,10),life:0.9,col:pick(['#fff1a6','#ffffff']),front});break;
     case'bubble':spawn({type:'bubble',x,y,vy:-rnd(8,14),size:rnd(1,2.5)|0,life:1.2,front});break;
@@ -6365,7 +6834,8 @@ function auraTick(dt,T){const id=S.eq.aura;if(!id||!S.inv[id])return;const a=IT[
     case'lotus':spawn({type:'px',x,y:y+8,vy:-rnd(8,14),size:2,life:1.2,col:pick(['#fff3a0','#ffd84a','#ffb0c8']),front});if(R()<0.12)spawn({type:'ring',x:C.x,y:C.y,r0:4,r1:22,flat:0.35,life:1,col:'#ffd84a',front:false});break;
     case'galaxy':{const a=T*2+R()*6.28,rr=hw+rnd(0,6);spawn({type:'star',x:b[0]+Math.cos(a)*rr,y:b[1]+Math.sin(a)*rr*0.45-4,vx:-Math.sin(a)*14,vy:Math.cos(a)*6,life:0.9,col:pick(['#c8a0ff','#7ab0ff','#ffffff','#ff9ef0']),front:Math.sin(a)>0});}break;
     case'divine':spawn({type:R()<0.5?'star':'spark',x,y:y+6,vy:-rnd(14,26),life:1,col:pick(['#ffffff','#fff3a0','#ffd84a']),front});if(R()<0.08)spawn({type:'ring',x:C.x,y:C.y,r0:3,r1:28,flat:0.35,life:0.9,col:'#fff3a0',front:false});break;
-    case'aurora':spawn({type:'star',x,y,vy:-rnd(6,14),life:1,col:rainbow(T,R()*8),front});if(R()<0.05)spawn({type:'ring',x:C.x,y:C.y,r0:4,r1:26,flat:0.4,life:0.8,col:rainbow(T),front:false});break;}}
+    case'aurora':spawn({type:'star',x,y,vy:-rnd(6,14),life:1,col:rainbow(T,R()*8),front});if(R()<0.05)spawn({type:'ring',x:C.x,y:C.y,r0:4,r1:26,flat:0.4,life:0.8,col:rainbow(T),front:false});break;
+    default:auraFX2(IT[id],a,x,y,b,hw,T,front);}}
 function drawComp(g,T){const id=S.eq.pet;if(!id||!S.inv[id])return;const it=IT[id],hw=(PET.A.hw||12)+12;
   const tx=PET.x-PET.face*hw,ty=PET.y-32+Math.sin(T*3)*2-(PET.lift||0);if(!COMP.init){COMP.x=tx;COMP.y=ty;COMP.init=true;}
   COMP.x+=(tx-COMP.x)*Math.min(1,0.06*30*(1/30)*3);COMP.y+=(ty-COMP.y)*0.12;
@@ -6493,7 +6963,7 @@ function hud(){dayRoll();regenEnergy();const F=PET.F,st=stats();
   $('c-study').classList.toggle('locked',!testMode&&S.qCount>=qMax());
   setDot('gacha',S.ticket>0,S.ticket>9?'9+':String(S.ticket));setDot('wheel',wheelFree(),'1');setDot('tower',S.energy>=S.emax,'!');
   setDot('miss',missionReady()||loginReady(),'!');setDot('dex',evoReady()||evoClaimable()>=0,'!');
-  const mfull=S.mine>=mineCap()*0.5;setDot('mine',mfull,fmt(S.mine));setDot('bag',false);setDot('pets',petsDot(),'!');setDot('slot',false);hudDot();
+  const mfull=S.mine>=mineCap()*0.5;setDot('mine',mfull,fmt(S.mine));setDot('bag',false);setDot('pets',petsDot(),'!');setDot('slot',false);hudDot();roomBtnUI();
   wallets();costUI();heroUI();
   $('b-snd').textContent=SFX.on?'ÂM: BẬT':'ÂM: TẮT';}
 
@@ -6684,7 +7154,7 @@ function initUI(){
   document.querySelectorAll('.modal>.sheet').forEach(sh=>{const body=document.createElement('div');body.className='sbody';const foot=document.createElement('div');foot.className='sfoot';
     const docks=[...sh.querySelectorAll('.acts.dock,.acts.sdock')];[...sh.childNodes].forEach(n=>body.appendChild(n));sh.appendChild(body);
     if(docks.length){docks.forEach(d=>{const home=d.parentElement;d._home=home;foot.appendChild(d);});sh.appendChild(foot);sh.classList.add('hasfoot');}});
-  {const f=document.querySelector('#m-rank .sfoot');if(f)f.insertBefore($('rk-me'),f.firstChild);}rankInit();cloudInit();
+  {const f=document.querySelector('#m-rank .sfoot');if(f)f.insertBefore($('rk-me'),f.firstChild);}rankInit();cloudInit();$('roompets').onclick=()=>{sfx('tap');openRoomPets();};setImg($('rp-ic'),sprIco('paw'));roomBtnUI();$('pevo').onclick=e=>{if(e.target.id==='pevo-ok')pevoClose();else pevoSkip();};
   const syncDocks=()=>document.querySelectorAll('.sfoot .acts').forEach(d=>{const h=d._home;d.hidden=!!(h&&h.closest('[hidden]'));});
   ['t-lobby','b-view','c-view'].forEach(id=>{const el=$(id);if(el)new MutationObserver(syncDocks).observe(el,{attributes:true,attributeFilter:['hidden']});});syncDocks();
   $('q-next').onclick=()=>{if(!testMode&&S.qCount>=qMax()){closeModal();return;}openQuiz();};
