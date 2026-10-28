@@ -2254,13 +2254,13 @@ function monKind(f){if(bigBoss(f))return{sp:-1,elite:false};const el=MSPEC.map((
 function floorTraits(f){const bb=bigBoss(f);if(bb)return bb.tr.slice();const a=(f*5+2)%6;if(f%5===0||f>=DIFF.t2)return[a,(a+3)%6];return[a];}
 const MONK=1.12; // quái mạnh hơn 12% để bù sức của thú chiến
 // Đường cong độ khó (răng cưa): tăng dần đều, gắt hơn ở nửa trên tháp, đỉnh nhọn ở tầng boss rồi chùng xuống tầng kế
-// hệ số theo mốc mỗi 10 tầng (tinh chỉnh bằng mô phỏng: tầng f cần khoảng cấp 0,9×f để thắng 50%)
+// hệ số theo mốc mỗi 10 tầng (tinh chỉnh bằng mô phỏng: tầng f cần khoảng cấp 0,65×f để thắng 50%)
 function diffK(f){const k=DIFF.k;if(f<=5)return 1+(k[0]-1)*Math.max(0,f)/5;if(f>=95)return k[9];const i=Math.floor((f-5)/10),t=(f-5-i*10)/10;return k[i]+(k[i+1]-k[i])*t;}
 function hpRamp(f){return diffK(f);}
 function atkRamp(f){return diffK(f);}
-// hệ số riêng từng tầng trùm (từ mô phỏng): trùm giữa ≈ cấp tầng thường +6, trùm canh tháp ≈ +10, tầng 100 ≈ cấp 115
-const BADJ={15:1.11,25:1.45,35:0.97,45:0.77,55:1.2,65:0.77,75:0.755,85:0.95,95:0.94,10:0.94,20:1.3,30:1.1,40:1.13,50:0.98,60:0.82,70:0.92,80:0.89,90:1.24,100:0.89};
-const DIFF={k:[1.338,1.522,1.26,2.82,2.25,1.94,2.62,2.57,2.43,2.21],d1:0.006,mh:1.5,ma:1.15,bh:2.2,ba:1.35,t2:85};
+// hệ số riêng từng tầng trùm (từ mô phỏng): trùm giữa ≈ cấp tầng thường +4, trùm canh tháp ≈ +7, tầng 100 ≈ cấp 85
+const BADJ={15:1.11,25:1.45,35:0.97,45:0.77,55:1.2,65:0.731,75:0.695,85:0.95,95:0.846,10:1.034,20:1.3,30:1.1,40:1.13,50:0.98,60:0.82,70:0.828,80:0.89,90:1.141,100:0.89};
+const DIFF={k:[0.761,0.95,0.7,1.43,1.11,1.07,1.71,1.578,1.623,1.476],d1:0.006,mh:1.5,ma:1.15,bh:2.2,ba:1.35,t2:85};
 function monBase(f,kind,guard){const boss=f%5===0&&!guard,bb=guard?null:bigBoss(f),q=bb?bb.m:[1,1,1,1],sp=guard?GUARD:(kind&&kind.sp>=0?MSPEC[kind.sp]:null),sm=sp?sp.m:[1,1,1,1],ramp=hpRamp(f),ba=boss?(BADJ[f]||1):1,bm=bb?[DIFF.bh*ba,DIFF.ba*ba]:boss?[DIFF.mh*ba,DIFF.ma*ba]:[1,1],m=bm[0]*MONK*ramp;
   return{hp:Math.round((90+f*42)*m*q[0]*sm[0]),atk:Math.round((9+f*3.1)*bm[1]*MONK*atkRamp(f)*q[1]*sm[1]),def:Math.round((4+f*2)*(1+DIFF.d1*f)*q[2]*sm[2]),spd:Math.round((9+f*1.05)*q[3]*sm[3]),crit:(guard?25:5)+Math.min(20,f*0.5)};}
 function monKit(f,kind){const bb=bigBoss(f);if(bb)return Object.assign({t:'melee'},bb.kit);const sp=MSPEC[kind.sp],k=Object.assign({t:'melee'},sp.k);if(kind.elite)k.skm=(k.skm||1.8)*1.15;return k;}
