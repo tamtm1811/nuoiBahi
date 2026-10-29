@@ -37,6 +37,7 @@ function clean(p) {
     v: clamp(p.v, 0, 3),
     fr: clamp(p.fr, 0, 5),
     best: clamp(p.best, 0, 100000),
+    tm: p.tm ? 1 : 0,
     gear,
     pet,
     cos: Array.isArray(p.cos) ? p.cos.slice(0, 3).map((x) => str(x, 24)).filter(Boolean) : [],
@@ -44,8 +45,9 @@ function clean(p) {
 }
 
 function view(board, id) {
-  const list = Object.entries(board.p || {}).map(([k, e]) => ({ id: k, ...e })).sort(cmp);
-  const pub = (e, i) => { const { h, last, id: pid, ...rest } = e; return { rank: i + 1, ...rest, me: pid === id }; };
+  // dữ liệu bị chỉnh sửa (tm) không lên bảng, chỉ chủ tài khoản thấy chính mình
+  const list = Object.entries(board.p || {}).map(([k, e]) => ({ id: k, ...e })).filter((e) => !e.tm || e.id === id).sort(cmp);
+  const pub = (e, i) => { const { h, last, id: pid, fb, lb, tm, ...rest } = e; return { rank: i + 1, ...rest, me: pid === id }; };
   const top = list.slice(0, 10).map(pub);
   let me = null, ahead = null;
   const i = id ? list.findIndex((e) => e.id === id) : -1;
@@ -81,6 +83,7 @@ export default async (req) => {
   const store = getStore({ name: "bahi-rank", consistency: "strong" });
   const url = new URL(req.url);
   if (req.method === "GET") {
+    if (url.searchParams.get("t")) return json({ at: Date.now() }); // giờ chuẩn cho game (chống chỉnh đồng hồ máy)
     let board = await store.get(KEY, { type: "json" });
     if (!board || Date.now() - (board.rebuilt || 0) > REBUILD_MS) board = await rebuild(store);
     return json(view(board, str(url.searchParams.get("id"), 40)));
@@ -99,7 +102,28 @@ export default async (req) => {
     const b = await store.get(KEY, { type: "json" });
     return json(view(b || { p: { [id]: old } }, id));
   }
-  const entry = { ...p, h, last: Date.now() };
+  // kiểm tra hợp lý: mỗi trận tháp tốn 1 năng lượng (hồi 1 điểm/10 phút, tối đa 10, thêm vài nguồn thưởng),
+  // nên số tầng/cấp tăng được bị giới hạn theo thời gian thực (kiểu "xô hạn mức" tự đầy dần).
+  // Vượt quá → chỉ ghi nhận đến mức hợp lý. Người chơi bình thường không bao giờ chạm giới hạn này.
+  const now = Date.now();
+  const F_CAP = 22, F_RATE = 8, L_CAP = 16, L_RATE = 6;
+  let fb, lb;
+  if (old) {
+    const hrs = Math.max(0, (now - (old.last || now)) / 3_600_000);
+    fb = Math.min(F_CAP, (old.fb ?? F_CAP) + hrs * F_RATE);
+    lb = Math.min(L_CAP, (old.lb ?? L_CAP) + hrs * L_RATE);
+    const df = p.floor - (old.floor || 0), dl = p.lv - (old.lv || 1);
+    if (df > fb) { p.floor = (old.floor || 0) + Math.floor(fb); p.floorT = now; }
+    if (dl > lb) p.lv = (old.lv || 1) + Math.floor(lb);
+    fb -= Math.max(0, p.floor - (old.floor || 0));
+    lb -= Math.max(0, p.lv - (old.lv || 1));
+    if (old.tm && !(p.floor <= 2 && p.lv <= 5)) p.tm = 1; // đã bị đánh dấu thì giữ, trừ khi chơi lại từ đầu
+  } else {
+    if (p.floor > 40) { p.floor = 40; p.floorT = now; }
+    if (p.lv > 60) p.lv = 60;
+    fb = Math.max(0, F_CAP - p.floor); lb = Math.max(0, L_CAP - p.lv / 4);
+  }
+  const entry = { ...p, h, last: now, fb: Math.round(fb * 100) / 100, lb: Math.round(lb * 100) / 100 };
   await store.setJSON("p/" + id, entry);
   const board = await mergeBoard(store, id, entry);
   return json(view(board, id));
