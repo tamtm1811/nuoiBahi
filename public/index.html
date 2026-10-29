@@ -736,6 +736,7 @@ input,select,textarea{font-size:16px}
 .subb.on{background:linear-gradient(135deg,var(--sd),#2a1e44);box-shadow:inset 0 0 0 3px var(--sc),0 0 12px var(--sc)}.subb.on::after{content:'ĐANG CHỌN';position:absolute;right:5px;top:5px;font-size:7px;color:#1a0a2a;background:var(--sc);padding:0 4px;border-radius:5px}
 .erev.apt{background:#4a6a8a}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.subb.pend{box-shadow:0 0 0 3px #ffe066,0 0 10px 2px rgba(255,224,102,.7)!important;animation:subpend .6s steps(2) infinite}@keyframes subpend{50%{filter:brightness(1.25)}}
 </style>
 </head>
 <body>
@@ -787,7 +788,7 @@ input,select,textarea{font-size:16px}
     <button class="fbtn" id="f-miss"><img alt="">Nhiệm vụ<i class="dot"></i></button>
     <button class="fbtn" id="f-dex"><img alt="">Tiến hóa<i class="dot"></i></button>
     <button class="fbtn" id="f-mine"><img alt="">Máy đào<i class="dot"></i></button>
-    <button class="fbtn" id="f-supply"><img alt="">Tiếp tế<i class="dot"></i></button>
+    <button class="fbtn" id="f-supply" hidden style="display:none"><img alt="">Tiếp tế<i class="dot"></i></button>
   </div>
   <div id="savebar">
     <button id="sv-save" type="button"><img id="sv-ic" alt=""><span><b>LƯU TIẾN TRÌNH</b><small id="sv-st">Chạm để lưu ngay lên máy chủ</small></span></button>
@@ -851,7 +852,7 @@ input,select,textarea{font-size:16px}
     <p class="hint" id="cl-msg"></p>
     <div id="cl-prev"></div>
   </div>
-  <div class="dzone"><b>Chơi lại từ đầu</b><small>Muốn thử vận may tìm lớp nhân vật hiếm? Bắt đầu lại từ Bé Vuông cấp 1. Tiến trình hiện tại vẫn được cất trên máy chủ bằng mã cũ.</small><button class="pbtn red" id="cl-reset">Chơi lại từ đầu</button></div>
+  <div class="dzone"><b>Chơi lại từ đầu</b><small>Muốn thử vận may tìm lớp nhân vật hiếm? Bắt đầu lại từ Bé Vuông cấp 1. Tiến trình hiện tại vẫn được cất trên máy chủ bằng mã cũ.</small><button class="mini red" id="cl-reset">Chơi lại tìm lớp hiếm</button></div>
   <div class="acts"><button class="pbtn grn" id="cl-save">Lưu ngay</button><button class="pbtn blue" id="cl-copy">Chép mã</button><button class="pbtn gray" data-close>Đóng</button></div>
 </div></div>
 
@@ -890,7 +891,7 @@ input,select,textarea{font-size:16px}
   <h3>Tháp Mã Độc<span class="tag">Năng lượng <span id="t-energy"></span></span></h3>
   <div class="wallet" data-w="energy"></div>
   <div class="costbox" id="t-cost"></div>
-  <button class="mini gold big" id="t-plus">Tiếp tế: thêm năng lượng &amp; tìm tài nguyên</button>
+  <button class="mini gold big" id="t-plus" hidden style="display:none">Tiếp tế</button>
   <div id="t-lobby">
     <div id="t-road"><div class="trtop"><b>HÀNH TRÌNH 100 TẦNG</b><span id="t-prog"></span></div><div class="trbar"><i id="t-pbar"></i></div><div id="t-nodes"></div></div>
     <div id="t-boss" class="tboss"><canvas id="t-bcv" class="pxc" width="96" height="104"></canvas><div class="tbinfo"><small id="t-btag"></small><b id="t-bname"></b><p id="t-bsk"></p><div id="t-btr"></div><em id="t-bdist"></em></div></div>
@@ -971,7 +972,7 @@ input,select,textarea{font-size:16px}
   <div class="tabs" id="dex-ctabs" hidden></div>
   <div id="dex-tree"></div>
   <div id="dex-info">Chạm vào một hình thái để xem chi tiết.</div>
-  <div class="acts"><button class="pbtn red" id="dex-reset">Chơi lại tìm lớp hiếm</button><button class="pbtn gray" data-close>Đóng</button></div>
+  <div class="acts"><button class="pbtn gray" data-close>Đóng</button></div>
 </div></div>
 
 <div id="m-rew" class="modal"><div class="sheet px" style="text-align:center">
@@ -2404,7 +2405,7 @@ const GUARD={floor:90,col:'#3a6ae0',k:{every:3,skm:2.6,sh:3,eva:0.2,first:1.5,pi
 function monKind(f){if(bigBoss(f))return{sp:-1,elite:false};const el=MSPEC.map((s,i)=>i).filter(i=>f>=MSPEC[i].from&&f<=MSPEC[i].to),boss=f%5===0;
   return{sp:el[((boss?f*11+5:f*13+7)>>>0)%el.length],elite:boss};}
 function floorTraits(f){const bb=bigBoss(f);if(bb)return bb.tr.slice();const a=(f*5+2)%6;if(f%5===0||f>=DIFF.t2)return[a,(a+3)%6];return[a];}
-const MONK=1.12; // quái mạnh hơn 12% để bù sức của thú chiến
+const MONK=1.21,MONH=1.1; // v44: quái mạnh hơn (công +21%, máu +10%) để game thử thách hơn
 // Đường cong độ khó (răng cưa): tăng dần đều, gắt hơn ở nửa trên tháp, đỉnh nhọn ở tầng boss rồi chùng xuống tầng kế
 // hệ số theo mốc mỗi 10 tầng (tinh chỉnh bằng mô phỏng: tầng f cần khoảng cấp 0,65×f để thắng 50%)
 function diffK(f){const k=DIFF.k;if(f<=5)return 1+(k[0]-1)*Math.max(0,f)/5;if(f>=95)return k[9];const i=Math.floor((f-5)/10),t=(f-5-i*10)/10;return k[i]+(k[i+1]-k[i])*t;}
@@ -2415,7 +2416,7 @@ const BADJ={5:1.2,10:0.691,15:0.749,20:0.757,25:1.046,30:0.931,35:0.986,40:0.717
 let FADJ={16:0.747,36:0.89,74:0.92,84:0.8,86:0.855,87:0.748,92:0.76,93:0.697,98:0.924}; // hệ số riêng vài tầng thường bị gắt bất thường (từ mô phỏng)
 const DIFF={k:[1.218,1.147,0.846,0.951,1.079,1.071,1.301,1.336,1.696,1.505],d1:0.006,mh:1.5,ma:1.15,bh:2.2,ba:1.35,t2:85};
 function monBase(f,kind,guard){const boss=f%5===0&&!guard,bb=guard?null:bigBoss(f),q=bb?bb.m:[1,1,1,1],sp=guard?GUARD:(kind&&kind.sp>=0?MSPEC[kind.sp]:null),sm=sp?sp.m:[1,1,1,1],ramp=hpRamp(f)*(!boss&&!guard&&FADJ[f]||1),ba=boss?(BADJ[f]||1):1,bm=bb?[DIFF.bh*ba,DIFF.ba*ba]:boss?[DIFF.mh*ba,DIFF.ma*ba]:[1,1],m=bm[0]*MONK*ramp;
-  return{hp:Math.round((90+f*42)*m*q[0]*sm[0]),atk:Math.round((9+f*3.1)*bm[1]*MONK*atkRamp(f)*(!boss&&!guard&&FADJ[f]||1)*q[1]*sm[1]),def:Math.round((4+f*2)*(1+DIFF.d1*f)*q[2]*sm[2]),spd:Math.round((9+f*1.05)*q[3]*sm[3]),crit:(guard?25:5)+Math.min(20,f*0.5)};}
+  return{hp:Math.round((90+f*42)*m*q[0]*sm[0]*MONH),atk:Math.round((9+f*3.1)*bm[1]*MONK*atkRamp(f)*(!boss&&!guard&&FADJ[f]||1)*q[1]*sm[1]),def:Math.round((4+f*2)*(1+DIFF.d1*f)*q[2]*sm[2]),spd:Math.round((9+f*1.05)*q[3]*sm[3]),crit:(guard?25:5)+Math.min(20,f*0.5)};}
 function monKit(f,kind){const bb=bigBoss(f);if(bb)return Object.assign({t:'melee'},bb.kit);const sp=MSPEC[kind.sp],k=Object.assign({t:'melee'},sp.k);if(kind.elite)k.skm=(k.skm||1.8)*1.15;return k;}
 function petBase(F,lv,gear){const k=KIT[F],p=k.p,s=SM[STAGE_OF[F]]*KK[F],g=gear||{hp:0,atk:0,def:0,spd:0,crit:0};
   return{hp:(100+lv*22)*p[0]*s*(1+g.hp/100),atk:(10+lv*3.2)*p[1]*s*(1+g.atk/100),def:(5+lv*2.1)*p[2]*SM[STAGE_OF[F]]*(1+g.def/100),
@@ -5694,7 +5695,10 @@ function subPicker(c,fresh){const box=document.createElement('div');box.classNam
   box.querySelector('small').textContent=cur==null?'Chọn 1 hướng đi riêng cho Bahi (miễn phí). Có thể đổi lại sau với giá '+SUB_COST+' đá.':'Đang theo: '+list[cur].n+'. Đổi sang hướng khác: '+SUB_COST+' đá.';
   const row=box.querySelector('.subr');list.forEach((sb,i)=>{const b=document.createElement('button');b.className='subb'+(cur===i?' on':'');b.style.setProperty('--sc',sb.c[1]);b.style.setProperty('--sd',sb.c[2]);
     b.innerHTML='<i></i><b></b><small></small>';b.querySelector('b').textContent=sb.n;b.querySelector('small').textContent=sb.d;
-    b.onclick=()=>{if(cur===i)return;if(cur!=null){if(S.gem<SUB_COST){toast('Cần '+SUB_COST+' đá để đổi con đường phụ');return;}S.gem-=SUB_COST;}S.sub=S.sub||{};S.sub[c]=i;save();hud();sfx('coin');
+    b.onclick=()=>{if(cur===i)return;
+      if(box._pend!==i){box._pend=i;row.querySelectorAll('.subb').forEach(x=>x.classList.remove('pend'));b.classList.add('pend');sfx('tap');
+        box.querySelector('small').textContent='Chọn '+sb.n+'? Chạm lần nữa vào ô này để xác nhận'+(cur!=null?' (tốn '+SUB_COST+' đá)':'')+'.';clearTimeout(box._t);box._t=setTimeout(()=>{if(!box.isConnected)return;box._pend=null;b.classList.remove('pend');box.querySelector('small').textContent=cur==null?'Chọn 1 hướng đi riêng cho Bahi (miễn phí). Có thể đổi lại sau với giá '+SUB_COST+' đá.':'Đang theo: '+list[cur].n+'. Đổi sang hướng khác: '+SUB_COST+' đá.';},5000);return;}
+      clearTimeout(box._t);if(cur!=null){if(S.gem<SUB_COST){toast('Cần '+SUB_COST+' đá để đổi con đường phụ');return;}S.gem-=SUB_COST;}S.sub=S.sub||{};S.sub[c]=i;save();hud();sfx('coin');
       notice('ok','Con đường phụ: '+sb.n,sb.d+'.');const nb=subPicker(c,fresh);box.replaceWith(nb);};row.appendChild(b);});return box;}
 // hạt nguyên tố của con đường phụ bay quanh Bahi (phòng và trận đấu)
 function drawSubMotes(g,x,y,h,T){const sb=subOf(PET.F);if(!sb)return;const c=sb.c;for(let k=0;k<5;k++){const a=T*(1.2+k*0.13)+k*1.26,r=11+((k*3)%5),px=x+Math.cos(a)*r,py=y-h*0.45+Math.sin(a)*r*0.45-((T*6+k*4)%8);
@@ -5957,7 +5961,7 @@ function bLoop(ts){if(!BT.run)return;requestAnimationFrame(bLoop);const d0=Math.
   updParts(d,BPARTS);drawBattle();}
 function bHud(){const me=BT.B.me,m=BT.B.mon;$('b-mehp').style.width=(Math.max(0,me.hp)/me.max*100)+'%';$('b-monhp').style.width=(Math.max(0,m.hp)/m.max*100)+'%';
   $('b-metx').textContent=Math.max(0,me.hp)+'/'+me.max+(me.shield>0?' · khiên '+me.shield:'');$('b-montx').textContent=m.guard?'? ? ?':Math.max(0,m.hp)+'/'+m.max+(m.block>0?' · chặn '+m.block:'');}
-function startFight(sweep){regenEnergy();if(S.energy<1){toast('Hết năng lượng! Nhận thêm ở Tiếp tế.');openSupply();return;}
+function startFight(sweep){regenEnergy();if(S.energy<1){toast('Hết năng lượng! Năng lượng tự hồi 1 điểm mỗi 10 phút.',3600);return;}
   if(sweep){if(S.floor<1){toast('Chưa có tầng nào để quét');return;}S.energy--;const r=floorReward(S.floor,false);giveBundle(r);mission('win',1);const sx=bonusXP(Math.round((10+S.floor*2)*0.4));gainXP(sx);sfx('coin');toast('Quét tầng '+S.floor+': +'+bundleText(r)+' + '+sx+' XP');save();hud();towerUI();return;}
   S.energy--;if(S.energy===S.emax-1)S.eT=Date.now()/1000;save();hud();newBattle(Math.min(TOWER_TOP,S.floor+1));if(BT.intro){sfx('rare',Math.min(4,1+Math.floor(BT.B.big/3)));vib([30,50,30]);}$('b-res').textContent='';$('b-res').className='b-res';$('b-fact').hidden=true;$('b-next').hidden=true;$('b-float').innerHTML='';
   $('b-view').hidden=false;$('t-lobby').hidden=true;bHead();bHud();if(!BT.run){BT.run=true;BT.last=0;requestAnimationFrame(bLoop);}}
@@ -8233,7 +8237,7 @@ const LASTRES={};
 const RESINFO={coin:'Xu: kiếm từ chăm sóc, học bài, Tháp, máy đào, quà rơi. Dùng để quay gacha (300 xu/lượt) và chơi máy xèng.',
  gem:'Đá quý: nhận khi lên cấp, làm nhiệm vụ, điểm danh, hạ tầng Tháp. Dùng quay gacha (25 đá/lượt) và quay vòng thêm (10 đá).',
  ticket:'Vé gacha: 1 vé = 1 lượt quay, được dùng trước xu và đá. Nhận từ điểm danh, nhiệm vụ, boss Tháp và mỗi 5 cấp.',
- energy:'Năng lượng: mỗi trận ở Tháp tốn 1 điểm. Tự hồi 1 điểm mỗi 10 phút, tối đa 10. Nhận miễn phí mỗi ngày hoặc mua thêm ở Tiếp tế.'};
+ energy:'Năng lượng: mỗi trận ở Tháp tốn 1 điểm. Tự hồi 1 điểm mỗi 10 phút, tối đa 10. Hãy dùng năng lượng thật khéo: mỗi lần leo tháp là một cơ hội.'};
 let toastTimer=0;
 function toast(msg,ms){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),ms||2400);}
 function banner(name,desc,lab){const b=$('banner');b.querySelector('small').textContent=lab||'TIẾN HÓA THÀNH CÔNG';$('bn-name').textContent=name;$('bn-desc').textContent=desc;b.classList.remove('show');void b.offsetWidth;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),3600);}
@@ -8398,7 +8402,7 @@ function initUI(){
   $('f-gacha').onclick=()=>{sfx('tap');openGacha();};$('f-wheel').onclick=()=>{sfx('tap');openWheel();};$('f-slot').onclick=()=>{sfx('tap');openSlot();};$('f-tower').onclick=()=>{sfx('tap');openTower();};
   $('f-bag').onclick=()=>{sfx('tap');openBag();};$('f-miss').onclick=()=>{sfx('tap');openMiss();};$('f-dex').onclick=()=>{sfx('tap');openDex();};$('f-mine').onclick=collectMine;$('f-pets').onclick=()=>{sfx('tap');openPets();};
   $('g-1').onclick=()=>pull(1);$('g-10').onclick=()=>pull(10);$('g-stage').onclick=e=>{if(e.target.closest&&e.target.closest('#g-rare'))return;if(G.phase==='crank'||G.phase==='drop'||G.phase==='shake')gachaOpen();};
-  document.querySelectorAll('.res').forEach(b=>b.onclick=()=>{sfx('tap');if(b.dataset.res==='energy'){openSupply();toast(RESINFO.energy,4200);return;}toast(RESINFO[b.dataset.res],4200);});
+  document.querySelectorAll('.res').forEach(b=>b.onclick=()=>{sfx('tap');toast(RESINFO[b.dataset.res],4200);});
   $('w-btn').onclick=spinWheel;$('s-btn').onclick=spinSlot;document.querySelectorAll('.betb').forEach(b=>b.onclick=()=>{SL.bet=+b.dataset.bet;sfx('tap');slotUI();costUI();});
   $('t-go').onclick=()=>startFight(false);$('t-sweep').onclick=()=>startFight(true);$('b-back').onclick=()=>{$('b-fact').hidden=true;stopBattle();$('b-view').hidden=true;$('t-lobby').hidden=false;towerUI();};
   $('b-next').onclick=()=>{$('b-fact').hidden=true;$('b-next').hidden=true;startFight(false);};$('b-speed').onclick=()=>{BT.speed=BT.speed===1?2:BT.speed===2?4:1;$('b-speed').textContent='Tốc độ x'+BT.speed;};
@@ -8426,7 +8430,7 @@ function initUI(){
     if(docks.length){docks.forEach(d=>{const home=d.parentElement;d._home=home;foot.appendChild(d);});sh.appendChild(foot);sh.classList.add('hasfoot');}});
   friendsInit();cloudInit();
   $('f-supply').onclick=()=>{sfx('tap');openSupply();};$('t-plus').onclick=()=>{sfx('tap');openSupply();};$('sp-tower').onclick=()=>{sfx('tap');closeModal();openTower();};
-  $('dex-reset').onclick=()=>{sfx('tap');openReset();};$('rs-go').onclick=doReset;$('rs-copy').onclick=clCopy;$('roompets').onclick=()=>{sfx('tap');openRoomPets();};setImg($('rp-ic'),sprIco('paw'));roomBtnUI();$('pevo').onclick=e=>{if(e.target.id==='pevo-ok')pevoClose();else pevoSkip();};
+  $('rs-go').onclick=doReset;$('rs-copy').onclick=clCopy;$('roompets').onclick=()=>{sfx('tap');openRoomPets();};setImg($('rp-ic'),sprIco('paw'));roomBtnUI();$('pevo').onclick=e=>{if(e.target.id==='pevo-ok')pevoClose();else pevoSkip();};
   const syncDocks=()=>document.querySelectorAll('.sfoot .acts').forEach(d=>{const h=d._home;d.hidden=!!(h&&h.closest('[hidden]'));});
   ['t-lobby','b-view','c-view'].forEach(id=>{const el=$(id);if(el)new MutationObserver(syncDocks).observe(el,{attributes:true,attributeFilter:['hidden']});});syncDocks();
   $('q-next').onclick=()=>{if(!testMode&&S.qCount>=qMax()){closeModal();return;}openQuiz();};
