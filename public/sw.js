@@ -1,5 +1,5 @@
 // Nuôi Bahi: chạy được khi không có mạng; luôn ưu tiên bản mới nhất khi có mạng
-const CACHE='bahi-v41';
+const CACHE='bahi-v44';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icons/bahi-192-v3.png','./icons/bahi-512-v3.png','./icons/bahi-maskable-512-v3.png','./icons/bahi-apple-180-v3.png','./icons/bahi-fav-32-v3.png','./apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
