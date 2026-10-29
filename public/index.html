@@ -737,6 +737,7 @@ input,select,textarea{font-size:16px}
 .erev.apt{background:#4a6a8a}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .subb.pend{box-shadow:0 0 0 3px #ffe066,0 0 10px 2px rgba(255,224,102,.7)!important;animation:subpend .6s steps(2) infinite}@keyframes subpend{50%{filter:brightness(1.25)}}
+.dzmore{margin-top:10px}.dzmore summary{font-size:10px;color:#a08060;cursor:pointer;list-style:none;text-align:center;text-decoration:underline}.dzmore summary::-webkit-details-marker{display:none}
 </style>
 </head>
 <body>
@@ -852,7 +853,7 @@ input,select,textarea{font-size:16px}
     <p class="hint" id="cl-msg"></p>
     <div id="cl-prev"></div>
   </div>
-  <div class="dzone"><b>Chơi lại từ đầu</b><small>Muốn thử vận may tìm lớp nhân vật hiếm? Bắt đầu lại từ Bé Vuông cấp 1. Tiến trình hiện tại vẫn được cất trên máy chủ bằng mã cũ.</small><button class="mini red" id="cl-reset">Chơi lại tìm lớp hiếm</button></div>
+  <details class="dzmore"><summary>Tùy chọn khác</summary><div class="dzone"><b>Chơi lại từ đầu</b><small>Muốn thử vận may tìm lớp nhân vật hiếm? Bắt đầu lại từ Bé Vuông cấp 1. Tiến trình hiện tại vẫn được cất trên máy chủ bằng mã cũ.</small><button class="mini red" id="cl-reset">Chơi lại tìm lớp hiếm</button></div></details>
   <div class="acts"><button class="pbtn grn" id="cl-save">Lưu ngay</button><button class="pbtn blue" id="cl-copy">Chép mã</button><button class="pbtn gray" data-close>Đóng</button></div>
 </div></div>
 
@@ -3659,7 +3660,7 @@ function luckMul(v,m,rb){return(1+LUCK.v[v||0])*(1+LUCK.mut*(m||0))*(1+LUCK.reb*
 // ---------- chuyển dữ liệu từ các phiên bản cũ ----------
 const OLD5={CLS:[1,2,3],BODY:[[4,5,6,16,17],[7,8,9,22,23],[10,11,12,26,30]],AWAKE:[[13,14,15,18],[19,20,21,24],[25,27,28,29]]};
 function legacyLine(F){const a=[];let x=F;while(x){a.unshift(x);x=PARENT[x];}return a;}
-function migrateEvo(){if(S.evoVer===6)return;let F=0,v=0;
+function migrateEvo(){if(S.evoVer>=6)return;let F=0,v=0;
   if(S.evoVer===5){const p=S.path||[],fl=S.fl||{};v=fl.v||0;if(p.length>=1)F=OLD5.CLS[p[0]];if(p.length>=2)F=fl.w>=0?OLD5.AWAKE[p[0]][fl.w]:OLD5.BODY[p[0]][p[1]];}
   else F=S.form||0;
   S.path=legacyLine(F);S.fl={v};S.disc={};S.path.forEach(discover);(S.unlocked||[]).forEach(x=>{if(x<=30)discover(x);});
@@ -5704,11 +5705,23 @@ function subPicker(c,fresh){const box=document.createElement('div');box.classNam
 function drawSubMotes(g,x,y,h,T){const sb=subOf(PET.F);if(!sb)return;const c=sb.c;for(let k=0;k<5;k++){const a=T*(1.2+k*0.13)+k*1.26,r=11+((k*3)%5),px=x+Math.cos(a)*r,py=y-h*0.45+Math.sin(a)*r*0.45-((T*6+k*4)%8);
   if(Math.sin(a)<-0.2)continue;g.globalAlpha=0.85;g.fillStyle=c[k%2?1:0];g.fillRect(Math.round(px),Math.round(py),k%3===0?2:1,k%3===0?2:1);g.fillStyle=c[2];g.fillRect(Math.round(px),Math.round(py)+1,1,1);}g.globalAlpha=1;}
 // chuyển bản lưu sang cây v44: giữ hình thái hiện tại, dựng lại đường đi theo cây mới
-function migrateEvo7(){if(S.evoVer===7)return;const p=S.path||[],last=p.length?p[p.length-1]:0;
-  // chọn đường dẫn tới hình thái hiện tại giống hành trình cũ nhất (cây hội tụ có nhiều đường)
-  const best=t=>{let bp=null,bs=-1;const walk=(q)=>{const F=q[q.length-1];if(F===t){const sc=q.filter((x,i)=>p[i]===x).length;if(sc>bs){bs=sc;bp=q.slice();}return;}if(q.length>=5)return;(KIDS[F]||[]).forEach(k=>walk(q.concat([k])));};CLASSES.forEach(c=>walk([c]));return bp||lineage(t)||[];};
-  if(last===ORIGIN){const lin=best(p[p.length-2]||1);S.path=lin.slice(0,4).concat([ORIGIN]);}else if(last){S.path=best(last);}
-  (S.path||[]).forEach(discover);S.evoVer=7;S.pendEvo=false;S.lp=Math.min(S.lp||0,5);if(S.apt==null&&S.path.length)S.apt=50;}
+const OLD43_ST=[0,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4];
+// nối dài hành trình tới đủ số lần tiến hóa đã có (ưu tiên hình thái đã từng thấy, rồi độ hiếm gần nhất) — không bao giờ bắt người chơi tiến hóa lại
+function evoDeepen(path,want,pref){const p=path.slice(),d=S.disc||{};while(p.length<want){const last=p[p.length-1];const ks=last==null?CLASSES:(last===ORIGIN?[]:KIDS[last]||[]);if(!ks.length)break;
+  let c=ks.find(k=>d[k]);if(c==null)c=ks.slice().sort((a,b)=>Math.abs(FRAR[a]-pref)-Math.abs(FRAR[b]-pref))[0];p.push(c);discover(c);}return p;}
+function bestLine(t,p){let bp=null,bs=-1;const walk=(q)=>{const F=q[q.length-1];if(F===t){const sc=q.filter((x,i)=>p[i]===x).length;if(sc>bs){bs=sc;bp=q.slice();}return;}if(q.length>=5)return;(KIDS[F]||[]).forEach(k=>walk(q.concat([k])));};CLASSES.forEach(c=>walk([c]));return bp||lineage(t)||[];}
+function migrateEvo7(){if(S.evoVer===7)return;const p=S.path||[],last=p.length?p[p.length-1]:0;S.path43=p.slice();
+  if(last===ORIGIN){const pv=p[p.length-2]||1;let lin=bestLine(pv,p);lin=evoDeepen(lin,4,FRAR[pv]||0);S.path=lin.slice(0,4).concat([ORIGIN]);}
+  else if(last){const want=Math.min(STAGE_MAX,p.length);S.path=evoDeepen(bestLine(last,p),want,FRAR[last]||0);}
+  (S.path||[]).forEach(discover);S.evoVer=7;S.evoFix=1;S.pendEvo=false;S.lp=Math.min(S.lp||0,5);if(S.apt==null&&S.path.length)S.apt=50;}
+// bản v44 đầu có lỗi làm mất hình thái sau lần mở thứ hai: bù cho người chơi đã bị mất (mỗi lần tiến hóa bị mất = 1 Bùa Đột Biến + 60 đá) để tiến hóa lại có lợi hơn
+function compEvo7(){if(S.evoComp||S.apt==null||(S.path||[]).length||S.lv<5)return;S.evoComp=1;const n=Math.min(STAGE_MAX,EVO_LV.filter((l,i)=>i>0&&l<=S.lv).length);if(!n)return;
+  S.bag=S.bag||{};S.bag.u_mut=(S.bag.u_mut||0)+n;S.gem+=60*n;setTimeout(()=>{try{notice('ok','Xin lỗi Sếp!','Bản cập nhật trước làm mất hình thái của Bahi. Đã tặng '+n+' Bùa Đột Biến + '+(60*n)+' đá để tiến hóa lại với cơ hội hiếm cao hơn.',6500);}catch(e){}},1600);}
+// sửa save đã lỡ chuyển bằng bản v44 đầu tiên (bị tụt số lần tiến hóa): khôi phục đủ số lần dựa trên các hình thái cũ đã khám phá
+function repairEvo7(){if(S.evoVer!==7||S.evoFix)return;S.evoFix=1;const path=S.path||[];if(path.length&&path[path.length-1]===ORIGIN)return;
+  let depth=0,tgt=null;for(const k in S.disc||{}){const id=+k;if(id>=78||id===ORIGIN||path.includes(id))continue;if(OLD43_ST[id]>depth){depth=OLD43_ST[id];tgt=id;}}
+  if(depth<=path.length)return;let np=path.length?path.slice():bestLine(tgt,[]);np=evoDeepen(np,Math.min(STAGE_MAX,depth),FRAR[tgt]||0);
+  if(np.length>path.length){S.path=np;S.pendEvo=false;if(S.apt==null)S.apt=50;S.evoNote=1;}}
 
 
 function bfxCols(F){const sb=F===PET.F&&typeof subOf==='function'?subOf(F):null;if(sb)return sb.c;const c=FXC[F]||FX.gold;return c;}
@@ -8457,7 +8470,7 @@ function initUI(){
   if(testMode)enableTest();}
 
 // ---------- khởi động ----------
-load();migratePets();migrateHunt();migrateV19();migrateEvo();migrateEvo7();PET.F=curForm();
+load();migratePets();migrateHunt();migrateV19();migrateEvo();migrateEvo7();repairEvo7();compEvo7();PET.F=curForm();if(S.evoNote){delete S.evoNote;setTimeout(()=>{try{notice('ok','Đã khôi phục tiến hóa','Bahi giữ nguyên số lần tiến hóa trên cây mới v44. Không cần tiến hóa lại.',5200);}catch(e){}},1500);}save();
 placePet();dogPlace();initUI();hud();save();
 ROOMC=renderRoom(dayPhase(),roomTheme());ROOMK=roomTheme()?roomTheme().n:'';
 requestAnimationFrame(loop);
