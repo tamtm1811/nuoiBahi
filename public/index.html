@@ -883,7 +883,7 @@ input,select,textarea{font-size:16px}
     <p class="hint" id="cl-msg"></p>
     <div id="cl-prev"></div>
   </div>
-  <p class="hint" style="text-align:center;opacity:.7">Phiên bản v49</p><details class="dzmore"><summary>Tùy chọn khác</summary><div class="dzone"><small>Xóa tiến trình trên máy này và bắt đầu ván mới (có 2 bước xác nhận).</small><button class="mini gray" id="cl-reset">Chơi lại từ đầu</button></div></details>
+  <p class="hint" style="text-align:center;opacity:.7">Phiên bản v50</p><details class="dzmore"><summary>Tùy chọn khác</summary><div class="dzone"><small>Xóa tiến trình trên máy này và bắt đầu ván mới (có 2 bước xác nhận).</small><button class="mini gray" id="cl-reset">Chơi lại từ đầu</button></div></details>
   <div class="acts"><button class="pbtn grn" id="cl-save">Lưu ngay</button><button class="pbtn blue" id="cl-copy">Chép mã</button><button class="pbtn gray" data-close>Đóng</button></div>
 </div></div>
 
@@ -1041,7 +1041,7 @@ input,select,textarea{font-size:16px}
   <h3>Bảng thử nghiệm</h3>
   <div class="row" style="flex-wrap:wrap;gap:6px">
     <button class="tbtn" id="t-lv">+1 cấp</button><button class="tbtn" id="t-lv9">Cấp 9</button><button class="tbtn" id="t-lv19">Cấp 19</button><button class="tbtn" id="t-lv29">Cấp 29</button>
-    <button class="tbtn" id="t-rich">+5000 xu, +500 đá, +20 vé</button><button class="tbtn" id="t-en">Đầy năng lượng</button><button class="tbtn" id="t-gift">Thả quà</button><button class="tbtn" id="t-bud">Gọi bạn Bahi</button><button class="tbtn" id="t-mine">Đầy máy đào</button>
+    <button class="tbtn" id="t-rich">+5000 xu, +500 đá, +20 vé</button><button class="tbtn" id="t-en">Đầy năng lượng</button><button class="tbtn" id="t-gift">Thả quà</button><button class="tbtn" id="t-bud">Gọi bạn Bahi</button><button class="tbtn" id="t-res">Cứu viện trận sau</button><button class="tbtn" id="t-mine">Đầy máy đào</button>
     <button class="tbtn" id="t-low">Chỉ số thấp</button><button class="tbtn" id="t-full">Chỉ số đầy</button><button class="tbtn" id="t-day">Sang ngày mới</button><button class="tbtn" id="t-guard">Trận sau gặp Hộ Vệ</button><button class="tbtn" id="t-pets">Nhận 5 thú hiếm</button><button class="tbtn" id="t-reset">Xóa dữ liệu</button>
   </div>
   <div style="margin-top:8px">Đổi hình thái:</div><div id="test-forms"></div>
@@ -2669,7 +2669,10 @@ const GUARD={floor:90,col:'#3a6ae0',k:{every:3,skm:2.6,sh:3,eva:0.2,first:1.5,pi
 function monKind(f){if(bigBoss(f))return{sp:-1,elite:false};const el=MSPEC.map((s,i)=>i).filter(i=>f>=MSPEC[i].from&&f<=MSPEC[i].to),boss=f%5===0;
   return{sp:el[((boss?f*11+5:f*13+7)>>>0)%el.length],elite:boss};}
 function floorTraits(f){const bb=bigBoss(f);if(bb)return bb.tr.slice();const a=(f*5+2)%6;if(f%5===0||f>=DIFF.t2)return[a,(a+3)%6];return[a];}
-const MONK=1.21,MONH=1.1; // v44: quái mạnh hơn (công +21%, máu +10%) để game thử thách hơn
+const MONK=1.21,MONH=1.1;
+const TXP_WIN=0.75,TXP_LOSE=0.2; // v50: leo tháp lâu dài (hàng tháng)
+let TMUL=[0, 0.55, 0.62, 0.68, 0.751, 1.156, 0.754, 0.787, 0.827, 0.84, 1.103, 0.943, 0.96, 0.983, 1.012, 1.096, 1.047, 1.158, 1.209, 1.221, 1.779, 1.433, 1.499, 1.71, 1.705, 1.722, 1.957, 1.844, 1.98, 2.04, 3.557, 2.483, 2.434, 2.372, 2.565, 2.713, 2.42, 2.631, 2.474, 2.7, 2.987, 2.662, 3.041, 3.022, 3.072, 3.498, 3.266, 3.246, 3.6, 3.566, 2.75, 3.784, 3.793, 3.705, 3.734, 3.815, 3.658, 3.5, 3.381, 3.345, 2.72, 4.068, 4.172, 4.206, 4.425, 3.981, 4.142, 4.216, 3.983, 4.006, 3.917, 3.944, 4.02, 3.907, 3.665, 4.602, 3.829, 3.613, 3.955, 4.082, 5.316, 4.492, 4.522, 4.487, 4.323, 4.554, 4.099, 4.24, 4.453, 4.374, 4.887, 4.18, 3.924, 3.787, 3.968, 3.996, 4.524, 4.625, 4.578, 4.695, 3.319]; // v50: hệ số sức mạnh từng tầng — hiệu chỉnh bằng mô phỏng để tầng f cần khoảng cấp 1,3×f (sau tầng 15) với trang bị khá + thú chiến
+function tmul(f){return TMUL&&TMUL[f]||1;} // v44: quái mạnh hơn (công +21%, máu +10%) để game thử thách hơn
 // Đường cong độ khó (răng cưa): tăng dần đều, gắt hơn ở nửa trên tháp, đỉnh nhọn ở tầng boss rồi chùng xuống tầng kế
 // hệ số theo mốc mỗi 10 tầng (tinh chỉnh bằng mô phỏng: tầng f cần khoảng cấp 0,65×f để thắng 50%)
 function diffK(f){const k=DIFF.k;if(f<=5)return 1+(k[0]-1)*Math.max(0,f)/5;if(f>=95)return k[9];const i=Math.floor((f-5)/10),t=(f-5-i*10)/10;return k[i]+(k[i+1]-k[i])*t;}
@@ -2680,7 +2683,7 @@ const BADJ={5:0.8,10:0.58,15:0.823,20:0.787,25:1.098,30:0.866,35:0.958,40:0.691,
 let FADJ={61:1.273,64:1.291,66:0.931,67:1.397,69:0.901,72:1.19,74:0.882,77:0.914,81:1.198,84:0.826,86:0.878,87:0.74,88:1.229,89:1.075,91:1.258,92:0.78,93:0.669,97:1.455,98:0.881}; // hệ số riêng vài tầng thường bị gắt bất thường (từ mô phỏng)
 const DIFF={k:[1.949,1.027,0.902,0.921,1.092,1.026,1.276,1.284,1.573,1.429],d1:0.006,mh:1.5,ma:1.15,bh:2.2,ba:1.35,t2:85};
 function monBase(f,kind,guard){const boss=f%5===0&&!guard,bb=guard?null:bigBoss(f),q=bb?bb.m:[1,1,1,1],sp=guard?GUARD:(kind&&kind.sp>=0?MSPEC[kind.sp]:null),sm=sp?sp.m:[1,1,1,1],ramp=hpRamp(f)*(!boss&&!guard&&FADJ[f]||1),ba=boss?(BADJ[f]||1):1,bm=bb?[DIFF.bh*ba,DIFF.ba*ba]:boss?[DIFF.mh*ba,DIFF.ma*ba]:[1,1],m=bm[0]*MONK*ramp;
-  return{hp:Math.round((90+f*42)*m*q[0]*sm[0]*MONH),atk:Math.round((9+f*3.1)*bm[1]*MONK*atkRamp(f)*(!boss&&!guard&&FADJ[f]||1)*q[1]*sm[1]),def:Math.round((4+f*2)*(1+DIFF.d1*f)*q[2]*sm[2]),spd:Math.round((9+f*1.05)*q[3]*sm[3]),crit:(guard?25:5)+Math.min(20,f*0.5)};}
+  const tm=tmul(f);return{hp:Math.round((90+f*42)*m*q[0]*sm[0]*MONH*tm),atk:Math.round(tm*(9+f*3.1)*bm[1]*MONK*atkRamp(f)*(!boss&&!guard&&FADJ[f]||1)*q[1]*sm[1]),def:Math.round((4+f*2)*(1+DIFF.d1*f)*q[2]*sm[2]),spd:Math.round((9+f*1.05)*q[3]*sm[3]),crit:(guard?25:5)+Math.min(20,f*0.5)};}
 function monKit(f,kind){const bb=bigBoss(f);if(bb)return Object.assign({t:'melee'},bb.kit);const sp=MSPEC[kind.sp],k=Object.assign({t:'melee'},sp.k);if(kind.elite)k.skm=(k.skm||1.8)*1.15;return k;}
 function petBase(F,lv,gear){const k=KIT[F],p=k.p,s=SM[STAGE_OF[F]]*KK[F],g=gear||{hp:0,atk:0,def:0,spd:0,crit:0};
   return{hp:(100+lv*22)*p[0]*s*(1+g.hp/100),atk:(10+lv*3.2)*p[1]*s*(1+g.atk/100),def:(5+lv*2.1)*p[2]*SM[STAGE_OF[F]]*(1+g.def/100),
@@ -5250,12 +5253,91 @@ const QBANK=[
 ["Bahi muốn mua bảo hiểm cho con mèo của hàng xóm. Điều gì còn thiếu?",["Quyền lợi có thể được bảo hiểm","Tiền đóng phí","Ảnh con mèo","Tên con mèo"],"Bahi không có lợi ích hợp pháp với con mèo của người khác.",0,2],
 ["Bahi làm rơi điện thoại có bảo hiểm, nhưng đó là chiếc thứ 5 trong tháng. Điều gì dễ xảy ra?",["Doanh nghiệp xem xét kỹ, có thể giới hạn số lần bồi thường","Được thưởng một chiếc điện thoại mới","Phí bảo hiểm tự động giảm xuống","Được mua thêm 5 chiếc với giá ưu đãi"],"Nhiều sản phẩm giới hạn số lần bồi thường mỗi năm.",0,2],
 ["Bahi định đốt nhà kho cũ để nhận bảo hiểm. Đây là gì?",["Hành vi gian lận, trục lợi bảo hiểm và vi phạm pháp luật","Một chiến lược tài chính thông minh","Quyền hợp pháp của người được bảo hiểm","Một dạng rủi ro thuần túy được bảo vệ"],"Tổn thất do cố ý không bao giờ được bảo hiểm.",0,1],
+// --- v50: CHUYÊN SÂU (bậc 4): tình huống, tính toán, áp dụng nguyên tắc — câu được phép cược ---
+["Hợp đồng có mức miễn thường (khấu trừ) 2 triệu đồng mỗi vụ. Thiệt hại 9 triệu, nằm trong phạm vi bảo hiểm. Công ty chi trả bao nhiêu?", ["7 triệu đồng", "9 triệu đồng", "2 triệu đồng", "11 triệu đồng"], "Mức khấu trừ là phần người được bảo hiểm tự chịu: 9 − 2 = 7 triệu.", 0, 4],
+["Gói sức khỏe đồng chi trả 20%. Chi phí nằm viện trong phạm vi là 15 triệu, hạn mức còn đủ. Khách tự trả bao nhiêu?", ["3 triệu đồng", "12 triệu đồng", "1,5 triệu đồng", "Không phải trả gì"], "Khách trả 20% × 15 = 3 triệu, bảo hiểm trả 12 triệu.", 0, 4],
+["Gói sức khỏe chi trả 80% chi phí nhưng tối đa 10 triệu mỗi lần nằm viện. Chi phí lần này là 15 triệu. Bảo hiểm trả bao nhiêu?", ["10 triệu đồng", "12 triệu đồng", "15 triệu đồng", "8 triệu đồng"], "80% × 15 = 12 triệu, nhưng vượt hạn mức mỗi lần nên chỉ trả 10 triệu. Luôn xem cả tỷ lệ chi trả lẫn hạn mức.", 0, 4],
+["Ngôi nhà trị giá 2 tỷ chỉ được mua bảo hiểm 1 tỷ. Cháy gây tổn thất 400 triệu, hợp đồng áp dụng bồi thường theo tỷ lệ. Công ty trả bao nhiêu?", ["200 triệu đồng", "400 triệu đồng", "1 tỷ đồng", "100 triệu đồng"], "Bảo hiểm dưới giá trị: chỉ mua 50% giá trị nên bồi thường 50% tổn thất = 200 triệu.", 0, 4],
+["Xe trị giá thực tế 500 triệu nhưng chủ xe mua bảo hiểm vật chất với số tiền 700 triệu. Xe bị tổn thất toàn bộ. Số tiền bồi thường tối đa thường là bao nhiêu?", ["Khoảng 500 triệu, theo giá trị thực tế", "700 triệu vì đã đóng phí cho số tiền đó", "1,2 tỷ vì cộng cả hai con số", "350 triệu vì bị phạt khai sai"], "Nguyên tắc bồi thường: không trả vượt thiệt hại thực tế. Mua trên giá trị chỉ tốn thêm phí.", 0, 4],
+["Một tài sản trị giá 1 tỷ được bảo hiểm ở công ty A 600 triệu và công ty B 600 triệu cho cùng rủi ro. Tổn thất 300 triệu. Thông thường hai công ty chia nhau thế nào?", ["Mỗi công ty trả 150 triệu", "Mỗi công ty trả 300 triệu", "Công ty A trả hết 300 triệu", "Không công ty nào trả vì mua trùng"], "Bảo hiểm trùng: các công ty chia bồi thường theo tỷ lệ số tiền bảo hiểm (600/1.200 mỗi bên), tổng không vượt thiệt hại.", 0, 4],
+["Trợ cấp nằm viện 300 nghìn đồng/ngày, tối đa 30 ngày/năm. Năm nay đã dùng 25 ngày, nay nằm viện thêm 10 ngày. Nhận bao nhiêu?", ["1,5 triệu đồng (5 ngày)", "3 triệu đồng (10 ngày)", "Không nhận gì vì đã dùng nhiều", "9 triệu đồng (30 ngày)"], "Chỉ còn 5 ngày trong hạn mức năm: 5 × 300 nghìn = 1,5 triệu.", 0, 4],
+["Hai công ty đồng bảo hiểm một nhà xưởng theo tỷ lệ A 60%, B 40%. Tổn thất 500 triệu trong phạm vi. Công ty A trả bao nhiêu?", ["300 triệu đồng", "500 triệu đồng", "200 triệu đồng", "250 triệu đồng"], "Đồng bảo hiểm: mỗi công ty chịu phần tổn thất theo tỷ lệ đã nhận, A = 60% × 500 = 300 triệu.", 0, 4],
+["Hạn mức năm của gói sức khỏe là 100 triệu, đã dùng 85 triệu. Lần này chi phí 30 triệu, không có đồng chi trả. Bảo hiểm trả bao nhiêu?", ["15 triệu đồng", "30 triệu đồng", "0 đồng", "100 triệu đồng"], "Chỉ còn 15 triệu trong hạn mức năm. Phần vượt hạn mức người bệnh tự trả.", 0, 4],
+["Bảo hiểm y tế chi trả 80% chi phí trong phạm vi được hưởng. Chi phí trong phạm vi là 10 triệu. Người bệnh cùng chi trả bao nhiêu?", ["2 triệu đồng", "8 triệu đồng", "0 đồng", "1 triệu đồng"], "Mức hưởng 80% nghĩa là người bệnh cùng chi trả 20% = 2 triệu.", 1, 4],
+["Lạm phát trung bình 6%/năm. Theo quy tắc 72, sau khoảng bao lâu sức mua của số tiền bảo hiểm 1 tỷ chỉ còn khoảng một nửa?", ["Khoảng 12 năm", "Khoảng 6 năm", "Khoảng 72 năm", "Khoảng 30 năm"], "72 ÷ 6 ≈ 12 năm giá cả tăng gấp đôi, nên sức mua của 1 tỷ chỉ còn khoảng 500 triệu. Nên định kỳ xem lại mức bảo vệ.", 0, 4],
+["Gia đình chi tiêu 15 triệu/tháng, muốn bảo vệ 5 năm, còn nợ nhà 300 triệu, cần 200 triệu học phí cho con, đã có 100 triệu tiết kiệm. Theo cách tính nhu cầu, cần khoảng bao nhiêu tiền bảo hiểm?", ["Khoảng 1,3 tỷ đồng", "Khoảng 900 triệu đồng", "Khoảng 1,5 tỷ đồng", "Khoảng 600 triệu đồng"], "15 × 12 × 5 = 900 triệu + 300 nợ + 200 học phí − 100 tiết kiệm = 1,3 tỷ.", 0, 4],
+["Mức miễn thường KHÔNG khấu trừ là 1 triệu. Thiệt hại 5 triệu. Công ty trả bao nhiêu?", ["5 triệu đồng", "4 triệu đồng", "1 triệu đồng", "Không trả gì"], "Miễn thường không khấu trừ: thiệt hại dưới mức thì không trả, vượt mức thì trả toàn bộ. Miễn thường có khấu trừ thì luôn trừ đi 1 triệu.", 0, 4],
+["Mức miễn thường không khấu trừ là 1 triệu. Thiệt hại 800 nghìn. Công ty trả bao nhiêu?", ["Không trả gì", "800 nghìn đồng", "200 nghìn đồng", "1 triệu đồng"], "Thiệt hại chưa vượt mức miễn thường thì người được bảo hiểm tự chịu toàn bộ.", 0, 4],
+["Phí nhân thọ đến hạn ngày 1/3. Ngày 20/4 (khoảng 50 ngày sau) người được bảo hiểm gặp tai nạn, chưa đóng phí. Hợp đồng thường xử lý thế nào?", ["Vẫn có hiệu lực vì còn trong thời gian gia hạn tối thiểu 60 ngày; quyền lợi thường được trả sau khi trừ phí còn thiếu", "Mất hiệu lực ngay từ ngày 2/3", "Chỉ được hoàn lại phí đã đóng", "Công ty được quyền từ chối vì chưa đóng phí"], "Trong thời gian gia hạn đóng phí, hợp đồng vẫn hiệu lực. Nhiều hợp đồng trừ khoản phí còn nợ vào số tiền chi trả.", 1, 4],
+["Khách nhận hợp đồng nhân thọ ngày 1/6 và đổi ý vào ngày 15/6. Khách được gì?", ["Được từ chối hợp đồng, nhận lại phí đã đóng sau khi trừ chi phí hợp lý như khám sức khỏe nếu có", "Chỉ nhận giá trị hoàn lại, thường rất thấp", "Không được hủy vì đã ký", "Phải đóng phạt 50% phí năm đầu"], "Vẫn trong 21 ngày cân nhắc kể từ khi nhận hợp đồng, áp dụng cho hợp đồng nhân thọ, sức khỏe trên 1 năm.", 1, 4],
+["Khách nhận hợp đồng ngày 1/6 nhưng đến ngày 30/6 mới muốn hủy. Điều gì thường xảy ra?", ["Đã quá 21 ngày cân nhắc, hủy lúc này chỉ nhận giá trị hoàn lại nếu có", "Vẫn được hoàn 100% phí", "Được hoàn phí và cộng thêm lãi", "Không được hủy cho tới khi đáo hạn"], "Thời gian cân nhắc là 21 ngày. Sau đó, chấm dứt hợp đồng chỉ nhận giá trị hoàn lại theo điều khoản, những năm đầu thường thấp.", 1, 4],
+["Hợp đồng nhân thọ bị tạm ngừng hiệu lực đã 18 tháng. Bên mua muốn tiếp tục. Câu nào đúng nhất?", ["Có thể yêu cầu khôi phục vì còn trong thời hạn tối thiểu 24 tháng, cần đóng phí còn thiếu và có thể phải thẩm định lại", "Không thể khôi phục, phải mua hợp đồng mới", "Được khôi phục tự động, không cần làm gì", "Chỉ được khôi phục nếu đại lý cũ còn làm việc"], "Luật cho phép khôi phục hiệu lực trong thời hạn tối thiểu 24 tháng kể từ khi bị tạm ngừng.", 1, 4],
+["Sự kiện bảo hiểm xảy ra ngày 1/2/2025. Nếu luật không quy định khác, hạn chót yêu cầu bồi thường thường là khi nào?", ["Ngày 1/2/2026", "Ngày 1/3/2025", "Ngày 1/2/2028", "Không có thời hạn"], "Thời hạn yêu cầu bồi thường hoặc trả tiền bảo hiểm là 1 năm kể từ ngày xảy ra sự kiện, trừ trường hợp luật quy định khác.", 1, 4],
+["Hợp đồng không thỏa thuận thời hạn trả tiền. Công ty nhận đủ hồ sơ hợp lệ ngày 1/9. Theo luật, phải trả tiền chậm nhất trong bao lâu?", ["15 ngày kể từ khi nhận đủ hồ sơ hợp lệ", "3 ngày làm việc", "60 ngày", "6 tháng"], "Khi không có thỏa thuận, thời hạn bồi thường hoặc trả tiền bảo hiểm là 15 ngày kể từ khi nhận đủ hồ sơ hợp lệ.", 1, 4],
+["Khách biết mình bị tiểu đường nhưng cố ý không khai trong đơn yêu cầu. Một năm sau nhập viện vì biến chứng tiểu đường. Điều gì có thể xảy ra?", ["Công ty có thể từ chối chi trả và có quyền đơn phương chấm dứt hợp đồng vì vi phạm nghĩa vụ kê khai trung thực", "Công ty bắt buộc phải chi trả vì đã thu phí", "Chỉ bị tăng phí năm sau", "Không ảnh hưởng gì vì đã qua một năm"], "Cố ý cung cấp thông tin sai làm mất cơ sở đánh giá rủi ro. Khai đúng ngay từ đầu là cách bảo vệ quyền lợi chắc nhất.", 1, 4],
+["Chị A muốn mua bảo hiểm nhân thọ có quyền lợi tử vong cho một đồng nghiệp, không có quan hệ gia đình hay tài chính, và tự làm người thụ hưởng. Điều này thế nào?", ["Không hợp lệ vì chị A không có quyền lợi có thể được bảo hiểm đối với người đó", "Hợp lệ nếu chị A đóng phí đúng hạn", "Hợp lệ nếu đồng nghiệp không biết", "Hợp lệ vì ai cũng có thể mua cho bất kỳ ai"], "Bên mua chỉ được mua bảo hiểm con người cho người mà mình có quyền lợi có thể được bảo hiểm, và cần người được bảo hiểm đồng ý bằng văn bản.", 1, 4],
+["Xe anh B bị người khác tông. Công ty bảo hiểm đã bồi thường toàn bộ chi phí sửa xe cho anh B. Sau đó điều gì đúng?", ["Công ty được thay anh B đòi người gây tai nạn hoàn trả; anh B không được nhận thêm tiền bồi thường cho cùng thiệt hại đó", "Anh B được đòi thêm người gây tai nạn để nhận gấp đôi", "Người gây tai nạn được miễn trách nhiệm", "Công ty phải trả thêm tiền cho người gây tai nạn"], "Đây là nguyên tắc thế quyền: người có lỗi vẫn phải chịu trách nhiệm, còn người được bảo hiểm không lời từ tổn thất.", 0, 4],
+["Một người lên cơn đau tim, ngã cầu thang và tử vong. Kết luận y khoa: nguyên nhân tử vong là cơn đau tim. Với bảo hiểm tai nạn thuần túy, điều gì dễ xảy ra nhất?", ["Có thể không được chi trả vì nguyên nhân trực tiếp là bệnh, không phải tai nạn", "Chắc chắn được chi trả vì có cú ngã", "Được chi trả gấp đôi", "Chỉ được hoàn phí"], "Nguyên tắc nguyên nhân trực tiếp: xét nguyên nhân chính gây ra tổn thất. Bảo hiểm tai nạn chi trả khi nguyên nhân chính là tác động bất ngờ từ bên ngoài.", 0, 4],
+["Mua gói sức khỏe ngày 1/1, ngày 15/1 nhập viện vì viêm phổi. Điều khoản có thời gian chờ 30 ngày cho bệnh thông thường. Kết quả thường là gì?", ["Chưa được chi trả vì còn trong thời gian chờ", "Được chi trả đầy đủ", "Được chi trả gấp đôi vì nhập viện sớm", "Hợp đồng bị hủy"], "Thời gian chờ thường áp dụng cho bệnh, còn điều trị do tai nạn thường được chi trả ngay theo điều khoản.", 0, 4],
+["Cũng gói sức khỏe đó, ngày 15/1 người được bảo hiểm gãy tay do tai nạn giao thông. Thông thường thì sao?", ["Thường được chi trả vì thời gian chờ thường không áp dụng cho tai nạn", "Không được chi trả vì còn thời gian chờ", "Chỉ được chi trả sau 1 năm", "Chỉ được hoàn phí"], "Đa số gói sức khỏe miễn thời gian chờ cho điều trị do tai nạn. Hãy đọc phần định nghĩa và thời gian chờ trong quy tắc.", 0, 4],
+["Hợp đồng định nghĩa điều trị nội trú là nằm viện từ 24 giờ trở lên. Người bệnh nằm viện 10 tiếng rồi về. Chi phí này được xếp vào đâu?", ["Không tính là nội trú; có thể thuộc quyền lợi ngoại trú nếu gói có", "Vẫn tính là nội trú", "Tính là bệnh hiểm nghèo", "Không bao giờ được chi trả"], "Định nghĩa trong hợp đồng quyết định quyền lợi. Một chữ khác là một quyền lợi khác.", 0, 4],
+["Xe chết máy trong vùng ngập, chủ xe cố đề máy lại khiến động cơ hỏng nặng. Hợp đồng vật chất xe không mua điều khoản thủy kích. Phần hỏng động cơ thường thế nào?", ["Thường không được chi trả", "Luôn được chi trả", "Được chi trả 50%", "Được bảo hiểm bắt buộc chi trả thay"], "Hư hỏng động cơ do nước lọt vào thường phải mua điều khoản bổ sung. Gặp ngập: không đề máy, gọi cứu hộ, báo bảo hiểm.", 0, 4],
+["Sau va chạm, chủ xe tự mang xe đi sửa ngay mà không báo công ty để giám định. Rủi ro lớn nhất là gì?", ["Công ty có thể từ chối phần thiệt hại không được giám định", "Không có rủi ro gì", "Công ty phải trả gấp đôi", "Bảo hiểm bắt buộc sẽ trả thay"], "Giám định giúp xác định nguyên nhân và mức độ thiệt hại. Báo ngay và chờ hướng dẫn trước khi sửa.", 0, 4],
+["Tài xế có nồng độ cồn vượt quy định gây va chạm làm hỏng chính chiếc xe của mình. Bảo hiểm vật chất xe thường xử lý thế nào?", ["Thường từ chối vì đây là điểm loại trừ phổ biến", "Chi trả đầy đủ", "Chi trả nhưng giảm 10%", "Chuyển sang bảo hiểm sức khỏe chi trả"], "Lái xe khi có nồng độ cồn vượt quy định là điểm loại trừ phổ biến trong bảo hiểm vật chất xe.", 0, 4],
+["Gói bảo hiểm trộm cắp yêu cầu có dấu hiệu đột nhập. Đồ trong nhà mất nhưng cửa không có dấu hiệu bị phá. Khả năng cao nhất là gì?", ["Có thể bị từ chối theo điều khoản", "Chắc chắn được chi trả", "Được chi trả gấp đôi", "Được chi trả nếu có lời khai của hàng xóm"], "Bảo hiểm trộm cắp thường yêu cầu bằng chứng đột nhập và biên bản công an.", 0, 4],
+["Gói sức khỏe một năm của chị C hết hạn, 2 tháng sau chị mới tái tục. Rủi ro thường gặp là gì?", ["Có thể phải chờ lại thời gian chờ và bệnh phát sinh trong khoảng gián đoạn có thể bị coi là bệnh có sẵn", "Không có rủi ro gì", "Được giảm phí vì nghỉ 2 tháng", "Được cộng dồn quyền lợi 2 tháng"], "Tái tục đúng hạn giúp giữ liên tục quyền lợi.", 0, 4],
+["Trong hợp đồng bảo hiểm liên kết đơn vị, ai chịu rủi ro đầu tư?", ["Bên mua bảo hiểm", "Công ty bảo hiểm", "Đại lý bảo hiểm", "Ngân hàng phân phối"], "Phần đầu tư đi vào các quỹ do khách chọn, lời lỗ phụ thuộc kết quả quỹ và do bên mua chịu.", 0, 4],
+["Bảng minh họa ghi giả định lãi suất 6%/năm cho quỹ liên kết chung. Con số này nghĩa là gì?", ["Chỉ là giả định minh họa; phần cam kết là lãi suất tối thiểu ghi trong hợp đồng", "Công ty cam kết trả đúng 6% mỗi năm", "Lãi suất tối thiểu là 6%", "Lãi suất tối đa là 6%"], "Số liệu trong bảng minh họa không phải là cam kết, trừ phần được ghi rõ là đảm bảo.", 0, 4],
+["Hợp đồng liên kết chung: phí bảo hiểm rủi ro tăng theo tuổi và được trừ từ giá trị tài khoản. Nếu khách ngừng đóng phí lâu và tài khoản cạn dần thì sao?", ["Khi giá trị tài khoản không đủ trừ các khoản phí, hợp đồng có thể mất hiệu lực", "Hợp đồng vẫn hiệu lực mãi mãi", "Công ty phải đóng phí thay khách", "Phí rủi ro sẽ tự giảm về 0"], "Hiểu cơ chế trừ phí giúp tránh trường hợp tưởng hợp đồng vẫn còn nhưng thực ra đã hết giá trị.", 0, 4],
+["Khách hủy hợp đồng nhân thọ có giá trị hoàn lại vào năm thứ 2. Điều gì thường xảy ra?", ["Nhận lại ít hơn tổng phí đã đóng vì các khoản phí và chi phí năm đầu", "Nhận lại đúng bằng tổng phí đã đóng", "Nhận lại gấp đôi", "Không được hủy"], "Những năm đầu, giá trị hoàn lại thường thấp hơn nhiều so với phí đã đóng. Cân nhắc kỹ trước khi hủy.", 0, 4],
+["Bên mua chưa đóng phí khi hết thời gian gia hạn, hợp đồng có giá trị hoàn lại đủ lớn và có điều khoản tự động vay đóng phí. Điều gì xảy ra?", ["Công ty tự động cho vay từ giá trị hoàn lại để đóng phí, khoản vay chịu lãi", "Hợp đồng bị hủy và trả hết giá trị hoàn lại", "Công ty miễn phí năm đó", "Đại lý phải đóng thay"], "Cơ chế này giữ hợp đồng không mất hiệu lực, nhưng khoản vay và lãi sẽ bị trừ khi chi trả.", 0, 4],
+["Ông D có hai hợp đồng nhân thọ ở hai công ty, mỗi hợp đồng 1 tỷ. Ông qua đời trong thời hạn. Người thụ hưởng nhận thế nào?", ["Mỗi hợp đồng chi trả theo điều khoản của mình, có thể nhận cả hai", "Chỉ nhận 1 tỷ vì không được bồi thường trùng", "Hai công ty chia nhau 1 tỷ", "Chỉ công ty ký trước chi trả"], "Bảo hiểm con người không áp dụng nguyên tắc bồi thường và chia phần như bảo hiểm tài sản, với điều kiện đã kê khai trung thực.", 0, 4],
+["Người thụ hưởng được chỉ định là con 8 tuổi. Khi phát sinh quyền lợi, việc nhận tiền thường thế nào?", ["Thông qua cha mẹ hoặc người giám hộ hợp pháp theo quy định", "Đứa trẻ tự đến công ty nhận", "Tiền bị giữ lại đến khi trẻ 30 tuổi", "Đại lý giữ hộ"], "Người chưa thành niên thường thực hiện quyền nhận tiền thông qua người đại diện theo pháp luật.", 1, 4],
+["Theo Luật Bảo hiểm xã hội 2024 có hiệu lực từ 1/7/2025, số năm đóng bảo hiểm xã hội tối thiểu để được hưởng lương hưu là bao nhiêu?", ["15 năm", "20 năm", "10 năm", "25 năm"], "Luật mới giảm điều kiện số năm đóng tối thiểu từ 20 xuống 15 năm, giúp nhiều người có cơ hội nhận lương hưu hơn.", 1, 4],
+["Anh E mất việc ngày 1/3. Thông thường anh cần nộp hồ sơ hưởng trợ cấp thất nghiệp trong thời hạn nào?", ["Trong 3 tháng kể từ ngày chấm dứt hợp đồng lao động", "Trong 1 năm", "Chỉ sau khi tìm được việc mới", "Bất kỳ lúc nào"], "Nộp trễ thời hạn có thể mất quyền hưởng trợ cấp thất nghiệp.", 1, 4],
+["Bé 4 tuổi đi khám chữa bệnh đúng quy định, chi phí trong phạm vi bảo hiểm y tế. Mức hưởng thường là bao nhiêu?", ["100% chi phí trong phạm vi", "80%", "95%", "50%"], "Trẻ em dưới 6 tuổi thuộc nhóm được hưởng 100% chi phí trong phạm vi được hưởng.", 1, 4],
+["Nhận bảo hiểm xã hội một lần khi chưa đến tuổi hưu thường dẫn đến điều gì?", ["Mất quá trình đóng để tính lương hưu và các quyền lợi lâu dài như thẻ bảo hiểm y tế khi về hưu", "Lương hưu sau này cao hơn", "Được nhận cả tiền một lần lẫn lương hưu đầy đủ", "Không ảnh hưởng gì"], "Tiền một lần giải quyết nhu cầu trước mắt nhưng đánh đổi sự an toàn lúc tuổi già.", 1, 4],
+["Trong ma trận quản lý rủi ro, rủi ro TẦN SUẤT THẤP nhưng MỨC ĐỘ THIỆT HẠI CAO (như cháy nhà) nên xử lý thế nào là hợp lý nhất?", ["Chuyển giao bằng bảo hiểm", "Tự chấp nhận toàn bộ", "Bỏ qua vì hiếm khi xảy ra", "Né tránh bằng cách không có nhà"], "Đây là loại rủi ro hợp với bảo hiểm nhất: phí nhỏ so với thiệt hại, mà nếu xảy ra thì khó tự gánh.", 0, 4],
+["Rủi ro TẦN SUẤT CAO và MỨC ĐỘ THIỆT HẠI CAO thường nên xử lý thế nào?", ["Né tránh hoặc thay đổi hoạt động, vì bảo hiểm sẽ rất đắt hoặc không nhận", "Mua bảo hiểm với giá rẻ", "Tự chấp nhận", "Không cần làm gì"], "Khi rủi ro vừa thường xuyên vừa nặng, phí bảo hiểm sẽ rất cao. Tránh rủi ro là lựa chọn hợp lý hơn.", 0, 4],
+["Rủi ro TẦN SUẤT CAO nhưng THIỆT HẠI NHỎ (như làm rơi bút) nên xử lý thế nào?", ["Tự chấp nhận và giảm thiểu, không cần bảo hiểm", "Mua bảo hiểm riêng cho từng cây bút", "Tái bảo hiểm", "Né tránh bằng cách không dùng bút"], "Thiệt hại nhỏ, dễ dự đoán thì tự gánh rẻ hơn mua bảo hiểm.", 0, 4],
+["Rủi ro đạo đức trong bảo hiểm là gì?", ["Người có bảo hiểm có thể trở nên bất cẩn hơn hoặc lợi dụng bảo hiểm", "Rủi ro công ty bảo hiểm phá sản", "Rủi ro do thiên tai", "Rủi ro lãi suất thay đổi"], "Mức khấu trừ và đồng chi trả giúp hạn chế rủi ro đạo đức, vì người được bảo hiểm vẫn gánh một phần.", 0, 4],
+["Lựa chọn đối nghịch trong bảo hiểm là gì?", ["Người có rủi ro cao thường có xu hướng tìm mua bảo hiểm nhiều hơn", "Công ty chọn khách hàng ngẫu nhiên", "Khách chọn công ty có phí cao nhất", "Đại lý chọn sản phẩm cho khách"], "Vì vậy cần thẩm định, thời gian chờ và điều khoản bệnh có sẵn để giữ quỹ chung công bằng.", 0, 4],
+["Vì sao một quỹ bảo hiểm chỉ có 10 thành viên thường kém ổn định?", ["Vì luật số lớn không phát huy tác dụng, số người gặp rủi ro dao động rất mạnh", "Vì phí quá thấp", "Vì không có đại lý", "Vì luật cấm"], "Càng đông người tham gia, tỷ lệ rủi ro thực tế càng gần với dự đoán.", 0, 4],
+["Mục đích chính của tái bảo hiểm là gì?", ["Giúp công ty bảo hiểm chia bớt rủi ro lớn, ổn định khả năng chi trả", "Giúp khách được bồi thường hai lần", "Giúp đại lý tăng hoa hồng", "Thay thế cho dự phòng nghiệp vụ"], "Tái bảo hiểm cho phép nhận những rủi ro lớn mà một công ty không gánh nổi một mình.", 0, 4],
+["Ngân hàng nói phải mua kèm hợp đồng bảo hiểm thì mới được giải ngân khoản vay. Theo quy định hiện hành, điều này thế nào?", ["Không đúng: ngân hàng không được ép mua bảo hiểm như điều kiện để được vay", "Đúng, đây là quy định bắt buộc", "Đúng nếu khoản vay trên 1 tỷ", "Đúng nếu khách đồng ý bằng lời"], "Mua bảo hiểm phải hoàn toàn tự nguyện. Khách có quyền phản ánh nếu bị ép.", 1, 4],
+["Đại lý hứa miệng: hợp đồng này chắc chắn lãi 10% mỗi năm. Hợp đồng không ghi điều đó. Quyền lợi của khách dựa vào đâu?", ["Dựa vào hợp đồng và điều khoản đã ký, không dựa vào lời hứa miệng", "Dựa vào lời hứa của đại lý", "Dựa vào quảng cáo trên mạng", "Dựa vào ý kiến của bạn bè"], "Mọi quyền lợi phải được ghi trong hợp đồng. Hãy yêu cầu chỉ rõ cam kết nằm ở điều khoản nào.", 1, 4],
+["Ông F có quyền lợi miễn đóng phí khi bên mua bị thương tật toàn bộ vĩnh viễn. Ông mua cho con và sau đó bị thương tật toàn bộ vĩnh viễn theo định nghĩa. Hợp đồng của con thế nào?", ["Tiếp tục hiệu lực mà không cần đóng phí các kỳ sau theo điều khoản", "Bị chấm dứt", "Phải chuyển cho người khác đóng", "Giảm một nửa quyền lợi"], "Quyền lợi miễn đóng phí giữ lời hứa bảo vệ con dù người đóng phí gặp rủi ro.", 0, 4],
+["Khách được chẩn đoán một bệnh nặng nhưng bệnh này không có trong danh sách và định nghĩa bệnh hiểm nghèo của hợp đồng. Điều gì đúng?", ["Quyền lợi bệnh hiểm nghèo thường không được chi trả cho bệnh đó", "Luôn được chi trả vì bệnh nặng", "Được chi trả nếu bác sĩ xác nhận nặng", "Được chi trả một nửa"], "Quyền lợi bệnh hiểm nghèo phụ thuộc vào danh sách và định nghĩa trong hợp đồng, không chỉ vào mức độ nặng.", 0, 4],
+["Người có bệnh mãn tính nộp hồ sơ. Kết quả thẩm định nào sau đây là hợp lý và phổ biến?", ["Chấp nhận có điều kiện, ví dụ loại trừ bệnh đó hoặc tăng phí", "Luôn bị từ chối", "Luôn được chấp nhận bình thường", "Được miễn phí"], "Thẩm định có thể cho kết quả chấp nhận bình thường, có điều kiện, tạm hoãn hoặc từ chối.", 0, 4],
+["Một gia đình: người chồng tạo 70% thu nhập, người vợ 30%, có một con nhỏ. Ngân sách chỉ đủ một hợp đồng bảo vệ. Ưu tiên ai trước là hợp lý nhất?", ["Người chồng, trụ cột thu nhập chính", "Đứa con", "Người vợ", "Chia đều cho cả ba với mức rất nhỏ"], "Bảo vệ nguồn thu nhập chính trước, vì nếu người đó gặp rủi ro thì cả nhà bị ảnh hưởng nhiều nhất.", 0, 4],
+["Bán hàng theo điều kiện CIF trong thương mại quốc tế, ai có nghĩa vụ mua bảo hiểm cho hàng trong vận chuyển chặng chính?", ["Người bán", "Người mua", "Hãng tàu", "Ngân hàng"], "Theo Incoterms, CIF yêu cầu người bán mua bảo hiểm cho hàng hóa. Với FOB, người mua thường tự lo bảo hiểm.", 0, 4],
+["Tàu gặp bão, thuyền trưởng ra lệnh ném một phần hàng của chủ hàng X xuống biển để cứu tàu và số hàng còn lại. Theo nguyên tắc tổn thất chung, ai chịu thiệt hại?", ["Tất cả các bên có quyền lợi trong chuyến đi cùng đóng góp theo tỷ lệ", "Chỉ chủ hàng X", "Chỉ thuyền trưởng", "Không ai cả"], "Tổn thất chung: hy sinh vì an toàn chung thì mọi bên được cứu cùng chia phần.", 0, 4],
+["Bảo hiểm thường loại trừ thiệt hại do chiến tranh chủ yếu vì lý do gì?", ["Thiệt hại quá lớn và xảy ra đồng loạt cho rất nhiều người, quỹ chung không gánh nổi", "Vì chiến tranh không gây thiệt hại", "Vì luật cấm bán bảo hiểm", "Vì khách hàng không muốn"], "Bảo hiểm vận hành tốt nhất khi các rủi ro độc lập với nhau.", 0, 4],
+["Bồi thường theo giá trị thay mới (mới thay cũ) khác bồi thường thông thường ở điểm nào?", ["Không trừ khấu hao, thường phải thỏa thuận riêng và phí cao hơn", "Trừ khấu hao gấp đôi", "Chỉ áp dụng cho bảo hiểm nhân thọ", "Luôn có sẵn trong mọi hợp đồng"], "Bồi thường thông thường hay tính theo giá trị thực tế sau khấu hao.", 0, 4],
+["Với một bức tranh cổ khó định giá, cách làm hợp lý để tránh tranh cãi khi có tổn thất là gì?", ["Thỏa thuận trước giá trị của bức tranh trong hợp đồng", "Đợi khi hỏng mới định giá", "Khai giá thật cao", "Không cần bảo hiểm"], "Giá trị thỏa thuận giúp hai bên rõ ràng ngay từ đầu.", 0, 4],
+["Nhân viên nghỉ việc ngày 30/6. Bảo hiểm sức khỏe nhóm do công ty mua thường thế nào sau ngày đó?", ["Thường chấm dứt hiệu lực với người đó, nên cần tính chuyện mua hợp đồng cá nhân", "Vẫn hiệu lực trọn đời", "Tự chuyển thành hợp đồng cá nhân miễn phí", "Được hoàn tiền phí"], "Bảo hiểm nhóm gắn với việc làm. Đừng để khoảng trống bảo vệ sau khi nghỉ việc.", 0, 4],
+["Một người nhận cuộc gọi tự xưng nhân viên bảo hiểm, đề nghị đọc mã OTP để nhận tiền hoàn phí. Nên làm gì?", ["Không cung cấp OTP, gác máy và gọi lại tổng đài chính thức để xác minh", "Đọc OTP để nhận tiền nhanh", "Chuyển trước một khoản phí xử lý", "Gửi ảnh căn cước để xác minh"], "Không tổ chức chính thống nào yêu cầu khách đọc OTP qua điện thoại.", 0, 4],
+["Dựng chuyện tai nạn để nhận tiền bảo hiểm gây hại cho ai?", ["Cho cả cộng đồng người tham gia, vì quỹ chung bị rút sai làm phí tăng; người làm còn vi phạm pháp luật", "Không hại ai vì công ty bảo hiểm giàu", "Chỉ hại đại lý", "Chỉ hại ngân hàng"], "Gian lận bảo hiểm là hành vi vi phạm pháp luật và làm tăng chi phí cho mọi người.", 1, 4],
+["Vì sao các hợp đồng thường có mức khấu trừ hoặc đồng chi trả?", ["Để giảm phí và hạn chế rủi ro đạo đức, vì người được bảo hiểm vẫn gánh một phần", "Để công ty khỏi phải trả tiền", "Để tăng hoa hồng đại lý", "Vì luật bắt buộc mọi hợp đồng phải có"], "Người được bảo hiểm cùng chịu một phần thì sẽ cẩn thận hơn, quỹ chung bền hơn.", 0, 4],
+["Hợp đồng đóng phí 10 năm, bảo vệ 20 năm. Từ năm thứ 11 đến năm 20 thì sao?", ["Không phải đóng phí nhưng vẫn được bảo vệ theo hợp đồng", "Hợp đồng chấm dứt", "Phải đóng gấp đôi", "Chỉ được bảo vệ một nửa"], "Thời hạn đóng phí và thời hạn bảo hiểm có thể khác nhau.", 0, 4],
+["Một sản phẩm tử kỳ 20 năm phí thấp, một sản phẩm hỗn hợp 20 năm phí cao hơn nhiều với cùng số tiền bảo hiểm. Khác biệt chính là gì?", ["Sản phẩm hỗn hợp có quyền lợi đáo hạn khi còn sống, còn tử kỳ thường không có", "Tử kỳ bảo vệ ít rủi ro hơn", "Hỗn hợp không bảo vệ tử vong", "Tử kỳ có lãi cao hơn"], "Phần phí cao hơn của hỗn hợp chủ yếu dành cho phần tích lũy để trả khi đáo hạn.", 0, 4],
+["Thông tin nào cần cập nhật ngay với công ty bảo hiểm khi gia đình có thay đổi lớn như ly hôn hay có con?", ["Người thụ hưởng và nhu cầu số tiền bảo hiểm", "Màu xe", "Tên đại lý", "Mật khẩu email"], "Hợp đồng nên phản ánh đúng hoàn cảnh hiện tại của gia đình.", 0, 4],
+["Trong hợp đồng sức khỏe, phạm vi địa lý là 'Việt Nam'. Khách điều trị ở nước ngoài theo nguyện vọng cá nhân. Chi phí đó thường thế nào?", ["Thường không được chi trả vì ngoài phạm vi địa lý", "Được chi trả gấp đôi", "Luôn được chi trả", "Được bảo hiểm y tế chi trả thay"], "Phạm vi địa lý là một điều kiện quan trọng cần đọc trước khi ra nước ngoài điều trị.", 0, 4],
+["Một đại lý tư vấn khách hủy hợp đồng cũ đã đóng 8 năm để mua hợp đồng mới. Rủi ro lớn nhất với khách là gì?", ["Mất giá trị tích lũy, có thể phải chịu phí cao hơn do tuổi lớn và bắt đầu lại thời gian chờ", "Không có rủi ro gì", "Được cộng dồn quyền lợi", "Được miễn thẩm định"], "Chuyển đổi hợp đồng cần so sánh rất kỹ. Hợp đồng cũ còn phù hợp thì nên giữ.", 0, 4],
+["Người tham gia bảo hiểm y tế đủ 5 năm liên tục và số tiền cùng chi trả trong năm vượt mức quy định. Quyền lợi đặc biệt là gì?", ["Có thể được hưởng 100% chi phí trong phạm vi cho phần còn lại của năm", "Được hoàn tiền phí 5 năm", "Được miễn đóng năm sau", "Được chuyển sang bảo hiểm thương mại"], "Tham gia liên tục, không gián đoạn mang lại quyền lợi đáng kể.", 1, 4],
+["Vì sao mua bảo hiểm khi còn trẻ và khỏe thường có lợi?", ["Phí thường thấp hơn và ít bị loại trừ hay từ chối vì bệnh có sẵn", "Vì người trẻ không bao giờ gặp rủi ro", "Vì được hoàn phí gấp đôi", "Vì không cần khai báo sức khỏe"], "Sức khỏe tốt là lợi thế khi thẩm định. Có bệnh rồi mới mua thì khó hơn nhiều.", 0, 4],
+["Thứ tự ưu tiên tài chính thường được khuyên là gì?", ["Quỹ dự phòng, bảo hiểm bảo vệ, rồi mới đầu tư sinh lời", "Đầu tư trước, bảo hiểm sau", "Chỉ cần gửi tiết kiệm", "Chỉ cần bảo hiểm liên kết đầu tư"], "Có nền móng an toàn rồi mới nên chấp nhận rủi ro đầu tư.", 0, 4],
+["Một hợp đồng có quyền lợi chia lãi. Năm nay công ty công bố mức chia lãi thấp hơn năm trước. Điều này có vi phạm hợp đồng không?", ["Thường không, vì chia lãi là quyền lợi không đảm bảo, phụ thuộc kết quả hoạt động", "Có, công ty phải bồi thường", "Có, khách được hủy và nhận 100% phí", "Không, vì chia lãi luôn cố định"], "Chỉ phần ghi rõ là đảm bảo mới là cam kết.", 0, 4],
+["Khi xảy ra cháy nhỏ, người được bảo hiểm dùng bình chữa cháy và thuê người dọn để hạn chế lan rộng. Chi phí hợp lý này thường thế nào?", ["Thường được công ty chi trả vì là chi phí hạn chế tổn thất", "Không bao giờ được chi trả", "Bị trừ vào tiền bồi thường gấp đôi", "Bị phạt"], "Người được bảo hiểm có nghĩa vụ hạn chế tổn thất; chi phí hợp lý cho việc này thường được chi trả.", 1, 4],
+["Tai nạn trên đường đi làm về, đúng tuyến đường và khoảng thời gian hợp lý. Theo chế độ bảo hiểm xã hội, trường hợp này có thể được xem là gì?", ["Tai nạn lao động", "Tai nạn ngoài giờ không được hỗ trợ", "Bệnh nghề nghiệp", "Không thuộc diện nào"], "Tai nạn trên tuyến đường hợp lý từ nơi ở đến nơi làm việc có thể được hưởng chế độ tai nạn lao động theo quy định.", 1, 4],
+["Đâu là cách đọc hợp đồng hiệu quả nhất trước khi ký?", ["Đọc quyền lợi, loại trừ, định nghĩa, thời gian chờ, hạn mức và phí, rồi hỏi lại những chỗ chưa rõ", "Chỉ đọc trang quảng cáo", "Chỉ hỏi số tiền nhận khi đáo hạn", "Không cần đọc vì đại lý đã giải thích"], "Hiểu hợp đồng là cách tốt nhất để dùng đúng quyền lợi của mình.", 0, 4]
 ];
 
 // Phân bổ vị trí đáp án đúng đều A/B/C/D (cố định theo câu), xáo trộn các phương án sai
 function seeded(n){let s=n*2654435761>>>0;return()=>{s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
-const QUIZ=(function(){const N=QBANK.length,pos=[];for(let k=0;k<N;k++)pos.push(k%4);
-  const r=seeded(77);for(let k=N-1;k>0;k--){const j=Math.floor(r()*(k+1));[pos[k],pos[j]]=[pos[j],pos[k]];}
+const QUIZ=(function(){const N=QBANK.length,pos=new Array(N),lv=k=>QBANK[k][4]||(k<12?1:k<29?2:3);
+  // v50: chia đều vị trí đáp án đúng A/B/C/D trong TỪNG bậc khó (tránh đoán mò theo vị trí)
+  for(let L=1;L<=4;L++){const ks=[];for(let k=0;k<N;k++)if(lv(k)===L)ks.push(k);const pp=ks.map((_,i)=>i%4),r=seeded(77+L);for(let i=pp.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[pp[i],pp[j]]=[pp[j],pp[i]];}ks.forEach((k,i)=>pos[k]=pp[i]);}
   return QBANK.map((q,k)=>{const rr=seeded(k+11),wrong=q[1].slice(1);for(let a=wrong.length-1;a>0;a--){const j=Math.floor(rr()*(a+1));[wrong[a],wrong[j]]=[wrong[j],wrong[a]];}
     const opts=wrong.slice();opts.splice(pos[k],0,q[1][0]);return{q:q[0],opts,ans:pos[k],exp:q[2],law:!!q[3],lvl:q[4]||(k<12?1:k<29?2:3)};});})();
 
@@ -5274,7 +5356,7 @@ function kmsReward(i){const n=KMS[i];if(n===500)return{mr:1,gem:500,t:'1 Thần 
   return n%50===0?{ticket:3,gem:30,t:'3 vé + 30 đá'}:{gem:25,ticket:1,t:'25 đá + 1 vé'};}
 function qKnown(){S.qKnown=S.qKnown||[];return S.qKnown;}
 // Cược tri thức: tỷ lệ trả thưởng theo độ khó
-const QODDS=[0,1.6,2.2,3.2],QBETS=[0,50,100,200,500];
+const QODDS=[0,1.6,2.2,3.2,4.5],QBETS=[0,50,100,200,500,1000];
 let QX={bet:0,gold:false};
 function qShield(){return S.qShield||0;}
 
@@ -5316,8 +5398,8 @@ function quizHud(){const st=S.streak||0,k=comboOf(st),C=COMBO[k],[nm,nt]=nextChe
   bar.querySelector('i').style.background=CHEST[nt].c;bar.querySelector('span').textContent='Còn '+(nm-st)+' câu đúng → '+CHEST[nt].n;hb.appendChild(bar);
   const kn=qKnown().length;const ki=(S.qKms||0);const kk=document.createElement('div');kk.className='qh-know';
   kk.textContent='Sổ tri thức: '+kn+'/'+QUIZ.length+' câu đã chinh phục'+(ki<KMS.length?' · mốc '+KMS[ki]+': '+kmsReward(ki).t:'');hb.appendChild(kk);}
-function renderBet(){const box=$('q-bet');box.innerHTML='';if(answered||(S.streak||0)<2){box.hidden=true;return;}box.hidden=false;
-  const od=QODDS[curQ.lvl]*(QX.gold?1.5:1);const l=document.createElement('span');l.className='qb-l';l.textContent='Cược tri thức (đúng nhận x'+od.toFixed(1)+'):';box.appendChild(l);
+function renderBet(){const box=$('q-bet');box.innerHTML='';if(answered||curQ.lvl<3){box.hidden=true;return;}box.hidden=false;
+  const od=QODDS[curQ.lvl]*(QX.gold?1.5:1);const l=document.createElement('span');l.className='qb-l';l.textContent=(curQ.lvl>=4?'CÂU CHUYÊN SÂU · ':'CÂU KHÓ · ')+'Cược tri thức (đúng nhận x'+od.toFixed(1)+'):';box.appendChild(l);
   QBETS.forEach(b=>{const x=document.createElement('button');x.className='mini'+(QX.bet===b?' gold':' gray');x.textContent=b?b+' xu':'Không';x.disabled=b>S.coin;x.onclick=()=>{QX.bet=b;sfx('tap');renderBet();};box.appendChild(x);});}
 // gọi khi mở câu hỏi mới
 function quizOpenExtras(){QX={bet:0,gold:R()<Math.min(0.25,0.1+(S.streak||0)*0.01)};$('q-chest').hidden=true;$('q-chest').innerHTML='';$('q-next').disabled=false;
@@ -6195,7 +6277,7 @@ function winChance(f,n){const st=stats(),ps=battlePetStats();let w=0;for(let k=0
 // ---------- trận đấu ----------
 const BW2=200,BH2=112,BPARTS=[];
 const BT={run:false,last:0,speed:1};
-function newBattle(f){const st=stats(),m=makeMon(f);BFX.length=0;BX.length=0;if(m.big>=0){bossSprite(m.big,{f:0,atk:0,ph:0});S.bossSeen=S.bossSeen||{};S.bossSeen[f]=1;}Object.assign(BT,{bevo:null,bvs:0,prevMon:null,gi:null,guardDone:0,guarded:0,bcut:null,intro:m.big>=0?{t:0,d:m.big>=5?3.0:2.4}:null,cut:null,quake:0,ghost:0,lungeK:0,floor:f,mon:m,pet:petById(S.battlePet)||null,B:newFight(st,PET.F,f,battlePetStats()),t:0,next:0.5,phase:m.big>=0?'intro':'fight',act:null,flash:[0,0],shake:[0,0],res:null,endT:0,fq:0});BPARTS.length=0;}
+function newBattle(f){const st=stats(),m=makeMon(f);BFX.length=0;BX.length=0;if(m.big>=0){bossSprite(m.big,{f:0,atk:0,ph:0});S.bossSeen=S.bossSeen||{};S.bossSeen[f]=1;}Object.assign(BT,{rs:null,rsDone:0,bevo:null,bvs:0,prevMon:null,gi:null,guardDone:0,guarded:0,bcut:null,intro:m.big>=0?{t:0,d:m.big>=5?3.0:2.4}:null,cut:null,quake:0,ghost:0,lungeK:0,floor:f,mon:m,pet:petById(S.battlePet)||null,B:newFight(st,PET.F,f,battlePetStats()),t:0,next:0.5,phase:m.big>=0?'intro':'fight',act:null,flash:[0,0],shake:[0,0],res:null,endT:0,fq:0});BPARTS.length=0;}
 function bFloat(side,txt,cls){const k=BT.fq++,box=$('b-float');setTimeout(()=>{const d=document.createElement('div');d.className='bfl '+(cls||'');d.textContent=txt;
   d.style.left=(side==='me'?26:74)+(((k%3)-1)*6)+'%';d.style.top=(30-(k%3)*7)+'%';box.appendChild(d);setTimeout(()=>d.remove(),900);},(k%4)*90);}
 function bspawn(o){const PC=PCUR;PCUR=BPARTS;spawn(o);PCUR=PC;}
@@ -6222,15 +6304,15 @@ function doTurn(){BT.fq=0;const ev=stepFight(BT.B,R),col=FXC[PET.F],kit=KIT[PET.
       case'bevo':bossEvoStart(e.n,e.of);break;
       case'phase2':bFloat('mon','GIAI ĐOẠN 2!','sk');bossPhase2FX();BT.next=Math.max(BT.next,1.8);break;
       case'end':endBattle(e.r==='win');break;}}
-  guardCheck();bHud();}
+  rescueCheck();guardCheck();bHud();}
 function endBattle(win){BT.phase=win?'win':'lose';BT.endT=BT.t;const f=BT.floor;
   hb(win?'win':'lose');if(win){const first=f>S.floor,bb=bigBoss(f);const r=floorReward(f,first);if(first){S.floor=f;S.floorT=Date.now();}giveBundle(r);mission('win',1);
     let extra='';if(f%5===0&&first){const i=f/10-1,it=rollItem(bb?(i>=9?4:i>=6?3:2):1),g=grantItem(it);extra=' + '+RAR[it.r]+' '+it.name;}
     if(bb&&first){S.bossWin=S.bossWin||{};S.bossWin[f]=Date.now();}
     BT.res=(BT.B.judged?'Hết giờ, Bahi còn nhiều máu hơn nên được xử thắng! ':'')+(bb?(first?'HẠ GỤC TRÙM '+bb.n.toUpperCase()+'! ':'Lại hạ '+bb.n+'! '):'Thắng tầng '+f+'! ')+'Nhận '+bundleText(r)+extra;
-    if(f===TOWER_TOP&&first&&!S.towerDone)towerComplete();BT.fact=nextFact();sfx('win');gainXP(bonusXP(10+f*2));BT.enc=rollEncounter(f);}
+    if(f===TOWER_TOP&&first&&!S.towerDone)towerComplete();BT.fact=nextFact();sfx('win');gainXP(bonusXP(Math.round((10+f*2)*TXP_WIN)));BT.enc=rollEncounter(f);}
   if(BT.pet){const p=BT.pet;p.fights=(p.fights||0)+1;if(win)addBond(p,2);petGainXP(p,win?15+f*2:5);BT.res2=SPEC[p.sp].n+' +'+(win?15+f*2:5)+' XP';}
-  if(!win){const sw=strongWeak(PET.F),bb=bigBoss(f);BT.res=(BT.B.judged?'Hết giờ, đối thủ còn nhiều máu hơn. ':'')+(bb?'Trùm '+bb.n+' quá mạnh. Xem điểm yếu ở sảnh tháp, nâng trang bị, luyện thú chiến rồi quay lại.':'Thua ở tầng '+f+'. Nâng trang bị, chăm Bahi đủ no và sạch, hoặc luyện thêm cấp rồi thử lại.');const lx=bonusXP(Math.round((10+f*2)*0.3));gainXP(lx);BT.res+=' (Vẫn học được +'+lx+' XP)';sfx('lose');}
+  if(!win){const sw=strongWeak(PET.F),bb=bigBoss(f);BT.res=(BT.B.judged?'Hết giờ, đối thủ còn nhiều máu hơn. ':'')+(bb?'Trùm '+bb.n+' quá mạnh. Xem điểm yếu ở sảnh tháp, nâng trang bị, luyện thú chiến rồi quay lại.':'Thua ở tầng '+f+'. Nâng trang bị, chăm Bahi đủ no và sạch, hoặc luyện thêm cấp rồi thử lại.');const lx=bonusXP(Math.round((10+f*2)*TXP_LOSE));gainXP(lx);BT.res+=' (Vẫn học được +'+lx+' XP)';sfx('lose');}
   if(BT.guarded)guardResult(win);
   save();hud();if(win)setTimeout(()=>rankSync(true),800);setTimeout(()=>{$('b-res').textContent=BT.res+(BT.pet?' · '+BT.res2:'')+(BT.res2x||'');BT.res2x='';$('b-res').className='b-res '+(win?'ok':'bad');if(win){$('b-facttx').textContent=BT.fact;$('b-fact').hidden=false;}$('b-next').hidden=!(win&&!BT.enc&&S.floor<TOWER_TOP);towerUI();if(win&&BT.enc){const e=BT.enc;BT.enc=null;$('b-res').textContent+=' · Bụi rậm đang rung động... có gì đó!';sfx('rare',e.r);vib([40,60,40]);setTimeout(()=>{BT.run=false;$('b-fact').hidden=true;openCatch(e);},1800);}},500);}
 function drawBattle(){const cv=$('b-cv'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
@@ -6264,11 +6346,12 @@ function drawBattle(){const cv=$('b-cv'),g=cv.getContext('2d');g.imageSmoothingE
     const sy=big>=0?Math.max(8,48-big*5):40;
     if(BT.B.mon.poison>0)for(let k=0;k<BT.B.mon.poison;k++){g.fillStyle='#8ae05a';g.fillRect(138+k*4,sy+Math.round(Math.sin(t*4+k)*1),2,2);}
     if(BT.B.mon.burnT>0&&Math.floor(t*8)%2){g.fillStyle='#ffb347';g.fillRect(146,sy-4,3,3);g.fillRect(152,sy-2,2,2);}}
-  drawBFX(g);drawBX(g,false);drawParts(g,true,BPARTS);g.restore();drawCutIn(g);drawPetCut(g);drawBossCut(g);drawBossEvoBanner(g);if(BT.phase==='intro')drawBossIntro(g);if(BT.phase==='guard')drawGuardIntro(g);if(BT.phase==='win'&&BT.floor===TOWER_TOP)drawCrown(g,t-(BT.endT||0));}
+  drawBFX(g);drawBX(g,false);drawParts(g,true,BPARTS);drawRescue(g);g.restore();drawCutIn(g);drawPetCut(g);drawBossCut(g);drawBossEvoBanner(g);drawRescueText(g);if(BT.phase==='intro')drawBossIntro(g);if(BT.phase==='guard')drawGuardIntro(g);if(BT.phase==='win'&&BT.floor===TOWER_TOP)drawCrown(g,t-(BT.endT||0));}
 const _silCache=new WeakMap();
 function bLoop(ts){if(!BT.run)return;requestAnimationFrame(bLoop);const d0=Math.min(0.05,(ts-(BT.last||ts))/1000);BT.last=ts;const d=d0*(BT.phase==='fight'?BT.speed:1);
   BT.t+=d;if(BT.act)BT.act.t+=d;if(BT.bevo){BT.bevo.t+=d;if(BT.bevo.t>=1.65&&!BT.bevo.done){BT.bevo.done=1;BT.bvs=BT.bevo.n;bossEvoBoom();}if(BT.bevo.t>3.1)BT.bevo=null;}updBFX(d);updBX(d);if(BT.phase==='intro'){bossWarmStep(BT.B.big);BT.intro.t+=d;if(BT.intro.t>=BT.intro.d){BT.phase='fight';BT.next=0.3;}}BT.flash=BT.flash.map(v=>Math.max(0,v-d));BT.shake=BT.shake.map(v=>Math.max(0,v-d));
   if(BT.phase==='guard')guardTick(d0);
+  if(BT.phase==='rescue')rescueTick(d0);
   if(BT.phase==='fight'){BT.next-=d;if(BT.next<=0){BT.next=0.6;doTurn();}}
   updParts(d,BPARTS);drawBattle();}
 function bHud(){const me=BT.B.me,m=BT.B.mon;$('b-mehp').style.width=(Math.max(0,me.hp)/me.max*100)+'%';$('b-monhp').style.width=(Math.max(0,m.hp)/m.max*100)+'%';
@@ -8405,7 +8488,7 @@ async function doReset(){const msg=$('rs-msg'),go=$('rs-go');if(!$('rs-ok').chec
   sfx('evolve');closeModal();notice('ok','Bắt đầu ván mới!',ok?'Ván cũ vẫn giữ trên máy chủ với mã '+clFmt(oldCode)+'.':'Chúc Sếp chơi vui!',3000);setTimeout(()=>location.reload(),1400);}
 
 // ================= TRẠNG THÁI / VÒNG LẶP =================
-const KEY='beVuongIso.v2',MAXQ=3,OFFLINE_CAP=6*3600,ENERGY_SEC=600,MINE_HOURS=4,EMAX=10;
+const KEY='beVuongIso.v2',MAXQ=3,OFFLINE_CAP=6*3600,ENERGY_SEC=600,MINE_HOURS=4,EMAX=5;
 const DECAY={food:1/180,clean:1/240,smart:1/300};
 const DEVMODE=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 let testMode=DEVMODE&&/thu/.test(location.hash);
@@ -8413,17 +8496,17 @@ function need(lv){return 30+lv*12;}
 function today(t){const d=new Date((t!=null?+t:Date.now())+7*3600e3);return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate();}
 function yesterday(){return today(Date.now()-86400e3);}
 function shuffle(a){for(let k=a.length-1;k>0;k--){const j=(R()*(k+1))|0;[a[k],a[j]]=[a[j],a[k]];}return a;}
-function newOrder(){return QUIZ.map((q,k)=>[k,q.lvl+R()*1.6]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);} // khó dần, xen kẽ ngẫu nhiên
+function newOrder(){const W=[0,1,2,3,6];return QUIZ.map((q,k)=>[k,Math.pow(R(),1/W[q.lvl||1])]).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);} // v50: câu khó và chuyên sâu xuất hiện thường hơn // khó dần, xen kẽ ngẫu nhiên
 function fmtTime(s){s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0');}
 const DEF={food:80,clean:80,smart:60,xp:0,lv:1,score:0,streak:0,best:0,qDay:'',qCount:0,qExtra:0,qOrder:[],qPos:0,form:0,unlocked:[0],path:[],fl:{v:0,w:-1,o:0},last:0,
-  coin:300,gem:30,ticket:3,energy:10,emax:10,eT:0,floor:0,inv:{},eq:{pet:null,aura:null,chip:null},bag:{},pity:0,pulls:0,jackpot:1000,wDay:'',
+  coin:300,gem:30,ticket:3,energy:5,emax:5,eT:0,floor:0,inv:{},eq:{pet:null,aura:null,chip:null},bag:{},pity:0,pulls:0,jackpot:1000,wDay:'',
   loginDay:'',loginIdx:-1,mDay:'',mProg:{},mClaim:{},mAll:false,mine:0,sound:true,slotNet:0,pendEvo:false,treeVer:3,stats:{feed:0,bath:0,quiz:0,win:0}};
 let S=JSON.parse(JSON.stringify(DEF));
 function load(){let bad=false;try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);bad=!lsCheck(o);S=Object.assign(JSON.parse(JSON.stringify(DEF)),o);}}catch(e){}
   if(bad)S.tamper=(S.tamper||0)+1;S.sigV=1;
   if(!S.qOrder||S.qOrder.length!==QUIZ.length){S.qOrder=newOrder();S.qPos=0;}
   if(S.treeVer!==3){S.treeVer=3;S.form=0;S.unlocked=[0];S.pendEvo=false;S.floor=Math.min(S.floor,Math.max(0,S.lv-2));}
-  const now=Date.now()/1000;if(!S.eT)S.eT=now;if((S.emax||0)<EMAX){S.energy=Math.min(EMAX,(S.energy||0)+(EMAX-(S.emax||6)));S.emax=EMAX;}
+  const now=Date.now()/1000;if(!S.eT)S.eT=now;if((S.emax||0)<EMAX){S.energy=Math.min(EMAX,(S.energy||0)+(EMAX-(S.emax||6)));S.emax=EMAX;}if(S.emax>EMAX){S.emax=EMAX;S.energy=Math.min(S.energy||0,EMAX);}
   SFX.on=S.sound!==false;}
 let CL_DIRTY=true; // có thay đổi chưa gửi lên máy chủ sao lưu
 function save(){if(TABLOCK)return;if(CLK.done){S.last=Date.now()/1000;S.tHi=Math.max(S.tHi||0,Date.now());}try{lsWrite(S);}catch(e){}CL_DIRTY=true;}
@@ -8795,6 +8878,236 @@ function budBubblePos(){const el=$('budtalk'),b=BUD.on;if(!el||!b||!b.chat||b.ch
 SND.blip=w=>{tone(w?880:620,0.05,'sine',0.035,w?1180:820);tone(w?1180:820,0.04,'sine',0.03,null,0.07);};
 
 /*BUD47-END*/
+/*RESCUE48-START*/
+// ================= v50: BẠN BÈ ỨNG CỨU (bí mật) =================
+// Khi Bahi sắp gục trong Tháp, rất hiếm khi một người bạn lao vào cứu. Ban đầu bạn ấy đánh rất yếu, bị đánh tới gần gục,
+// rồi hô thần chú và tiến hóa thành hình thái RPG, tung chiêu áp đảo kết liễu đối thủ. Không có bất kỳ gợi ý nào trước đó.
+const RES_P=0.03,RES_CD=60*3600*1000,RES_HP=0.2;
+const RES_CHANT=['Thuật thức IZIon24!','Ma pháp Ideal Life!','Hơi thở Data!','IT ma pháp!','Để ta cho ngươi biết HR Ideal Life mạnh cỡ nào!'];
+const RESQ={
+ anan:{evo:'Lục Dực Thiên Sứ',ch:1,col:'#ffe58a',col2:'#ffffff',
+  in:['Ờm... tớ đến rồi. Cậu đứng sau tớ đi, Bahi. Lần này tớ không chạy đâu.','Đừng... đừng đánh bạn tớ nữa! Tớ sợ lắm, nhưng tớ sẽ không lùi.'],
+  hurt:'Đau quá... nhưng tớ còn đứng được.',
+  sk:['Lục Dực Thánh Quang','Phán Quyết Thiên Thương'],
+  out:['Tớ sẽ luôn bảo vệ cậu. Cứ tiến lên tầng trên nhé, Bahi.','Hết run rồi... Cậu đi tiếp đi. Khi nào cần, tớ lại đến.']},
+ bong:{evo:'Đại Triệu Hồi Sư',ch:0,col:'#9ff4ff',col2:'#c8b0ff',
+  in:['Ưm... tớ đang ngủ thì nghe thấy cậu gọi. Nằm nghỉ đi Bahi, để tớ.','Tớ thấy cậu mệt từ trên mây. Đổi ca nhé, cậu nghỉ một chút.'],
+  hurt:'Ưm... hắn đánh đau thật. Tỉnh ngủ hẳn rồi.',
+  sk:['Triệu Hồi · Vân Long','Thiên Lôi Vạn Quân'],
+  out:['Xong rồi. Tớ về ngủ tiếp. Cứ leo lên tầng trên đi, tớ trông chừng từ trên mây.','Cậu làm tốt lắm rồi. Phần còn lại cứ để mây che cho.']},
+ bao:{evo:'Tu Sĩ Ánh Sáng',ch:3,col:'#ffd84a',col2:'#fff3c0',
+  in:['Khoan! Cậu mà gục thì tiền thuốc đắt lắm. Tớ đến rồi, không tốn của cậu đồng nào.','Tớ chạy bộ sang cho đỡ tiền xe. Đứng sau tớ, Bahi!'],
+  hurt:'Hắn... hắn làm rơi củ cà rốt của tớ rồi.',
+  sk:['Kho Báu Ánh Sáng','Đại Quang Minh Ấn'],
+  out:['Lần này tớ bao. Lên tầng trên đi, đừng để tớ phải tiêu thêm lần nữa đấy.','Cả năm tớ để dành ánh sáng cho đúng lúc này. Đáng từng đồng. Đi tiếp đi!']},
+ tini:{evo:'Hỏa Tướng Quân',ch:4,col:'#ff8a3a',col2:'#ffe066',
+  in:['Hừ! Cậu luyện tập kiểu gì mà để con quái này đánh ra nông nỗi đấy? Lùi lại, tớ đến rồi!','Đứa nào dám bắt nạt bạn tớ?! Ra đây với tớ!'],
+  hurt:'Hừ... chỉ là vết xước thôi!',
+  sk:['Hỏa Long Trảm','Thiêu Thiên Liệt Diễm'],
+  out:['Lần sau đánh cho đàng hoàng vào! ... Nhưng nếu cần, tớ vẫn sẽ đến.','Lên tầng trên đi! Đứa nào chặn đường thì gọi tên tớ.']},
+ nam:{evo:'Chú Thuật Sư Thượng Cấp',ch:2,col:'#7fffe0',col2:'#c08aff',
+  in:['Tớ quên đường về nhà, nhưng tớ nhớ cậu còn đúng {hp}% máu. Để tớ lo phần còn lại.','Cậu là... à, Bahi! Máu cậu còn {hp}%. Không ổn. Tớ đến đây.'],
+  hurt:'Ơ... tớ quên mất mình đang đánh nhau.',
+  sk:['Chú Ấn · Số Học','Lãnh Địa Triển Khai · Vô Hạn Số'],
+  out:['Xác suất cậu thắng ở tầng trên là... à, tớ quên rồi. Nhưng tớ tin cậu. Đi tiếp đi!','Tớ đã ghi lên mũ: "bảo vệ Bahi". Cứ tiến lên nhé.']}
+};
+const RX=92,RY=100; // chỗ đứng của người bạn, chắn trước Bahi
+// mốc thời gian (giây)
+const RST={arr:1.3,line:1.4,weak:5.6,chant:10.4,evo:12.9,name:14.6,s1:15.8,s2:19.0,dead:22.2,out:22.6,fade:26.6,end:27.4};
+function rescueCheck(){if(BT.rsDone||BT.phase!=='fight'||!BT.B||BT.B.over||BT.mon.guard||BT.floor>=TOWER_TOP)return;const me=BT.B.me;
+  if(me.hp>0&&me.hp<=me.max*RES_HP){BT.rsDone=1;const force=S.tRes!=null;
+    if(force||(R()<RES_P&&Date.now()-(S.resT||0)>RES_CD)){const k=force&&S.tRes>=0?S.tRes:(R()*BUDS.length)|0;delete S.tRes;startRescue(k);}}}
+function startRescue(k){const D=BUDS[k],Q=RESQ[D.id],me=BT.B.me;S.resT=Date.now();S.resMet=S.resMet||{};S.resMet[D.id]=(S.resMet[D.id]||0)+1;
+  const hp=Math.max(1,Math.round(me.hp/me.max*100)),ch=R()<0.7?RES_CHANT[Q.ch]:pick(RES_CHANT);
+  BT.rs={k,id:D.id,t:0,fhp:1,shake:0,flash:0,ev:{},q:Q,lineIn:pick(Q.in).replace('{hp}',hp),lineOut:pick(Q.out),chant:ch,hops:0};
+  BT.phase='rescue';BT.act=null;BFX.length=0;$('b-float').innerHTML='';sfx('rare',3);vib([30,40,30]);save();}
+function rsFloat(txt,cls,dy){const box=$('b-float'),d=document.createElement('div');d.className='bfl '+(cls||'');d.textContent=txt;d.style.left=(RX/200*100)+'%';d.style.top=(22+(dy||0))+'%';box.appendChild(d);setTimeout(()=>d.remove(),900);}
+function rsOnce(rs,key,at){if(rs.t>=at&&!rs.ev[key]){rs.ev[key]=1;return true;}return false;}
+function rsHitMon(frac,txt,cls){const m=BT.B.mon,v=Math.max(1,Math.round(m.max*frac));m.hp=Math.max(1,m.hp-v);BT.flash[1]=0.25;BT.shake[1]=0.25;bFloat('mon',txt!=null?txt:'-'+v,cls||'');bHud();return v;}
+function rescueTick(d){const rs=BT.rs;if(!rs)return;rs.t+=d;const t=rs.t,m=BT.B.mon,id=rs.id,Q=rs.q;rs.flash=Math.max(0,rs.flash-d);rs.shake=Math.max(0,rs.shake-d);
+  if(rsOnce(rs,'land',RST.arr*0.85)){bburst(RX,RY-6,14,{type:'spark',life:0.6,col:['#ffffff',BUDS[rs.k].c],smin:20,smax:60});sfx('drop');}
+  // ---- giai đoạn yếu: 3 đòn đánh lẹt đẹt, bị quái phản đòn 3 lần ----
+  for(let i=0;i<3;i++){const a=RST.weak+i*1.55;
+    if(rsOnce(rs,'h'+i,a)){rs.hop=t;sfx('tap');rsHitMon(0.012,null,'');bburst(150,72,4,{type:'px',life:0.35,col:['#ffffff',BUDS[rs.k].c],smin:10,smax:30});}
+    if(rsOnce(rs,'m'+i,a+0.75)){BT.act={who:'mon',t:0};rs.fhp=[0.62,0.3,0.08][i];rs.flash=0.3;rs.shake=0.3;rsFloat('-'+(30+i*25+((R()*20)|0)),'crit');sfx('hit');
+      bburst(RX+4,RY-12,8,{type:'spark',life:0.4,col:[m.col||'#ff5a5a','#ffffff'],smin:20,smax:50});if(i===2)rsFloat(Q.hurt,'eff',-10);}}
+  // ---- hô thần chú ----
+  if(rsOnce(rs,'chant',RST.chant)){sfx('big');vib([60,40,60]);BT.quake=0.5;}
+  if(t>RST.chant&&t<RST.evo&&R()<0.6)bspawn({type:'spark',x:RX+rnd(-24,24),y:RY+2,vy:-rnd(40,80),life:0.7,col:pick([Q.col,Q.col2,'#ffffff'])});
+  // ---- tiến hóa ----
+  if(rsOnce(rs,'evo',RST.evo)){sfx('evolve');vib([40,40,40,40,140]);rs.flash=0.6;BT.quake=0.6;rs.fhp=1;
+    bburst(RX,RY-24,40,{type:'star',life:1,col:[Q.col,Q.col2,'#ffffff'],smin:30,smax:110});bspawn({type:'ring',x:RX,y:RY-2,r0:4,r1:60,flat:0.3,life:0.8,col:Q.col});}
+  if(rsOnce(rs,'evo2',RST.evo+0.9))rsFloat('TIẾN HÓA!','sk',-6);
+  // ---- chiêu 1: nhiều đòn mạnh ----
+  if(rsOnce(rs,'s1',RST.s1)){rsFloat(Q.sk[0],'sk',-8);sfx('big');}
+  for(let i=0;i<4;i++)if(rsOnce(rs,'s1h'+i,RST.s1+0.9+i*0.5)){rsHitMon(0.11+R()*0.03,null,'crit');sfx('crit');BT.quake=0.25;}
+  // ---- chiêu 2: tuyệt kỹ kết liễu ----
+  if(rsOnce(rs,'s2',RST.s2)){rsFloat(Q.sk[1],'sk',-8);sfx('evolve');BT.quake=0.4;}
+  for(let i=0;i<3;i++)if(rsOnce(rs,'s2h'+i,RST.s2+1.5+i*0.45)){const left=m.hp;rsHitMon(i<2?0.2:1,i<2?null:'-'+(left*9+999).toLocaleString('vi-VN'),'crit');sfx('crit');BT.quake=0.45;
+    if(id==='bao'&&i===0){const me=BT.B.me,h=Math.round(me.max*0.5);me.hp=Math.min(me.max,me.hp+h);bFloat('me','+'+h,'heal');bHud();}}
+  if(rsOnce(rs,'dead',RST.dead)){m.hp=0;bHud();sfx('win');}
+  if(BT.quake>0)BT.quake=Math.max(0,BT.quake-d);
+  if(t>=RST.end)rescueEnd();}
+function rescueEnd(){const rs=BT.rs,B=BT.B;B.mon.hp=0;B.over='win';BT.rs=null;BT.phase='fight';endBattle(true);BT.res='Một người bạn đã đến ứng cứu! '+BT.res;bHud();}
+// ---------------- vẽ ----------------
+const DIG={0:['111','101','101','101','111'],1:['010','110','010','010','111'],2:['111','001','111','100','111'],3:['111','001','111','001','111'],4:['101','101','111','001','001'],
+ 5:['111','100','111','001','111'],6:['111','100','111','101','111'],7:['111','001','010','010','010'],8:['111','101','111','101','111'],9:['111','101','111','001','111']};
+function rsDigit(g,n,x,y,c){const m=DIG[n];g.fillStyle=c;for(let j=0;j<5;j++)for(let i=0;i<3;i++)if(m[j][i]==='1')g.fillRect(Math.round(x)+i,Math.round(y)+j,1,1);}
+function rsGlow(g,x,y,rx,ry,c,a){g.save();g.globalCompositeOperation='lighter';g.globalAlpha=Math.min(1,a*1.6);g.translate(x,y);g.scale(1,ry/rx);const gr=g.createRadialGradient(0,0,0,0,0,rx);gr.addColorStop(0,c);gr.addColorStop(0.45,c+'88');gr.addColorStop(1,c+'00');g.fillStyle=gr;g.beginPath();g.arc(0,0,rx,0,Math.PI*2);g.fill();g.restore();}
+function rsFeat(g,x0,y0,ang,len,w,c,edge){const ca=Math.cos(ang),sa=Math.sin(ang);for(let k=-w;k<=w;k++){const ox=-sa*k*0.6,oy=ca*k*0.6,l=len*(1-Math.abs(k)/(w+1)*0.35);pxLine(g,x0+ox,y0+oy,x0+ox+ca*l,y0+oy+sa*l,Math.abs(k)===w?edge:c);}}
+function rsOl(g,parts,x,y,ink){ink=ink||BUD_INK;for(const p of parts)pxEllipse(g,x+p[0],y+p[1],p[2]+1,p[3]+1,ink);for(const p of parts)pxEllipse(g,x+p[0],y+p[1],p[2],p[3],p[4]);}
+function rsFeather(g,x0,y0,ang,len,n,c1,c2,ink,s){// một cánh: chuỗi lông vũ hình giọt dọc theo góc
+  const ca=Math.cos(ang),sa=Math.sin(ang);for(const pass of[0,1])for(let j=0;j<n;j++){const u=(j+1)/n,px=x0+ca*len*u*s,py=y0+sa*len*u,rx=2.4+1.4*Math.sin(u*Math.PI),ry=1.4+0.6*Math.sin(u*Math.PI);
+    if(!pass)pxEllipse(g,px,py,rx+1,ry+1,ink);else{pxEllipse(g,px,py,rx,ry,j>n-3?c2:c1);budPx(g,px-1,py-1,'#ffffff');}}}
+const EVODRAW={
+ anan(g,x,y,t,a){// LỤC DỰC THIÊN SỨ: ba đôi cánh lông vũ lớn, hào quang vàng, thương ánh sáng
+  const fl=Math.sin(t*2.6),ink='#7a5a20';rsGlow(g,x,y-30,34,34,'#fff3a0',0.35+0.08*Math.sin(t*4));
+  // ba đôi cánh: đôi trên vươn cao, đôi giữa dang rộng, đôi dưới che chân
+  const tiers=[{y:-34,a0:-1.25,sp:0.95,n:7,L:24},{y:-27,a0:-0.55,sp:0.9,n:7,L:26},{y:-18,a0:0.05,sp:0.75,n:6,L:20}];
+  for(const s of[-1,1])tiers.forEach((w,i)=>{for(let j=w.n-1;j>=0;j--){const u=j/(w.n-1),ang0=w.a0+u*w.sp+fl*0.07*(i+1),ang=s>0?ang0:Math.PI-ang0,L=w.L*(0.62+0.38*Math.sin((1-u*0.8)*Math.PI*0.55+0.5));
+    rsFeat(g,x+s*4,y+w.y,ang,L+1,2,ink,ink);rsFeat(g,x+s*4,y+w.y,ang,L,1,j%2?'#fffdf2':'#fff6dc','#ffe58a');}
+    const am=w.a0+w.sp*0.45+fl*0.07*(i+1),A=s>0?am:Math.PI-am;for(const u of[0.22,0.42])rsOl(g,[[Math.cos(A)*w.L*u,Math.sin(A)*w.L*u,4.2-u*3,3-u*1.5,'#fffdf2']],x+s*4,y+w.y,'#c8a050');});
+  // thân áo choàng trắng viền vàng
+  rsOl(g,[[0,-5,9,5,'#fff8e6'],[0,-14,7,11,'#fffdf2'],[0,-31,8,7,'#b07a4c'],[-5,-37,1.6,2.8,'#8c5f3a'],[5,-37,1.6,2.8,'#8c5f3a']],x,y,ink);
+  for(let k=-8;k<=8;k++)budPx(g,x+k,y-1,k%2?'#ffd84a':'#ffe58a');for(let k=-6;k<=6;k++)budPx(g,x+k,y-14+Math.round(k*0.45),'#ffd84a');pxEllipse(g,x,y-21,2,2,'#ffd84a');budPx(g,x,y-22,'#ffffff');
+  pxEllipse(g,x,y-30,6,5,'#f6e2bd');for(const s of[-1,1]){pxEllipse(g,x+s*3,y-31,2.2,2.2,'#fff6b0');pxEllipse(g,x+s*3,y-31,1.2,1.2,'#ffb800');budPx(g,x+s*3-1,y-32,'#ffffff');}
+  budPx(g,x-1,y-28,'#f2a03a',2,2);budPx(g,x-6,y-27,'#ff8fa8',2,1);budPx(g,x+4,y-27,'#ff8fa8',2,1);
+  const hy=y-44+Math.round(Math.sin(t*2));rsGlow(g,x,hy,10,4,'#ffe58a',0.5);g.save();g.globalCompositeOperation='lighter';pxRing(g,x,hy,8,2.2,'#ffe58a');pxRing(g,x,hy,7,1.6,'#fff6b0');g.restore();
+  // thương ánh sáng (chiếc ô đã hóa thành thương)
+  const sx=x+12,lift=a?Math.round(Math.sin(Math.min(1,a)*Math.PI)*5):0;pxLine(g,sx,y+1-lift,sx+3,y-50-lift,'#7a5a20');pxLine(g,sx+1,y+1-lift,sx+4,y-50-lift,'#ffe58a');
+  const tx=sx+4,ty=y-53-lift;rsGlow(g,tx,ty,9,9,'#fff6b0',0.8);for(const[dx,dy]of[[0,-6],[0,5],[-4,0],[4,0]])pxLine(g,tx,ty,tx+dx,ty+dy,'#ffffff');
+  for(let k=0;k<5;k++){const an=t*2+k*1.26;budPx(g,x+Math.cos(an)*24,y-28+Math.sin(an)*20,(k+Math.floor(t*6))%2?'#ffffff':'#fff6b0');}},
+ bong(g,x,y,t,a){// ĐẠI TRIỆU HỒI SƯ: áo choàng sao trời xòe rộng, mũ trùm tai mèo, khăn mây, trượng trăng khuyết, ba linh mây hộ thân
+  const hv=Math.round(5+Math.sin(t*2)*1.5),Y=y-hv,ink='#0e1230';
+  // trận pháp triệu hồi dưới chân
+  rsGlow(g,x,y,26,7,'#7fe0ff',0.35);g.save();g.globalCompositeOperation='lighter';pxRing(g,x,y,22,5.5,'#7fe0ff');pxRing(g,x,y,16,4,'#c8b0ff');for(let k=0;k<12;k++){const an=-t*0.8+k*Math.PI/6;budPx(g,x+Math.cos(an)*19,y+Math.sin(an)*4.7,k%3?'#9ff4ff':'#ffffff');}g.restore();
+  rsGlow(g,x,Y-26,28,30,'#6a8cff',0.3);
+  // áo choàng xòe hình chuông, mép viền sao
+  const cape=[];for(let k=0;k<7;k++)cape.push([0,-30+k*4.3,5+k*2,3.2,k%2?'#1f2a66':'#24306e']);rsOl(g,cape,x,Y,ink);
+  for(let k=-17;k<=17;k++){const yy=Y-1+Math.round(Math.sin(k*0.5+t*3));budPx(g,x+k,yy,'#9ec9ff');if(k%4===0)budPx(g,x+k,yy-1,'#fff6b0');}
+  for(const[u,v]of[[-9,-6],[6,-10],[-3,-14],[11,-4],[-13,-3],[2,-20],[-6,-22],[8,-18]])budPx(g,x+u,Y+v,(Math.floor(t*3+u)%3)?'#fff6b0':'#9ff4ff');
+  // khăn mây quanh vai
+  for(let k=0;k<7;k++)rsOl(g,[[-9+k*3,-24+Math.round(Math.sin(t*2+k)),2.8,2.4,'#ffffff']],x,Y,ink);
+  // mũ trùm tai mèo + gương mặt mèo mây
+  rsOl(g,[[0,-33,8.5,8,'#1a2560'],[-6,-41,2.4,3.6,'#1a2560'],[6,-41,2.4,3.6,'#1a2560']],x,Y,ink);budPx(g,x-6,Y-42,'#ffb3c6');budPx(g,x+6,Y-42,'#ffb3c6');
+  pxEllipse(g,x+1,Y-32,6,5,'#ffffff');for(const s of[-1,1]){pxEllipse(g,x+1+s*2.6,Y-33,1.5,1.3,'#9ff4ff');budPx(g,x+1+s*2.6,Y-33,'#ffffff');}
+  budPx(g,x-2,Y-30,'#ff8fa8',2,1);budPx(g,x+3,Y-30,'#ff8fa8',2,1);budPx(g,x+1,Y-30,BUD_INK);for(let k=-8;k<=8;k++)budPx(g,x+k,Y-40+Math.round(Math.abs(k)*0.15),k%3?'#9ec9ff':'#fff6b0');
+  // trượng trăng khuyết, tay áo giơ cao
+  const up=a?Math.round(Math.sin(Math.min(1,a)*Math.PI)*6):0,sx=x+14;rsOl(g,[[11,-24-up*0.5,3,4,'#24306e']],x,Y,ink);pxLine(g,sx,Y+2-up,sx,Y-46-up,'#5a3a20');pxLine(g,sx+1,Y+2-up,sx+1,Y-46-up,'#d8b47a');
+  rsGlow(g,sx+1,Y-51-up,10,10,'#fff6b0',0.7);pxEllipse(g,sx+1,Y-51-up,5,5,'#ffe066');pxEllipse(g,sx+3,Y-52-up,4,4,'#1a2560');
+  for(let k=0;k<3;k++){const an=t*2.4+k*2.1;budPx(g,sx+1+Math.cos(an)*9,Y-51-up+Math.sin(an)*4,'#ffffff');}
+  // ba linh mây hộ thân bay quanh
+  for(let k=0;k<3;k++){const an=t*1.3+k*2.09,cx=x+Math.cos(an)*25,cy=Y-30+Math.sin(an)*9;if(Math.sin(an)<-0.2)continue;rsOl(g,[[0,0,3.4,2.6,'#ffffff'],[-3,1,2,1.8,'#ffffff'],[3,1,2,1.8,'#ffffff']],cx,cy,'#2a3a7a');budPx(g,cx-1,cy,'#2a3a7a');budPx(g,cx+1,cy,'#2a3a7a');}},
+ bao(g,x,y,t,a){// TU SĨ ÁNH SÁNG: ngồi kiết già trên đài sen vàng, mạn-đà-la xoay, dải lụa bay, chuỗi tiền ánh sáng
+  const ink='#6a4018',hv=Math.round(3+Math.sin(t*1.6)),Y=y-hv,cy=Y-30,rot=t*0.7;
+  rsGlow(g,x,cy,30,30,'#ffe066',0.38);
+  g.save();g.globalCompositeOperation='lighter';g.globalAlpha=0.7;for(let k=0;k<24;k++){const an=rot+k*Math.PI/12,r1=k%2?14:11;pxLine(g,x+Math.cos(an)*r1,cy+Math.sin(an)*r1,x+Math.cos(an)*21,cy+Math.sin(an)*21,k%2?'#ffe066':'#fff3c0');}
+  g.globalAlpha=0.9;pxCircleO(g,x,cy,21,'#ffd84a');pxCircleO(g,x,cy,10,'#fff3c0');for(let k=0;k<8;k++){const an=-rot*1.5+k*Math.PI/4;budPx(g,x+Math.cos(an)*17,cy+Math.sin(an)*17,'#ffffff',2,2);}g.restore();
+  // dải lụa tiên bay hai bên
+  for(const s of[-1,1])for(let k=0;k<22;k++){const u=k/21,px=x+s*(8+u*18),py=Y-22+u*10+Math.sin(t*3+u*5+s)*3;budPx(g,px,py,k%5?'#ff9ab8':'#ffd84a',2,1);}
+  // đài sen
+  for(let k=0;k<9;k++){const an=Math.PI*(0.05+k*0.1125),px=x+Math.cos(an)*14,py=y-1-Math.sin(an)*3;rsOl(g,[[0,0,3.2,2.2,k%2?'#ffb3cc':'#ffd0e0']],px,py-1,'#a04060');budPx(g,px,py-3,'#ffffff');}
+  pxEllipse(g,x,y-1,14,2.2,'#d8a030');
+  // thân ngồi kiết già, áo cà sa
+  const ear=[];for(const sd of[-1,1])for(let k=0;k<6;k++){const u=k/5;ear.push([sd*(3+u*u*7+Math.sin(t*2+sd)*u),-36-u*9+u*u*3,2.1-u*0.5,2.2,'#fff7ec']);}
+  rsOl(g,[[0,-5,12,5,'#fff3dc'],[0,-14,9,9,'#fff3dc']].concat(ear,[[0,-29,8,7,'#fff7ec']]),x,Y,ink);
+  for(const sd of[-1,1]){for(let k=1;k<5;k++){const u=k/5;budPx(g,x+sd*(3+u*u*7+Math.sin(t*2+sd)*u),Y-36-u*9+u*u*3,'#ffb3c6');}pxRing(g,x+sd*3.4,Y-38,2.4,0.9,'#ffd84a');}
+  for(let k=-9;k<=7;k++)budPx(g,x+k,Y-20+Math.round((k+9)*0.95),'#e8902a',2,2);for(let k=-11;k<=11;k++)budPx(g,x+k,Y-1,'#ffd84a');
+  rsOl(g,[[0,-13,2.2,3,'#fff7ec']],x,Y,ink);budPx(g,x,Y-16,ink,1,5);
+  const open=a&&a>0.15;for(const s of[-1,1]){if(open){pxEllipse(g,x+s*3,Y-29,1.4,1.4,'#ffb800');budPx(g,x+s*3,Y-30,'#ffffff');}else{budPx(g,x+s*3-1,Y-29,ink,3,1);}}
+  budPx(g,x,Y-33,'#ff5a5a');budPx(g,x-6,Y-27,'#ff8fa8',2,1);budPx(g,x+5,Y-27,'#ff8fa8',2,1);budPx(g,x,Y-26,ink);
+  // chuỗi đồng tiền ánh sáng xoay quanh
+  for(let k=0;k<10;k++){const an=t*1.8+k*Math.PI/5,px=x+Math.cos(an)*18,py=Y-16+Math.sin(an)*5;pxEllipse(g,px,py,2,2,'#7a5a10');pxEllipse(g,px,py,1.5,1.5,Math.sin(an)>0?'#ffe066':'#d8a030');if(Math.sin(an)>0)budPx(g,px,py-1,'#ffffff');}},
+ tini(g,x,y,t,a){// HỎA TƯỚNG QUÂN: áo choàng lửa, giáp đỏ viền vàng, mũ sừng, đại đao rực lửa
+  const ink='#1a1020';for(let k=0;k<9;k++){const fx=x-10+k*2.4,h=12+Math.round(Math.sin(t*9+k*1.7)*3+((k*7)%4)),c=k%3===0?'#ffe066':k%3===1?'#ff8a3a':'#e0472a';
+    pxEllipse(g,fx-4,y-24+h*0.5,2.4,h*0.6,c);}
+  rsGlow(g,x,y-26,22,28,'#ff6a2a',0.22+0.08*Math.sin(t*7));
+  rsOl(g,[[0,-15,9,14,'#2e3a5c'],[-9,-26,3.6,3,'#d8a030'],[9,-26,3.6,3,'#d8a030'],[0,-32,7.5,6.5,'#2e3a5c'],[-3,0,2.4,1.4,'#f2a03a'],[3,0,2.4,1.4,'#f2a03a']],x,y,ink);
+  pxEllipse(g,x,y-14,6,8,'#c0392b');pxRing(g,x,y-14,6,8,'#ffd84a');pxEllipse(g,x,y-10,3.5,4,'#ffffff');budPx(g,x-1,y-19,'#ffd84a',3,3);
+  pxEllipse(g,x+1,y-31,4.5,3.4,'#ffffff');pxEllipse(g,x,y-36,7.5,3,'#b8321c');for(let k=-7;k<=7;k++)budPx(g,x+k,y-34,'#ffd84a');
+  for(const s of[-1,1]){pxLine(g,x+s*5,y-37,x+s*9,y-44,'#ffd84a');pxLine(g,x+s*9,y-44,x+s*8,y-47,'#ffffff');}
+  for(let k=0;k<3;k++)pxEllipse(g,x+Math.round(Math.sin(t*10+k)),y-41-k*3,1.6-k*0.4,2,k?'#ffe066':'#ff6a2a');
+  for(const s of[-1,1]){budPx(g,x+1+s*2-1,y-32,'#ff6a2a',2,1);budPx(g,x+1+s*2-(s<0?1:0),y-33,'#1a1020',1,1);}budPx(g,x,y-29,'#f2a03a',3,1);
+  for(const s of[-1,1])for(let k=0;k<2;k++)pxEllipse(g,x+s*9+Math.round(Math.sin(t*12+k+s)),y-30-k*2,1.2,1.6,k?'#ffe066':'#ff8a3a');
+  const sw=a?Math.sin(Math.min(1,a)*Math.PI):0,bx=x+12+Math.round(sw*6),by=y-2;pxLine(g,bx,by,bx+4,by-46,'#5a1a10');pxLine(g,bx+1,by,bx+5,by-46,'#8a2a18');
+  const hx=bx+4,hy=by-46;rsGlow(g,hx+5,hy+2,12,14,'#ff8a3a',0.6);
+  for(let r=4;r<=11;r++)for(let k=0;k<=24;k++){const an=-1.9+k*(2.6/24),px=hx+Math.cos(an)*r*0.85+2,py=hy+4+Math.sin(an)*r*1.15;if(r>=4+Math.abs(k-12)*0.45)budPx(g,px,py,r>=10?'#3a0a08':r>=8?'#ff6a2a':r>=6?'#ffb03a':'#ffe066');}
+  pxLine(g,hx+2,hy+12,hx+11,hy-8,'#ffffff');for(let k=0;k<4;k++)pxEllipse(g,hx+10+Math.round(Math.sin(t*14+k)*2),hy-4+k*4,1.6,2.2,k%2?'#ffe066':'#ff8a3a');
+  if(R()<0.5)bspawn({type:'px',x:x+rnd(-10,14),y:y-rnd(10,44),vy:-rnd(10,26),vx:rnd(-4,4),life:0.6,col:pick(['#ffe066','#ff8a3a','#e0472a'])});},
+ nam(g,x,y,t,a){// CHÚ THUẬT SƯ THƯỢNG CẤP: mũ nấm phù thủy khổng lồ, đốm phù văn sáng, vòng số bay quanh
+  const ink='#120820';rsGlow(g,x,y-26,22,28,'#9a5aff',0.2+0.06*Math.sin(t*5));
+  const ring=(k,n)=>{const an=t*1.4+k*Math.PI*2/n;return[x+Math.cos(an)*19,y-18+Math.sin(an)*5,Math.sin(an)];};
+  for(let k=0;k<10;k++){const[px,py,z]=ring(k,10);if(z<0)rsDigit(g,(k+Math.floor(t*2))%10,px-1,py-2,'#3fa0a0');}
+  rsOl(g,[[0,-10,9,11,'#2a1640'],[0,-2,11,3.5,'#24123a'],[-8,-14,3,5,'#2a1640'],[8,-16,3,5,'#2a1640'],[0,-21,5.5,4.5,'#fbe9cf']],x,y,ink);
+  for(let k=-9;k<=9;k+=2)budPx(g,x+k,y-1,'#c08aff');for(let k=0;k<6;k++)budPx(g,x-1,y-14+k*2,'#c08aff',2,1);
+  rsOl(g,[[0,-26,15,4,'#3a1a5a'],[0,-31,10,5,'#3a1a5a'],[1,-37,7,5,'#3a1a5a'],[3,-43,4.5,4,'#3a1a5a'],[6,-48,2.6,3,'#3a1a5a'],[9,-51,1.6,1.8,'#3a1a5a']],x,y,ink);
+  pxEllipse(g,x,y-24,12,1.4,'#1a0a2a');
+  for(const[u,v,r]of[[-8,-27,1.4],[-3,-32,1.2],[4,-30,1.4],[1,-38,1.1],[5,-44,1],[9,-27,1.2]]){const on=Math.floor(t*4+u)%3!==0;pxEllipse(g,x+u,y+v,r,r,on?'#7fffe0':'#3fa0a0');}
+  for(const s of[-1,1]){pxEllipse(g,x+s*2,y-21,1.2,1,'#c08aff');budPx(g,x+s*2,y-21,'#ffffff');}budPx(g,x-4,y-19,'#ff8fa8',2,1);budPx(g,x+3,y-19,'#ff8fa8',2,1);
+  const up=a?Math.round(Math.sin(Math.min(1,a)*Math.PI)*6):0,hx=x+11,hy=y-20-up;pxEllipse(g,hx,hy,2,2,'#fbe9cf');g.save();g.globalCompositeOperation='lighter';pxRing(g,hx,hy-4,5+Math.sin(t*6),5+Math.sin(t*6),'#c08aff');pxRing(g,hx,hy-4,3,3,'#7fffe0');g.restore();
+  for(let k=0;k<10;k++){const[px,py,z]=ring(k,10);if(z>=0)rsDigit(g,(k+Math.floor(t*2))%10,px-1,py-2,'#7fffe0');}}
+};
+function rsTypeBar(g,who,txt,t0,t1,col){const t=BT.rs.t;if(t<t0||t>t1)return;const p=Math.min(1,(t-t0)/0.25)*Math.min(1,(t1-t)/0.25),bar=Math.round(28*p);
+  g.fillStyle='#000000';g.globalAlpha=0.82;g.fillRect(0,BH2-bar,BW2,bar);g.globalAlpha=1;if(p<0.6)return;
+  g.save();g.textAlign='left';g.font='bold 7px monospace';g.fillStyle=col;g.fillText(who,6,BH2-20);g.fillStyle='#fff3dc';
+  const n=Math.floor((t-t0-0.2)*40),ls=wrapLines(g,'“'+txt+'”',188);let k=n;ls.forEach((l,j)=>{if(k<=0)return;g.fillText(l.slice(0,k),6,BH2-11+j*8);k-=l.length+1;});g.restore();}
+function drawRescue(g){const rs=BT.rs;if(!rs)return;const t=rs.t,T=BT.t,D=BUDS[rs.k],Q=rs.q,evo=t>=RST.evo,fade=t>RST.fade?Math.max(0,1-(t-RST.fade)/0.8):1;
+  // nền tối dần khi niệm chú, sáng rực khi tiến hóa
+  if(t>RST.chant&&t<RST.s1){const p=Math.min(1,(t-RST.chant)/0.6)*(t>RST.evo+0.6?Math.max(0,1-(t-RST.evo-0.6)/1.2):1);g.save();g.globalAlpha=0.55*p;g.fillStyle='#0a0618';g.fillRect(0,0,BW2,BH2);g.restore();}
+  if(t>RST.chant&&t<RST.evo){const p=(t-RST.chant)/(RST.evo-RST.chant),w=Math.round(4+p*16);g.save();g.globalCompositeOperation='lighter';g.globalAlpha=0.35+0.3*p;g.fillStyle=Q.col;g.fillRect(RX-w,0,w*2,RY+2);g.globalAlpha=0.6;g.fillStyle='#ffffff';g.fillRect(RX-(w>>2),0,(w>>1)||1,RY+2);g.restore();}
+  // người bạn
+  let x=RX,y=RY;if(t<RST.arr){const p=t/RST.arr;y=Math.round(-20+(RY+20)*(1-(1-p)*(1-p)));}
+  const hp=rs.hop!=null&&t-rs.hop<0.4?Math.sin((t-rs.hop)/0.4*Math.PI):0;x+=Math.round(hp*14);y-=Math.round(hp*3);if(rs.shake>0)x+=Math.floor(t*40)%2?2:-2;
+  g.save();g.globalAlpha=fade;g.globalAlpha*=0.3;pxEllipse(g,RX,RY+1,evo?12:6,2,'#000');g.restore();
+  g.save();g.globalAlpha=fade;
+  if(!evo){const st={t:T,a:null,at:0,walk:t>=RST.weak&&t<RST.chant,blink:(T%3.2)<0.12,talk:t>RST.line&&t<RST.weak};
+    if(t>RST.chant)st.a=null;BUDDRAW[D.id](g,x,y,1,st);
+    if(t>RST.chant){const p=(t-RST.chant)/(RST.evo-RST.chant);if(Math.floor(t*(6+p*20))%2){g.save();g.globalCompositeOperation='lighter';g.globalAlpha=0.5*p;pxEllipse(g,x,y-10,9,12,'#ffffff');g.restore();}}
+    if(t>=RST.weak-0.3&&t<RST.chant){const w=16,bx=x-w/2,by=y-30;g.fillStyle='#1a0e08';g.fillRect(bx-1,by-1,w+2,4);g.fillStyle='#5a2a1a';g.fillRect(bx,by,w,2);g.fillStyle=rs.fhp>0.35?'#5ad16a':'#ff5a5a';g.fillRect(bx,by,Math.max(1,Math.round(w*rs.fhp)),2);}}
+  else{const k=Math.min(1,(t-RST.evo)/0.5),s=0.55+0.45*(1-(1-k)*(1-k));let atk=0;
+    if(t>=RST.s1&&t<RST.s1+2.8)atk=(t-RST.s1)/0.8;else if(t>=RST.s2&&t<RST.s2+2.8)atk=(t-RST.s2)/0.9;
+    g.translate(RX,RY);g.scale(s,s);g.translate(-RX,-RY);if(rs.flash>0&&Math.floor(t*30)%2)g.globalAlpha*=0.5;EVODRAW[D.id](g,RX,RY,T,atk);}
+  g.restore();
+  if(t>=RST.s1)drawRescueFX(g,rs,t);
+  if(rs.flash>0&&evo){g.save();g.globalAlpha=Math.min(1,rs.flash*1.6);g.fillStyle='#ffffff';g.fillRect(0,0,BW2,BH2);g.restore();}}
+function drawRescueFX(g,rs,t){const id=rs.id,Q=rs.q,MX=150,MY=70;
+  {const d=Math.min(1,(t-RST.s1)/0.5)*Math.max(0,Math.min(1,(RST.dead+0.6-t)/0.6));if(d>0){g.save();g.globalAlpha=0.38*d;g.fillStyle='#0a0618';g.fillRect(0,0,BW2,BH2);g.restore();}}
+  const win=(a,d)=>t>=a&&t<a+d?(t-a)/d:-1;
+  if(id==='anan'){let p=win(RST.s1+0.4,2.6);if(p>=0){for(let i=0;i<6;i++){const q=Math.min(1,Math.max(0,(p-i*0.08)/0.35)),bx=MX-22+i*9;if(q<=0)continue;const w=Math.max(1,Math.round(3*Math.sin(Math.min(1,q)*Math.PI)));
+      g.save();g.globalCompositeOperation='lighter';g.globalAlpha=0.8;g.fillStyle=Q.col;g.fillRect(bx-w,0,w*2,Math.round(98*Math.min(1,q*1.6)));g.fillStyle='#ffffff';g.fillRect(bx,0,1,Math.round(98*Math.min(1,q*1.6)));g.restore();}}
+    p=win(RST.s2+0.6,2.2);if(p>=0){const q=Math.min(1,p/0.35),ex=RX+16+(MX-RX-16)*q;g.save();g.globalCompositeOperation='lighter';for(let k=0;k<3;k++)pxLine(g,RX+16,RY-48+k,ex,MY-6+k,k===1?'#ffffff':Q.col);
+      if(q>=1){const r=8+p*40;pxRing(g,MX,MY,r,r*0.9,Q.col);pxRing(g,MX,MY,r*0.6,r*0.55,'#ffffff');pxLine(g,MX-r,MY,MX+r,MY,'#ffffff');pxLine(g,MX,MY-r,MX,MY+r,'#ffffff');}g.restore();}}
+  if(id==='bong'){let p=win(RST.s1+0.3,2.8);if(p>=0){const n=12;for(let i=n-1;i>=0;i--){const u=Math.max(0,p*1.5-i*0.04),px=20+u*150,py=24+Math.sin(u*8+i*0.5)*14+u*30,r=i===0?6:5-i*0.3;
+      if(u<=0)continue;pxEllipse(g,px,py,r+1,r*0.8+1,'#22306a');pxEllipse(g,px,py,r,r*0.8,i%2?'#ffffff':'#e3eeff');if(i===0){budPx(g,px+2,py-2,'#9ff4ff',2,2);pxLine(g,px-2,py-5,px-5,py-10,'#ffe066');pxLine(g,px+1,py-5,px,py-11,'#ffe066');}}}
+    p=win(RST.s2+0.5,2.6);if(p>=0){g.save();g.fillStyle='#1a2040';g.globalAlpha=0.35;g.fillRect(0,0,BW2,BH2);g.restore();for(let k=0;k<5;k++){const q=(p*5+k*0.37)%1;if(q>0.45)continue;let lx=MX-16+k*8,ly=0;g.save();g.globalCompositeOperation='lighter';
+      for(let s=0;s<8;s++){const nx=lx+((s*7+k*3)%5)-2,ny=ly+11;pxLine(g,lx,ly,nx,ny,'#ffffff');pxLine(g,lx+1,ly,nx+1,ny,'#9ff4ff');lx=nx;ly=ny;}g.restore();}}}
+  if(id==='bao'){let p=win(RST.s1+0.3,2.8);if(p>=0){for(let i=0;i<26;i++){const q=(p*1.6-i*0.035);if(q<0||q>1)continue;const cx=MX-24+((i*37)%48),cy=-6+q*(MY+20);pxEllipse(g,cx,cy,2.2,2.2,'#7a5a10');pxEllipse(g,cx,cy,1.6,1.6,'#ffe066');budPx(g,cx,cy-1,'#ffffff');}
+      rsGlow(g,MX,MY,18,18,'#ffe066',0.25*Math.sin(p*Math.PI));}
+    p=win(RST.s2+0.4,2.8);if(p>=0){const q=Math.min(1,p/0.5),sy=Math.round(-30+(MY-14+30)*q*q),sz=18;g.save();g.fillStyle='#7a5a10';g.fillRect(MX-sz-1,sy-sz-1,sz*2+2,sz*2+2);g.fillStyle='#ffd84a';g.fillRect(MX-sz,sy-sz,sz*2,sz*2);
+      g.fillStyle='#fff3c0';g.fillRect(MX-sz+3,sy-sz+3,sz*2-6,sz*2-6);g.fillStyle='#e8902a';for(let k=0;k<4;k++){g.fillRect(MX-10,sy-10+k*6,20,2);}g.fillRect(MX-1,sy-12,2,24);g.restore();
+      if(q>=1){g.save();g.globalCompositeOperation='lighter';const r=10+(p-0.5)*80;pxRing(g,MX,MY+20,r,r*0.25,'#ffe066');g.restore();}}}
+  if(id==='tini'){let p=win(RST.s1+0.4,2.4);if(p>=0){for(let k=0;k<4;k++){const q=Math.min(1,Math.max(0,(p-k*0.2)/0.3));if(q<=0||q>=1)continue;g.save();g.globalCompositeOperation='lighter';
+      for(let j=0;j<14;j++){const an=-1.3+j*0.19,r=20;const px=MX+Math.cos(an)*r*(0.4+q),py=MY+Math.sin(an)*r;pxEllipse(g,px,py,2.4,1.6,j%3===0?'#ffe066':'#ff8a3a');}g.restore();}}
+    p=win(RST.s2+0.5,2.6);if(p>=0){const h=Math.round(Math.min(1,p/0.3)*104);for(let k=0;k<7;k++){const fx=MX-14+k*4.6,ph=Math.sin(BT.t*12+k)*4;g.save();g.globalCompositeOperation='lighter';g.globalAlpha=0.85;
+      g.fillStyle=k%2?'#ff6a2a':'#ffb03a';g.fillRect(Math.round(fx),98-h+Math.round(ph),3,h);g.fillStyle='#ffe066';g.fillRect(Math.round(fx)+1,98-h+Math.round(ph)+4,1,Math.max(0,h-8));g.restore();}
+      if(R()<0.7)bspawn({type:'px',x:MX+rnd(-16,16),y:98,vy:-rnd(40,90),vx:rnd(-10,10),life:0.8,col:pick(['#ffe066','#ff8a3a','#ffffff'])});}}
+  if(id==='nam'){let p=win(RST.s1+0.3,2.8);if(p>=0){const r=Math.max(10,40-p*30);for(let k=0;k<12;k++){const an=BT.t*3+k*Math.PI/6;rsDigit(g,(k*7+Math.floor(BT.t*6))%10,MX+Math.cos(an)*r-1,MY+Math.sin(an)*r*0.6-2,k%2?'#7fffe0':'#c08aff');}
+      if(p>0.4){g.save();g.globalAlpha=0.8;for(let k=0;k<3;k++)pxLine(g,MX-24,MY-12+k*12,MX+24,MY-6+k*10,'#c08aff');g.restore();}}
+    p=win(RST.s2+0.2,3);if(p>=0){const q=Math.min(1,p/0.3);g.save();g.globalAlpha=0.7*q;g.fillStyle='#14062a';g.fillRect(0,0,BW2,BH2);g.restore();
+      const R0=p<0.65?Math.round(10+q*40):Math.max(2,Math.round(50*(1-(p-0.65)/0.3)));g.save();g.globalCompositeOperation='lighter';pxCircleO(g,MX,MY,R0,'#c08aff');pxCircleO(g,MX,MY,Math.max(1,R0-4),'#7fffe0');
+      for(let k=0;k<16;k++){const an=-BT.t*2+k*Math.PI/8;rsDigit(g,(k+Math.floor(BT.t*8))%10,MX+Math.cos(an)*(R0+5)-1,MY+Math.sin(an)*(R0+5)-2,'#7fffe0');}g.restore();
+      if(p>0.92){g.save();g.globalAlpha=(1-p)/0.08;g.fillStyle='#ffffff';g.fillRect(0,0,BW2,BH2);g.restore();}}}}
+function drawRescueText(g){const rs=BT.rs;if(!rs)return;const t=rs.t,D=BUDS[rs.k],Q=rs.q;
+  rsTypeBar(g,D.n,rs.lineIn,RST.line,RST.weak-0.2,D.c);
+  // thần chú: chữ lớn rung, viền sáng
+  if(t>RST.chant+0.3&&t<RST.evo+0.2){const p=Math.min(1,(t-RST.chant-0.3)/0.3),sh=Math.floor(t*30)%2;g.save();g.textAlign='center';g.globalAlpha=p;
+    const ls=wrapLines((g.font='bold 10px monospace',g),rs.chant,180);ls.forEach((l,j)=>{const yy=30+j*12+(sh?1:0);g.fillStyle='#000000';for(const[dx,dy]of[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,1]])g.fillText(l,BW2/2+dx,yy+dy);g.fillStyle=Q.col;g.fillText(l,BW2/2,yy);});g.restore();}
+  // tên hình thái mới
+  if(t>RST.name&&t<RST.s1+0.6){const p=Math.min(1,(t-RST.name)/0.3)*Math.min(1,(RST.s1+0.6-t)/0.3);g.save();g.globalAlpha=p;g.fillStyle='#000000';g.globalAlpha=p*0.7;g.fillRect(0,8,BW2,22);g.globalAlpha=p;g.textAlign='center';
+    g.font='bold 7px monospace';g.fillStyle=Q.col2;g.fillText(D.n.toUpperCase()+' TIẾN HÓA',BW2/2,16);g.font='bold 10px monospace';g.fillStyle='#000';g.fillText(Q.evo.toUpperCase(),BW2/2+1,27);g.fillStyle=Q.col;g.fillText(Q.evo.toUpperCase(),BW2/2,26);g.restore();}
+  rsTypeBar(g,D.n+' · '+Q.evo,rs.lineOut,RST.out,RST.fade+0.6,D.c);}
+
+/*RESCUE48-END*/
 const $=id=>document.getElementById(id);
 const fmt=n=>Math.floor(n).toLocaleString('vi-VN');
 const UIPAL={k:'#3e230e',g:'#5aa04a',r:'#e0472a',w:'#ffffff',d:'#a8281c',b:'#4fa8e0',p:'#7a4fe0',y:'#ffd84a'};
@@ -8868,7 +9181,7 @@ function care(k){if(EVO||cooling(k))return;sfx('tap');
 let curQ=null,answered=false;
 function nextQ(){if(S.qPos>=S.qOrder.length){S.qOrder=newOrder();S.qPos=0;}return QUIZ[S.qOrder[S.qPos]];}
 function openQuiz(){curQ=nextQ();answered=false;
-  $('q-num').textContent='Câu '+(S.qPos+1)+'/'+QUIZ.length;$('q-lvl').textContent=['','Cơ bản','Trung bình','Nâng cao'][curQ.lvl];
+  $('q-num').textContent='Câu '+(S.qPos+1)+'/'+QUIZ.length;$('q-lvl').textContent=['','Cơ bản','Trung bình','Nâng cao','Chuyên sâu'][curQ.lvl];
   $('q-law').style.display=curQ.law?'block':'none';$('q-text').textContent=curQ.q;
   const box=$('q-opts');box.innerHTML='';curQ.opts.forEach((o,k)=>{const b=document.createElement('button');b.className='opt px';b.innerHTML='<b>'+'ABCD'[k]+'</b><span></span>';b.querySelector('span').textContent=o;b.onclick=()=>answer(k);box.appendChild(b);});
   $('q-res').style.display='none';$('q-next').style.display='none';$('q-more').hidden=true;$('q-num').textContent+=(S.qCount>=MAXQ&&!testMode?' · CÂU THƯỞNG':'');quizOpenExtras();showModal('quiz');}
@@ -8877,7 +9190,7 @@ function answer(k){if(answered)return;answered=true;const ok=k===curQ.ans,btns=[
   $('q-bet').hidden=true;let pts,xp,coin=0,bonus='',shieldUsed=false;
   if(ok){S.streak++;}else if(qShield()>0&&S.streak>0){S.qShield--;shieldUsed=true;}else S.streak=0;
   const ex=quizAfter(ok,idx),gold=QX.gold;
-  if(ok){pts=Math.round(100*Math.min(10,S.streak)*(gold?3:1));xp=(20+Math.min(60,(S.streak-1)*10))*(gold?2:1);S.smart=clamp(S.smart+25,0,100);coin=addCoin(Math.round(20*ex.mul));mission('quiz',1);
+  if(ok){const lk=[1,1,1.15,1.35,1.7][curQ.lvl||1];pts=Math.round(100*Math.min(10,S.streak)*(gold?3:1)*lk);xp=Math.round((20+Math.min(60,(S.streak-1)*10))*(gold?2:1)*lk);S.smart=clamp(S.smart+25,0,100);coin=addCoin(Math.round(20*ex.mul));mission('quiz',1);
     if(R()<0.15){const u=R();if(u<0.5){S.gem+=5;bonus=' · Rương may mắn: +5 đá';}else if(u<0.8){S.ticket+=1;bonus=' · Rương may mắn: +1 vé';}else{const r=grantItem(rollItem(1));bonus=' · Rương may mắn: '+RAR[r.it.r]+' '+r.it.name;}}
     sfx('win');}
   else{pts=10;xp=5;S.smart=clamp(S.smart+8,0,100);sfx(shieldUsed?'coin':'lose');}
@@ -9007,7 +9320,7 @@ function initUI(){
   document.querySelectorAll('.res').forEach(b=>b.onclick=()=>{sfx('tap');toast(RESINFO[b.dataset.res],4200);});
   $('w-btn').onclick=spinWheel;$('s-btn').onclick=spinSlot;document.querySelectorAll('.betb').forEach(b=>b.onclick=()=>{SL.bet=+b.dataset.bet;sfx('tap');slotUI();costUI();});
   $('t-go').onclick=()=>startFight(false);$('b-back').onclick=()=>{$('b-fact').hidden=true;stopBattle();$('b-view').hidden=true;$('t-lobby').hidden=false;towerUI();};
-  $('b-next').onclick=()=>{$('b-fact').hidden=true;$('b-next').hidden=true;startFight(false);};$('b-speed').onclick=()=>{BT.speed=BT.speed===1?2:BT.speed===2?4:1;$('b-speed').textContent='Tốc độ x'+BT.speed;};
+  $('b-next').onclick=()=>{$('b-fact').hidden=true;$('b-next').hidden=true;startFight(false);};$('b-speed').onclick=()=>{BT.speed=BT.speed===1?1.5:1;$('b-speed').textContent='Tốc độ x'+(BT.speed===1?'1':'1,5');};
   document.querySelectorAll('#m-bag .tab').forEach(t=>t.onclick=()=>{bagTab=t.dataset.tab;renderBag();});
   document.querySelectorAll('#dex-tabs .tab').forEach(t=>t.onclick=()=>{dexMode=t.dataset.dex;sfx('tap');renderDex();});
   document.querySelectorAll('#pt-tabs .tab').forEach(t=>t.onclick=()=>{ptTab=t.dataset.pt;sfx('tap');renderPets();});
@@ -9042,7 +9355,7 @@ function initUI(){
   $('t-lv').onclick=()=>{closeModal();gainXP(need(S.lv)-S.xp);hud();save();};
   for(const L of[9,19,29])$('t-lv'+L).onclick=()=>{closeModal();setLevel(L);toast('Đặt cấp '+L+'. Thêm 1 cấp để tiến hóa.');};
   $('t-rich').onclick=()=>{S.coin+=5000;S.gem+=500;S.ticket+=20;hud();save();toast('Đã thêm tiền thử');};
-  $('t-en').onclick=()=>{S.energy=S.emax;hud();save();};$('t-gift').onclick=()=>{closeModal();GIFT=null;giftWait=0;};$('t-bud').onclick=()=>{closeModal();BUD.on=null;budBubble(null);BUD.tk=((BUD.tk==null?-1:BUD.tk)+1)%BUDS.length;budTry(BUD.tk);};$('t-mine').onclick=()=>{S.mine=mineCap();hud();};
+  $('t-en').onclick=()=>{S.energy=S.emax;hud();save();};$('t-gift').onclick=()=>{closeModal();GIFT=null;giftWait=0;};$('t-res').onclick=()=>{BUD.rk=((BUD.rk==null?-1:BUD.rk)+1)%BUDS.length;S.tRes=BUD.rk;toast('Trận sau khi Bahi yếu máu, '+BUDS[BUD.rk].n+' sẽ đến');};$('t-bud').onclick=()=>{closeModal();BUD.on=null;budBubble(null);BUD.tk=((BUD.tk==null?-1:BUD.tk)+1)%BUDS.length;budTry(BUD.tk);};$('t-mine').onclick=()=>{S.mine=mineCap();hud();};
   $('t-low').onclick=()=>{S.food=15;S.clean=15;S.smart=15;hud();closeModal();};$('t-full').onclick=()=>{S.food=S.clean=S.smart=100;hud();closeModal();};
   $('t-guard').onclick=()=>{S.tGuard=1;toast('Trận Tháp kế tiếp: Hộ Vệ chắc chắn xuất hiện khi quái sắp gục');};
   $('t-pets').onclick=()=>{[49,47,45,42,53].forEach(sp=>{const r=receivePet(sp,35,0,[0,1,0]);S.petCaught=S.petCaught||{};S.petCaught[sp]=1;if(r.pet)S.battlePet=r.pet.uid;});save();hud();toast('Đã nhận 5 thú chiến hiếm, con cuối được chọn ra trận');};
