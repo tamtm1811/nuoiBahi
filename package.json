@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Nuôi Bahi v44: game nuôi thú pixel, cây tiến hóa 142 hình thái, 50 thú chiến + 5 hộ vệ, kết bạn, sao lưu (Netlify Functions + Netlify Blobs)",
+  "description": "Nuôi Bahi: game nuôi thú pixel + Bảng Vàng xếp hạng (Netlify Functions + Netlify Blobs)",
   "dependencies": {
     "@netlify/blobs": "^11.1.6"
   }
