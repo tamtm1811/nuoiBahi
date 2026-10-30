@@ -26,3 +26,8 @@
   for = "/icons/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/title.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

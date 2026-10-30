@@ -11,6 +11,9 @@ import { getStore } from "@netlify/blobs";
 
 export const config = { path: "/api/friends" };
 
+// Mùa giải: tăng số này (cùng SEASON trong index.html) để mở mùa mới → kho dữ liệu mới bahi-…-s<mùa>, bản game cũ bị từ chối
+const SEASON = 2;
+
 const NICK_MAX = 12;
 const MAX_FRIENDS = 50;
 const MAX_INC = 40; // lời mời đang chờ tối đa của một người
@@ -118,9 +121,10 @@ export default async (req) => {
   if (req.method !== "POST") return json({ error: "method" }, 405);
   let body;
   try { body = await req.json(); } catch { return json({ error: "json" }, 400); }
+  if (body.season !== SEASON) return json({ error: "season" }, 426); // bản game mùa cũ: không cho ghi vào mùa mới
   const id = str(body.id, 40), sec = str(body.secret, 80);
   if (!ID_RE.test(id) || sec.length < 16) return json({ error: "id" }, 400);
-  const store = getStore({ name: "bahi-friend", consistency: "strong" });
+  const store = getStore({ name: "bahi-friend-s" + SEASON, consistency: "strong" });
   const h = await sha(id + ":" + sec);
   let me = await store.get("u/" + id, { type: "json" });
   if (me && me.h !== h) return json({ error: "owner" }, 403);

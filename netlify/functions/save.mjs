@@ -4,6 +4,9 @@ import { getStore } from "@netlify/blobs";
 
 export const config = { path: "/api/save" };
 
+// Mùa giải: tăng số này (cùng SEASON trong index.html) để mở mùa mới → kho dữ liệu mới bahi-…-s<mùa>, bản game cũ bị từ chối
+const SEASON = 2;
+
 const MAX_DATA = 400_000; // ~400KB, bản lưu thực tế chỉ vài chục KB
 const MIN_GAP_MS = 4_000; // chống gửi dồn dập
 const CODE_RE = /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{12}$/;
@@ -42,9 +45,10 @@ export default async (req) => {
   if (req.method !== "POST") return json({ error: "method" }, 405);
   let body;
   try { body = await req.json(); } catch { return json({ error: "json" }, 400); }
+  if (body.season !== SEASON) return json({ error: "season" }, 426); // bản game mùa cũ: không cho ghi vào mùa mới
   const code = normCode(body.code);
   if (!CODE_RE.test(code)) return json({ error: "code" }, 400);
-  const store = getStore({ name: "bahi-save", consistency: "strong" });
+  const store = getStore({ name: "bahi-save-s" + SEASON, consistency: "strong" });
   const key = "s/" + (await sha("bahi-save:" + code));
   const op = body.op;
   const cur = await store.get(key, { type: "json" });
