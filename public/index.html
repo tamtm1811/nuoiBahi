@@ -788,7 +788,7 @@ input,select,textarea{font-size:16px}
 </head>
 <body>
 <div id="intro"><img id="in-bgi" alt=""><div id="in-stage"><img id="in-img" src="title.webp" alt="Nuôi Bahi" decoding="async" fetchpriority="high"><canvas id="in-fx"></canvas></div>
-  <div class="in-ui"><button id="in-go" type="button" disabled><span>BẮT ĐẦU</span></button><p class="in-ver">Phiên bản v55 · Mùa 2</p></div></div>
+  <div class="in-ui"><button id="in-go" type="button" disabled><span>BẮT ĐẦU</span></button><p class="in-ver">Phiên bản v56 · Mùa 2</p></div></div>
 <div id="app">
   <div id="top" class="px">
     <div class="row"><div id="title">NUÔI BAHI</div><button id="b-snd">ÂM: BẬT</button></div>
@@ -914,7 +914,7 @@ input,select,textarea{font-size:16px}
     <p class="hint" id="cl-msg"></p>
     <div id="cl-prev"></div>
   </div>
-  <p class="hint" style="text-align:center;opacity:.7">Phiên bản v55 · Mùa 2</p><details class="dzmore"><summary>Tùy chọn khác</summary><div class="dzone"><small>Xóa tiến trình trên máy này và bắt đầu ván mới (có 2 bước xác nhận).</small><button class="mini gray" id="cl-reset">Chơi lại từ đầu</button></div></details>
+  <p class="hint" style="text-align:center;opacity:.7">Phiên bản v56 · Mùa 2</p><details class="dzmore"><summary>Tùy chọn khác</summary><div class="dzone"><small>Xóa tiến trình trên máy này và bắt đầu ván mới (có 2 bước xác nhận).</small><button class="mini gray" id="cl-reset">Chơi lại từ đầu</button></div></details>
   <div class="acts"><button class="pbtn grn" id="cl-save">Lưu ngay</button><button class="pbtn blue" id="cl-copy">Chép mã</button><button class="pbtn gray" data-close>Đóng</button></div>
 </div></div>
 
@@ -10162,87 +10162,113 @@ function answer(k){if(answered)return;answered=true;const ok=k===curQ.ans,btns=[
 // ---------- túi đồ ----------
 let bagTab='eq',bagSlot={eq:'weapon',cos:'back',comp:'pet'};
 /*FORGE55-START*/
-// ================= v55 · LÒ RÈN THẦN BÍ: đồ hiếm thấp / đồ cất kho trở nên hữu ích =================
-// 1) Luyện Hóa (hộp mù): bỏ 3–5 món không dùng vào lò → 1 món ngẫu nhiên, có cơ hội nhảy bậc hiếm.
-// 2) Phân Giải: đổi đồ không dùng thành Tinh Thạch.
-// 3) Cường Hóa: dùng Tinh Thạch nâng món đang mặc +1 → +10 (mỗi cấp +6% chỉ số món đó), tỉ lệ giảm dần, thất bại tích "may mắn".
-const FG_V=[1,2.5,8,40,180,1250],FG_DIV=1.5,FG_MAX=5,FG_MIN=3,FG_FEE=100,FG_PITY=8;
-const ENH_MAX=10,ENH_STEP=0.08,ENH_C=[3,5,8,12,18,26,36,50,70,100],ENH_RW=[1,1.3,1.7,2.2,3,4],ENH_P=[1,1,0.95,0.85,0.75,0.65,0.55,0.45,0.35,0.25],ENH_LUCK=0.08;
-let FG={mode:'fuse',sel:[],busy:false};
+// ================= v56 · LÒ RÈN THẦN BÍ (cân bằng lại: khó hơn, nhiều tầng may rủi hơn) =================
+// 1) Luyện Hóa (hộp mù): 3–5 món không mặc → 1 món ngẫu nhiên. 5 kết cục: Nổ lò (tụt bậc) · Giữ bậc · Thăng bậc · Đại thành công (+2) · Thần tích (+3).
+//    Than Thần (đá) tăng tỉ lệ thăng bậc. Độ nóng lò: 12 lần không thăng bậc → lần sau chắc chắn thăng bậc.
+// 2) Phân Giải: đồ không dùng → Tinh Thạch.
+// 3) Cường Hóa +1 → +10 (mỗi cấp +5% chỉ số món): tỉ lệ 90% → 16%, từ +3 thất bại có thể tụt cấp; Bùa Bảo Hộ (đá) chặn tụt cấp;
+//    thành công có 8% BẠO KÍCH nhảy 2 cấp; thất bại cộng dồn may mắn +3% (tối đa +20%).
+// Cân bằng (mô phỏng kinh tế 1000 lượt quay): lò chỉ thêm khoảng 15% số món UR so với không dùng lò (bản trước: +53%).
+const FG_V=[1,2.5,8,40,180,1250],FG_DIV=2,FG_MAX=5,FG_MIN=3,FG_PITY=12,FG_FEE=[60,100,200,400,800,1500];
+const FG_UP=[0.04,0.34,0.4],FG_J2=[0.002,0.012],FG_J3=0.0008,FG_TGT=[1,1,1,0.85,0.6,0.2],FG_DN=0.12,FG_COAL=30,FG_COALUP=0.08;
+const ENH_MAX=10,ENH_STEP=0.05,ENH_C=[4,7,11,16,24,34,46,62,82,110],ENH_RW=[1,1.3,1.7,2.2,3,4],ENH_P=[0.9,0.8,0.68,0.56,0.46,0.38,0.31,0.25,0.2,0.16],ENH_LUCK=0.03,ENH_LMAX=0.2,ENH_CRIT=0.08;
+let FG={mode:'fuse',sel:[],busy:false,coal:false,prot:false};
 function enhLv(id){return S.enh&&S.enh[id]||0;}
 function enhMul(id){return 1+ENH_STEP*enhLv(id);}
 function fgGot(){S.got=S.got||{};for(const id in S.inv||{})S.got[id]=1;return S.got;}
 function fgEquipped(id){for(const k in S.eq)if(S.eq[k]===id)return true;return false;}
 function fgVal(id){const it=IT[id],s=S.inv[id]||0;return it&&s?FG_V[it.r]*(1+0.6*(s-1)):0;}
 function fgPool(){return ITEMS.filter(i=>S.inv[i.id]&&!fgEquipped(i.id)).sort((a,b)=>a.r-b.r||(S.inv[a.id]-S.inv[b.id])||a.name.localeCompare(b.name));}
-// phân bố bậc hiếm của lò theo tổng Linh khí E
-function fgOdds(E,pity){const o=[0,0,0,0,0,0];if(E<=0)return o;const e=E/FG_DIV;let rt=0;for(let r=0;r<6;r++)if(FG_V[r]<=e)rt=r;
-  if(rt>=5){o[5]=1;return o;}const f=Math.min(1,e/FG_V[rt+1]);let up=Math.min(0.6,0.05+0.45*f),j2=rt+2<=5?(0.005+0.02*f):0;
-  if(rt+1===5)up*=0.35;if(rt+2===5)j2*=0.35;if(pity)up=Math.max(up,1-j2);
-  o[rt+1]=up;if(j2)o[rt+2]=j2;o[rt]=Math.max(0,1-up-j2);return o;}
+function fgBase(E){const e=E/FG_DIV;let rt=0;for(let r=0;r<6;r++)if(FG_V[r]<=e)rt=r;return rt;}
+// phân bố bậc hiếm của lò theo tổng Linh khí E (o[r] = xác suất ra bậc r)
+function fgOdds(E,pity,coal){const o=[0,0,0,0,0,0];if(E<=0)return o;const rt=fgBase(E),e=E/FG_DIV;if(rt>=5){o[5]=1;return o;}
+  const f=Math.min(1,e/FG_V[rt+1]);let up=(Math.min(FG_UP[2],FG_UP[0]+FG_UP[1]*f)+(coal?FG_COALUP:0))*FG_TGT[rt+1];
+  const j2=rt+2<=5?(FG_J2[0]+FG_J2[1]*f)*FG_TGT[rt+2]:0,j3=rt+3<=4?FG_J3:0;let dn=rt>0&&!pity?FG_DN:0;
+  if(pity)up=Math.max(up,1-j2-j3);o[rt+1]+=up;if(j2)o[rt+2]+=j2;if(j3)o[rt+3]+=j3;if(dn)o[rt-1]+=dn;o[rt]+=Math.max(0,1-up-j2-j3-dn);return o;}
 function fgE(){return FG.sel.reduce((a,id)=>a+fgVal(id),0);}
-function fgRoll(o){let u=R(),r=0;for(;r<5;r++){u-=o[r];if(u<0)break;}return r;}
-function fgPick(r){const pool=ITEMS.filter(i=>i.r===r);const un=pool.filter(i=>!S.inv[i.id]);return pick(R()<0.45&&un.length?un:pool);}
-function fgConsume(ids){ids.forEach(id=>{delete S.inv[id];if(S.enh)delete S.enh[id];});}
+function fgFee(){return FG_FEE[fgBase(fgE())]||100;}
+function fgPick(r){const pool=ITEMS.filter(i=>i.r===r);const un=pool.filter(i=>!S.inv[i.id]);return pick(R()<0.4&&un.length?un:pool);}
+function fgConsume(ids){ids.forEach(id=>{delete S.inv[id];if(S.enh)delete S.enh[id];if(S.enhLuck)delete S.enhLuck[id];});}
 function fgFuse(){if(FG.busy)return;const ids=FG.sel.filter(id=>S.inv[id]&&!fgEquipped(id));if(ids.length<FG_MIN){toast('Cần ít nhất '+FG_MIN+' món trong lò');return;}
-  if(S.coin<FG_FEE){toast('Cần '+FG_FEE+' xu phí đốt lò');return;}
-  const E=ids.reduce((a,id)=>a+fgVal(id),0),best=Math.max(...ids.map(id=>IT[id].r)),pity=(S.fgPity||0)>=FG_PITY,o=fgOdds(E,pity);
-  const r=fgRoll(o);let rt=0;for(let k=0;k<6;k++)if(o[k]>0){rt=k;break;}
-  S.coin-=FG_FEE;fgGot();fgConsume(ids);FG.sel=[];const it=fgPick(r),res=grantItem(it);fgGot();
-  const up=r>rt;S.fgPity=up?0:(S.fgPity||0)+1;S.fgN=(S.fgN||0)+1;mission&&mission('forge',1);
-  save();hud();fgReveal(res,r,up,r>=rt+2,best);}
+  const E=ids.reduce((a,id)=>a+fgVal(id),0),rt=fgBase(E),fee=FG_FEE[rt],coal=FG.coal&&rt<5;
+  if(S.coin<fee){toast('Cần '+fee+' xu phí đốt lò');return;}if(coal&&S.gem<FG_COAL){toast('Cần '+FG_COAL+' đá cho Than Thần');return;}
+  const best=Math.max(...ids.map(id=>IT[id].r)),pity=(S.fgPity||0)>=FG_PITY,o=fgOdds(E,pity,coal);
+  // thứ tự kết cục: nổ lò → giữ bậc → thăng bậc → đại thành công → thần tích (để biết "suýt nữa")
+  const seq=[];if(rt>0)seq.push(rt-1);for(let r=rt;r<6;r++)seq.push(r);let u=R(),acc=0,r=rt,near=false;
+  for(const k of seq){acc+=o[k];if(u<acc){r=k;if(k===rt&&acc-u<0.06&&rt<5)near=true;break;}}
+  S.coin-=fee;if(coal)S.gem-=FG_COAL;fgGot();fgConsume(ids);FG.sel=[];const it=fgPick(r),res=grantItem(it);fgGot();
+  const up=r>rt;S.fgPity=up?0:(S.fgPity||0)+1;S.fgN=(S.fgN||0)+1;S.fgBest=Math.max(S.fgBest||0,r-rt);mission('forge',1);
+  save();hud();fgReveal(res,r,rt,best,near);}
 function fgSalvage(){if(FG.busy)return;const ids=FG.sel.filter(id=>S.inv[id]&&!fgEquipped(id));if(!ids.length){toast('Chọn món muốn phân giải');return;}
   const E=Math.round(ids.reduce((a,id)=>a+fgVal(id),0));fgGot();fgConsume(ids);FG.sel=[];S.ess=(S.ess||0)+E;sfx('coin');toast('Phân giải '+ids.length+' món → +'+E+' Tinh Thạch');save();hud();renderBag();}
 function enhCost(id){const it=IT[id],L=enhLv(id);return Math.ceil(ENH_C[Math.min(L,ENH_MAX-1)]*ENH_RW[it.r]);}
-function enhRate(id){const L=enhLv(id);return Math.min(1,ENH_P[Math.min(L,ENH_MAX-1)]+(S.enhLuck&&S.enhLuck[id]||0));}
-function enhGo(id){const it=IT[id];if(!it||!S.inv[id])return;const L=enhLv(id);if(L>=ENH_MAX){toast('Đã cường hóa tối đa');return;}const c=enhCost(id);
-  if((S.ess||0)<c){toast('Cần '+c+' Tinh Thạch. Phân giải đồ không dùng để có thêm.');return;}
-  S.ess-=c;S.enh=S.enh||{};S.enhLuck=S.enhLuck||{};const p=enhRate(id);
-  if(R()<p){S.enh[id]=L+1;S.enhLuck[id]=0;sfx(L+1>=7?'big':'coin');vib(L+1>=7?[50,40,90]:30);toast('THÀNH CÔNG! '+it.name+' +'+(L+1));FG.flash={id,ok:1,t:Date.now()};}
-  else{S.enhLuck[id]=Math.min(0.5,(S.enhLuck[id]||0)+ENH_LUCK);sfx('lose');toast('Thất bại... May mắn lần sau +'+Math.round(S.enhLuck[id]*100)+'%');FG.flash={id,ok:0,t:Date.now()};}
-  mission&&mission('forge',1);save();hud();renderBag();}
+function enhLuck(id){return S.enhLuck&&S.enhLuck[id]||0;}
+function enhRate(id){const L=enhLv(id);return Math.min(0.95,ENH_P[Math.min(L,ENH_MAX-1)]+enhLuck(id));}
+function enhProt(id){return 15+10*enhLv(id);}
+// rủi ro khi thất bại: <+3 an toàn; +3..+5: 35% tụt 1; từ +6: 45% tụt 1, 10% tụt 2
+function enhRisk(L){return L<3?[0,0]:L<6?[0.35,0]:[0.45,0.1];}
+function enhGo(id){if(FG.busy)return;const it=IT[id];if(!it||!S.inv[id])return;const L=enhLv(id);if(L>=ENH_MAX){toast('Đã cường hóa tối đa');return;}const c=enhCost(id),prot=FG.prot&&L>=3,pc=enhProt(id);
+  if((S.ess||0)<c){toast('Cần '+c+' Tinh Thạch. Phân giải đồ không dùng để có thêm.');return;}if(prot&&S.gem<pc){toast('Cần '+pc+' đá cho Bùa Bảo Hộ');return;}
+  S.ess-=c;if(prot)S.gem-=pc;S.enh=S.enh||{};S.enhLuck=S.enhLuck||{};const p=enhRate(id);let out;
+  if(R()<p){const crit=L+2<=ENH_MAX&&R()<ENH_CRIT;S.enh[id]=L+(crit?2:1);S.enhLuck[id]=0;out={ok:1,crit,to:S.enh[id]};}
+  else{S.enhLuck[id]=Math.min(ENH_LMAX,enhLuck(id)+ENH_LUCK);const rk=enhRisk(L);let d=0;if(!prot){const u=R();d=u<rk[1]?2:u<rk[0]+rk[1]?1:0;}S.enh[id]=Math.max(0,L-d);out={ok:0,drop:d,to:S.enh[id],saved:prot&&rk[0]>0};}
+  S.enhN=(S.enhN||0)+1;mission('forge',1);save();hud();enhReveal(it,L,out);}
+// ---- hoạt cảnh cường hóa: búa gõ, tia lửa, rồi kết quả ----
+function enhReveal(it,L,out){FG.busy=true;const ov=mkEl('div','fg-ov'),bx=mkEl('div','fg-box'),im=mkEl('img','fg-chest');im.src=icoData(itemCanvas(it),4);
+  bx.appendChild(im);bx.appendChild(mkEl('div','fg-tx','Đang cường hóa +'+L+' → +'+(L+1)+'...'));ov.appendChild(bx);document.body.appendChild(ov);let k=0;
+  const tick=setInterval(()=>{k++;sfx('tick');im.style.filter='drop-shadow(0 0 '+(3+k)+'px '+(k%2?'#ffe066':'#ffffff')+')';},160);
+  setTimeout(()=>{clearInterval(tick);bx.className='fg-box open '+(out.ok?'r4':'fail');bx.innerHTML='';const a=mkEl('img','fg-it');a.src=icoData(itemCanvas(it),4);bx.appendChild(a);
+    if(out.ok){bx.appendChild(mkEl('b',null,(out.crit?'BẠO KÍCH! ':'THÀNH CÔNG! ')+it.name+' +'+out.to));bx.appendChild(mkEl('small',null,out.crit?'Nhảy liền 2 cấp!':'Chỉ số món này +'+Math.round(ENH_STEP*100*out.to)+'%'));sfx(out.crit||out.to>=7?'big':'coin');vib(out.crit?[60,40,120]:40);}
+    else{bx.appendChild(mkEl('b',null,out.drop?'THẤT BẠI! Tụt xuống +'+out.to:'THẤT BẠI'));bx.appendChild(mkEl('small',null,(out.saved?'Bùa Bảo Hộ đã giữ cấp. ':out.drop?'':'May là không tụt cấp. ')+'May mắn lần sau +'+Math.round(enhLuck(it.id)*100)+'%'));sfx('lose');vib(out.drop?[80,40,80]:30);}
+    bx.appendChild(mkEl('small','fg-hint','Chạm để tiếp tục'));ov.onclick=()=>{ov.remove();FG.busy=false;renderBag();};},1100);}
 // ---- hoạt cảnh mở lò: rương rung, ánh sáng nhá màu bậc cao hơn để nhử, rồi bung ----
-function fgReveal(res,r,up,jack,best){FG.busy=true;const ov=mkEl('div','fg-ov'),bx=mkEl('div','fg-box'),im=mkEl('img','fg-chest');im.src=icoData(sprIco('chest'),4);
-  const tx=mkEl('div','fg-tx','Lò đang luyện...');bx.appendChild(im);bx.appendChild(tx);ov.appendChild(bx);$('m-bag').querySelector('.sheet').appendChild(ov);
+function fgReveal(res,r,rt,best,near){FG.busy=true;const up=r>rt,jack=r>=rt+2,boom=r<rt;const ov=mkEl('div','fg-ov'),bx=mkEl('div','fg-box'),im=mkEl('img','fg-chest');im.src=icoData(sprIco('chest'),4);
+  const tx=mkEl('div','fg-tx','Lò đang luyện...');bx.appendChild(im);bx.appendChild(tx);ov.appendChild(bx);document.body.appendChild(ov);
   const cols=['#ffffff',...RCOL];let k=0;sfx('drop');
-  const tick=setInterval(()=>{k++;const tease=Math.min(5,best+(k%3===0?1:0)+(up&&k>5?1:0)+(jack&&k>7?1:0));im.style.filter='drop-shadow(0 0 '+(4+k)+'px '+cols[tease+1]+')';if(k%2)sfx('tick');},140);
-  setTimeout(()=>{clearInterval(tick);const it=res.it;bx.className='fg-box open r'+r;bx.innerHTML='';
+  const tick=setInterval(()=>{k++;const tease=Math.min(5,rt+(k%3===0?1:0)+((up||near)&&k>6?1:0)+(jack&&k>8?1:0));im.style.filter='drop-shadow(0 0 '+(4+k)+'px '+cols[tease+1]+')';if(k===8)tx.textContent=up||near?'Lò đang đỏ rực...!':'Lò đang luyện...';if(k%2)sfx('tick');},140);
+  setTimeout(()=>{clearInterval(tick);const it=res.it;bx.className='fg-box open r'+r+(boom?' fail':'');bx.innerHTML='';
     const a=mkEl('img','fg-it');a.src=icoData(itemCanvas(it),4);bx.appendChild(a);
-    bx.appendChild(mkEl('b',null,(jack?'ĐẠI THÀNH CÔNG! ':up?'THĂNG BẬC! ':'')+RAR[it.r]+' · '+it.name));
+    const tag=r>=rt+3?'THẦN TÍCH! ':jack?'ĐẠI THÀNH CÔNG! ':up?'THĂNG BẬC! ':boom?'NỔ LÒ! ':'';
+    bx.appendChild(mkEl('b',null,tag+RAR[it.r]+' · '+it.name));
+    if(near)bx.appendChild(mkEl('small','fg-near','Suýt nữa thì lên '+RAR[rt+1]+'!'));
     bx.appendChild(mkEl('small',null,res.isNew?'MỚI! Đã thêm vào bộ sưu tập':res.gem?'Đã đủ 5 sao · đổi thành +'+res.gem+' đá':'Lên '+res.star+' sao'));
-    bx.appendChild(mkEl('small','fg-hint','Chạm để tiếp tục'));sfx(r>=3?'big':'coin');if(r>=3)vib([60,40,120]);
-    ov.onclick=()=>{ov.remove();FG.busy=false;renderBag();};},1500);}
+    bx.appendChild(mkEl('small','fg-hint','Chạm để tiếp tục'));sfx(r>=3||jack?'big':boom?'lose':'coin');if(r>=3||jack)vib([60,40,120]);
+    ov.onclick=()=>{ov.remove();FG.busy=false;renderBag();};},jack?2300:1700);}
 // ---- giao diện ----
 function fgIcon(it,cls){const d=mkEl('div','fgi r'+it.r+(cls?' '+cls:''));const im=mkEl('img');im.src=icoData(itemCanvas(it),2);d.appendChild(im);
   const s=S.inv[it.id]||0;if(s)d.appendChild(mkEl('i',null,'★'+s));const L=enhLv(it.id);if(L)d.appendChild(mkEl('u',null,'+'+L));return d;}
+function pct(p){return p>=0.995?'100':p<0.01?(p*100).toFixed(p<0.001?2:1):Math.round(p*100)+'';}
+function fgCheck(lbl,on,fn){const l=mkEl('label','fg-chk'+(on?' on':''));const c=document.createElement('input');c.type='checkbox';c.checked=on;c.onchange=fn;l.appendChild(c);l.appendChild(document.createTextNode(' '+lbl));return l;}
 function forgeUI(box){fgGot();FG.sel=FG.sel.filter(id=>S.inv[id]&&!fgEquipped(id));
-  const hd=el('div','featb forge');hd.innerHTML='<b>LÒ RÈN THẦN BÍ</b><small>Đồ không dùng đến vẫn có giá trị: bỏ vào lò để luyện ra món mới, phân giải lấy Tinh Thạch, rồi cường hóa món đang mặc lên +10.</small>';box.appendChild(hd);
+  const hd=el('div','featb forge');hd.innerHTML='<b>LÒ RÈN THẦN BÍ</b><small>Đồ không dùng đến vẫn có giá trị: bỏ vào lò thử vận may, phân giải lấy Tinh Thạch, rồi liều cường hóa món đang mặc lên +10.</small>';box.appendChild(hd);
   const tb=mkEl('div','tabs fgtabs');[['fuse','Luyện hóa'],['enh','Cường hóa']].forEach(([k,n])=>{const b=mkEl('button','tab'+(FG.mode===k?' on':''),n);b.onclick=()=>{FG.mode=k;sfx('tap');renderBag();};tb.appendChild(b);});box.appendChild(tb);
-  const es=mkEl('p','fg-ess');es.innerHTML='Tinh Thạch: <b>'+fmt(S.ess||0)+'</b>';box.appendChild(es);
+  const es=mkEl('p','fg-ess');es.innerHTML='Tinh Thạch: <b>'+fmt(S.ess||0)+'</b> · Đá: <b class="gm">'+fmt(S.gem||0)+'</b>';box.appendChild(es);
   if(FG.mode==='enh'){enhUI(box);return;}
-  // lò: 5 ô
-  const E=fgE(),pity=(S.fgPity||0)>=FG_PITY,o=fgOdds(E,pity);const lo=mkEl('div','fg-slots');
+  const E=fgE(),rt=fgBase(E),pity=(S.fgPity||0)>=FG_PITY,o=fgOdds(E,pity,FG.coal);const lo=mkEl('div','fg-slots');
   for(let i=0;i<FG_MAX;i++){const id=FG.sel[i];if(id){const d=fgIcon(IT[id],'on');d.onclick=()=>{FG.sel.splice(i,1);sfx('tap');renderBag();};lo.appendChild(d);}else lo.appendChild(mkEl('div','fgi emp','+'));}
   box.appendChild(lo);
-  const od=mkEl('div','fg-odds');if(FG.sel.length){o.forEach((p,r)=>{if(p<=0)return;const s=mkEl('span','r'+r);s.style.flex=Math.max(0.12,p);s.textContent=RAR[r]+' '+(p>=0.995?'100':p<0.01?(p*100).toFixed(1):Math.round(p*100))+'%';od.appendChild(s);});}
-  else od.appendChild(mkEl('em',null,'Chọn món bên dưới để bỏ vào lò. Càng nhiều món, càng hiếm, càng nhiều sao → cơ hội thăng bậc càng cao.'));box.appendChild(od);
-  const pm=mkEl('div','fg-pity');pm.innerHTML='<span>Độ nóng lò</span><i><b style="width:'+Math.min(100,(S.fgPity||0)/FG_PITY*100)+'%"></b></i><small>'+(pity?'NÓNG ĐỎ! Lần luyện tới chắc chắn thăng bậc':(S.fgPity||0)+'/'+FG_PITY+' lần không thăng bậc')+'</small>';box.appendChild(pm);
-  const ac=mkEl('div','fg-acts');const b1=btn('LUYỆN HÓA · '+FG_FEE+' xu',FG.sel.length>=FG_MIN?'gold':'gray',fgFuse),b2=btn('Phân giải → +'+Math.round(E)+' Tinh Thạch',FG.sel.length?'':'gray',fgSalvage);ac.appendChild(b1);ac.appendChild(b2);box.appendChild(ac);
+  const od=mkEl('div','fg-odds');if(FG.sel.length){o.forEach((p,r)=>{if(p<=0)return;const s=mkEl('span','r'+r+(r<rt?' dn':''));s.style.flex=Math.max(0.14,p);s.textContent=(r<rt?'Nổ ':'')+RAR[r]+' '+pct(p)+'%';od.appendChild(s);});}
+  else od.appendChild(mkEl('em',null,'Chọn món bên dưới để bỏ vào lò. Món càng hiếm, càng nhiều sao → cơ hội thăng bậc càng cao. Nhưng lò cũng có thể NỔ làm tụt bậc!'));box.appendChild(od);
+  const pm=mkEl('div','fg-pity');pm.innerHTML='<span>Độ nóng lò</span><i><b style="width:'+Math.min(100,(S.fgPity||0)/FG_PITY*100)+'%"></b></i><small>'+(pity?'NÓNG ĐỎ! Lần tới chắc chắn thăng bậc':(S.fgPity||0)+'/'+FG_PITY)+'</small>';box.appendChild(pm);
+  box.appendChild(fgCheck('Thêm Than Thần ('+FG_COAL+' đá): +'+Math.round(FG_COALUP*100)+'% tỉ lệ thăng bậc',FG.coal,()=>{FG.coal=!FG.coal;sfx('tap');renderBag();}));
+  const ac=mkEl('div','fg-acts');const b1=btn('LUYỆN HÓA · '+(FG.sel.length?FG_FEE[rt]:FG_FEE[0])+' xu'+(FG.coal?' + '+FG_COAL+' đá':''),FG.sel.length>=FG_MIN?'gold':'gray',fgFuse),b2=btn('Phân giải → +'+Math.round(E)+' Tinh Thạch',FG.sel.length?'':'gray',fgSalvage);ac.appendChild(b1);ac.appendChild(b2);box.appendChild(ac);
   const pool=fgPool();const qh=mkEl('div','fg-qh');qh.appendChild(mkEl('b',null,'Đồ đang cất kho ('+pool.length+')'));
   const q=btn('Chọn nhanh 5 món thấp nhất','gray',()=>{FG.sel=pool.filter(i=>i.r<=2).slice(0,FG_MAX).map(i=>i.id);sfx('tap');renderBag();});qh.appendChild(q);box.appendChild(qh);
   if(!pool.length){box.appendChild(mkEl('p','hint','Chưa có đồ cất kho. Đồ đang mặc không thể bỏ vào lò. Quay Gacha để có thêm đồ.'));return;}
   const gr=mkEl('div','fg-grid');pool.forEach(it=>{const on=FG.sel.includes(it.id),d=fgIcon(it,on?'sel':'');d.title=it.name;
     d.onclick=()=>{if(on)FG.sel=FG.sel.filter(x=>x!==it.id);else{if(FG.sel.length>=FG_MAX){toast('Lò chỉ chứa tối đa '+FG_MAX+' món');return;}
       if(it.r>=3&&FG.warn!==it.id){FG.warn=it.id;toast('Món '+RAR[it.r]+' quý đấy! Chạm lần nữa để bỏ vào lò.',2600);return;}FG.sel.push(it.id);}FG.warn=null;sfx('tap');renderBag();};gr.appendChild(d);});box.appendChild(gr);
-  box.appendChild(mkEl('p','hint','Món bị đem luyện hoặc phân giải sẽ rời khỏi túi (vẫn được tính trong Bộ sưu tập). Có thể nhận lại từ Gacha.'));}
+  box.appendChild(mkEl('p','hint','Luyện hóa: Nổ lò (tụt 1 bậc) · Giữ bậc · Thăng bậc · Đại thành công (+2 bậc) · Thần tích (+3 bậc, cực hiếm). Phí đốt lò tăng theo bậc. Món đem luyện hoặc phân giải rời khỏi túi nhưng vẫn tính trong Bộ sưu tập.'));}
 function enhUI(box){const ids=[];for(const sl of['weapon','armor','shield','acc','pet','aura','chip','back','head','face']){const id=S.eq[sl];if(id&&S.inv[id]&&IT[id]&&!ids.includes(id))ids.push(id);}
-  box.appendChild(mkEl('p','hint','Mỗi cấp cường hóa +'+Math.round(ENH_STEP*100)+'% chỉ số của món đó. Tối đa +'+ENH_MAX+'. Thất bại chỉ mất Tinh Thạch và cộng dồn may mắn cho lần sau.'));
+  box.appendChild(mkEl('p','hint','Mỗi cấp +'+Math.round(ENH_STEP*100)+'% chỉ số món đó, tối đa +'+ENH_MAX+'. Thành công có '+Math.round(ENH_CRIT*100)+'% BẠO KÍCH nhảy 2 cấp. Từ +3, thất bại có thể TỤT CẤP. Thất bại cộng dồn may mắn +'+Math.round(ENH_LUCK*100)+'% (tối đa +'+Math.round(ENH_LMAX*100)+'%).'));
+  box.appendChild(fgCheck('Dùng Bùa Bảo Hộ (đá) khi cường hóa từ +3: không tụt cấp nếu thất bại',FG.prot,()=>{FG.prot=!FG.prot;sfx('tap');renderBag();}));
   if(!ids.length){box.appendChild(mkEl('p','hint','Chưa mặc trang bị nào.'));return;}
-  ids.forEach(id=>{const it=IT[id],L=enhLv(id),row=mkEl('div','irow fg-row r'+it.r+(FG.flash&&FG.flash.id===id&&Date.now()-FG.flash.t<1500?(FG.flash.ok?' fok':' ffail'):''));
+  ids.forEach(id=>{const it=IT[id],L=enhLv(id),row=mkEl('div','irow fg-row r'+it.r);
     row.appendChild(fgIcon(it));const nm=mkEl('div','nm');const t=mkEl('span');t.appendChild(mkEl('i','rt r'+it.r,RAR[it.r]));t.appendChild(document.createTextNode(' '+it.name+(L?' +'+L:'')));nm.appendChild(t);
     const m=starMul(S.inv[id]);nm.appendChild(mkEl('small',null,stText(it.st,m*enhMul(id))+(L<ENH_MAX?'  →  +'+(L+1)+': '+stText(it.st,m*(1+ENH_STEP*(L+1))):'')));
+    if(L<ENH_MAX){const rk=enhRisk(L),lk=enhLuck(id);nm.appendChild(mkEl('small','fg-risk','Thành công '+Math.round(enhRate(id)*100)+'%'+(lk?' (gồm may mắn +'+Math.round(lk*100)+'%)':'')+' · '+(rk[0]?(FG.prot?'Bảo hộ: không tụt cấp ('+enhProt(id)+' đá)':'Thất bại: '+Math.round(rk[0]*100)+'% tụt 1 cấp'+(rk[1]?', '+Math.round(rk[1]*100)+'% tụt 2 cấp':'')):'Thất bại không tụt cấp')));}
     const bar=mkEl('div','fg-lv');for(let k=0;k<ENH_MAX;k++)bar.appendChild(mkEl('i',k<L?'on':''));nm.appendChild(bar);row.appendChild(nm);
-    const w=mkEl('div');if(L<ENH_MAX){const c=enhCost(id),p=enhRate(id),lk=S.enhLuck&&S.enhLuck[id]||0;const b=mkEl('button','mini'+((S.ess||0)>=c?'':' gray'));b.innerHTML='Cường hóa<small>'+c+' TT · '+Math.round(p*100)+'%'+(lk?' (+may mắn)':'')+'</small>';b.onclick=()=>enhGo(id);w.appendChild(b);}
+    const w=mkEl('div');if(L<ENH_MAX){const c=enhCost(id);const b=mkEl('button','mini'+((S.ess||0)>=c?'':' gray'));b.innerHTML='Cường hóa<small>'+c+' TT'+(FG.prot&&L>=3?' + '+enhProt(id)+' đá':'')+'</small>';b.onclick=()=>enhGo(id);w.appendChild(b);}
     else w.appendChild(mkEl('b','fg-max','MAX'));row.appendChild(w);box.appendChild(row);});}
 (function(){const st=document.createElement('style');st.textContent=`
 .featb.forge{background:linear-gradient(135deg,#5a1e0a,#c0501a)}
@@ -10264,13 +10290,17 @@ function enhUI(box){const ids=[];for(const sl of['weapon','armor','shield','acc'
 .fg-row .fgi{flex:none;cursor:default}.fg-row button small{display:block;font-size:8px}.fg-lv{display:flex;gap:1px;margin-top:2px}.fg-lv i{width:8px;height:4px;background:#e8d8c0}.fg-lv i.on{background:linear-gradient(#ffb020,#e0472a)}
 .fg-row.fok{animation:fgok .5s steps(3) 2}.fg-row.ffail{animation:fgf .3s steps(2) 3}@keyframes fgok{50%{background:#fff3a0}}@keyframes fgf{50%{transform:translateX(3px);background:#ffd8d8}}
 .fg-max{color:#e0472a;font-size:12px}
-.fg-ov{position:absolute;inset:0;z-index:30;background:rgba(10,4,20,.82);display:flex;align-items:center;justify-content:center;cursor:pointer}
-.fg-box{display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff;text-align:center;padding:16px;max-width:260px}
+.fg-ov{position:fixed;inset:0;z-index:9000;background:rgba(10,4,20,.82);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fg-box{display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff;text-align:center;padding:16px;max-width:280px;background:rgba(24,10,34,.95);box-shadow:0 0 0 3px #3e230e,0 0 0 5px #ffe066,0 0 30px rgba(255,200,80,.4)}
 .fg-chest{width:84px;height:84px;image-rendering:pixelated;animation:fgsh .14s steps(2) infinite}@keyframes fgsh{0%{transform:translate(-2px,0) rotate(-3deg)}100%{transform:translate(2px,-1px) rotate(3deg)}}
-.fg-tx{font-size:12px;letter-spacing:1px}.fg-box.open{animation:cardin .45s steps(4) both}.fg-it{width:72px;height:72px;image-rendering:pixelated;filter:drop-shadow(0 0 10px #fff)}
+.fg-tx{font-size:13px;letter-spacing:1px}.fg-box.open b{font-size:15px!important}.fg-box.open small{font-size:12px!important}.fg-box.open{animation:cardin .45s steps(4) both}.fg-it{width:72px;height:72px;image-rendering:pixelated;filter:drop-shadow(0 0 10px #fff)}
 .fg-box.open b{font-size:13px;color:#ffe066}.fg-box.open small{font-size:10px;color:#f0e0ff}.fg-box .fg-hint{opacity:.6;margin-top:6px}
 .fg-box.r3 .fg-it{filter:drop-shadow(0 0 12px #f4c430)}.fg-box.r4 .fg-it{filter:drop-shadow(0 0 14px #ff5fdc)}.fg-box.r5 .fg-it{filter:drop-shadow(0 0 16px #ff3a3a)}
 .irow .nm .enh{color:#e0472a;font-weight:700}
+.fg-odds span.dn{background:repeating-linear-gradient(45deg,#3a2a2a,#3a2a2a 4px,#5a3a3a 4px,#5a3a3a 8px)}
+.fg-chk{display:flex;align-items:center;gap:4px;font-size:10px;margin:4px 0;cursor:pointer}.fg-chk.on{color:#c0300a;font-weight:700}
+.fg-ess b.gm{color:#2a8ab0}.fg-risk{color:#a8300e}.fg-near{color:#ffb020!important;font-weight:700}
+.fg-box.fail .fg-it{filter:grayscale(.6) drop-shadow(0 0 8px #ff3a3a)}.fg-box.fail b{color:#ff8a7a}
 `;document.head.appendChild(st);})();
 
 /*FORGE55-END*/
