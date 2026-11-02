@@ -9395,7 +9395,9 @@ function rkLive(){const box=$('rk-live');if(!box)return;const ok=RANK.ok!==false
 const _rankApply58=rankApply;
 rankApply=function(j){if(j&&j.same){RANK.at=j.at||Date.now();RK58.live=Date.now();rkLive();return;}
   if(j){if(j.ver!=null){RK58.ver=j.ver;RK58.pver=Math.max(RK58.pver,j.ver);}if(j.feed)rkFeedIn(j.feed);rkDiffTop(j.top||[]);RK58.live=Date.now();}
-  _rankApply58(j);if(j){rkDiffMe(j);RANK.behind=j.behind||null;}};
+  _rankApply58(j);if(j){rkDiffMe(j);RANK.behind=j.behind||null;rkFixLater(j);}};
+// máy chủ chỉ ghi nhận một phần (hạn mức theo giờ) → tự gửi lại sau 5 phút cho tới khi khớp tầng thật
+function rkFixLater(j){clearTimeout(RK58.fix);if(!j.me||!S.nick||S.tamper)return;if(j.me.floor<Math.min(S.floor,TOWER_TOP))RK58.fix=setTimeout(()=>{RANK.lastSync=0;rankSync(true);},300000);}
 const _rankFetch58=rankFetch;
 rankFetch=async function(){if(RANK.busy)return;RANK.busy=true;try{rankIdent();
     const url=RANK_API+'?id='+encodeURIComponent(S.pid||'')+(RK58.ver>=0&&RANK.ok?'&v='+RK58.ver:'');const r=await fetch(url);const ct=r.headers.get('content-type')||'';if(!ct.includes('json'))throw new Error('noapi');

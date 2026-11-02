@@ -60,7 +60,7 @@ function sorted(board, id) {
 }
 function view(board, id) {
   const list = sorted(board, id);
-  const pub = (e, i) => { const { h, last, first, id: pid, fb, lb, tm, ...rest } = e; return { rank: i + 1, ...rest, me: pid === id }; };
+  const pub = (e, i) => { const { h, last, first, id: pid, fb, lb, tm, cv, ...rest } = e; return { rank: i + 1, ...rest, me: pid === id }; };
   const top = list.slice(0, 10).map(pub);
   let me = null, ahead = null, behind = null;
   const i = id ? list.findIndex((e) => e.id === id) : -1;
@@ -69,7 +69,7 @@ function view(board, id) {
 }
 function pubView(board) {
   const list = sorted(board, null);
-  const top = list.slice(0, 10).map((e, i) => { const { h, last, first, id, fb, lb, tm, ...rest } = e; return { rank: i + 1, ...rest }; });
+  const top = list.slice(0, 10).map((e, i) => { const { h, last, first, id, fb, lb, tm, cv, ...rest } = e; return { rank: i + 1, ...rest }; });
   return { top, total: list.length, at: Date.now(), ver: board.ver || 0, feed: (board.feed || []).slice(0, 12) };
 }
 // tin mới cho dải chạy chữ: ai vừa lên tầng, ai vừa vượt mặt ai (không lộ id, bỏ qua tài khoản bị đánh dấu)
@@ -152,19 +152,22 @@ export default async (req) => {
   }
   const first = Math.min(acc ? acc.first : now, old && old.first ? old.first : now);
   if (!acc) await store.setJSON("a/" + id, { h, first });
-  // KIỂM TRA HỢP LÝ (mùa 2): tiến trình không thể nhanh hơn người chơi chăm nhất.
-  // Năng lượng tối đa 5, hồi 1 điểm/10 phút; người chơi rất chăm (70 trận/ngày) mất ~50 ngày để lên tầng 100.
-  // 1) Trần theo tuổi tài khoản  2) "xô hạn mức" tự đầy dần theo giờ  3) lực chiến không vượt mức tối đa của cấp.
-  // Vượt quá → chỉ ghi nhận đến mức hợp lý (người chơi thật không bao giờ chạm tới).
+  // KIỂM TRA HỢP LÝ (v58b — nới để KHÔNG BAO GIỜ cắt điểm người chơi thật).
+  // Bản cũ giới hạn tầng = 12 + 2,5 × số ngày: người chơi thật đã lên tầng 35 sau ~4 ngày nhưng bị ghi 21 → sai.
+  // Giới hạn vật lý thật: mỗi trận lên tối đa 1 tầng, năng lượng hồi 6 điểm/giờ (+ vật phẩm năng lượng tích trữ).
+  // 1) "xô hạn mức" theo giờ: tầng chứa 30, hồi 8/giờ (> 6 năng lượng/giờ); cấp chứa 40, hồi 12/giờ
+  // 2) trần theo tuổi tài khoản rất rộng: tầng 40 + 15 × ngày, cấp 50 + 25 × ngày (tài khoản giả vẫn cần ~4 ngày mới chạm tầng 100)
+  // 3) lực chiến không vượt mức tối đa của cấp. Vượt quá → chỉ ghi đến mức hợp lý; lần đồng bộ sau tự ghi tiếp phần còn lại.
   const days = Math.max(0, (now - first) / 86_400_000);
-  const F_AGE = Math.min(100, Math.floor(12 + 2.5 * days)), L_AGE = Math.floor(25 + 4 * days);
-  const F_CAP = 10, F_RATE = 0.6, L_CAP = 20, L_RATE = 1.5;
+  const F_AGE = Math.min(100, Math.floor(40 + 15 * days)), L_AGE = Math.floor(50 + 25 * days);
+  const F_CAP = 30, F_RATE = 8, L_CAP = 40, L_RATE = 12;
   const of = old ? old.floor || 0 : 0, ol = old ? old.lv || 1 : 1;
   let fb = F_CAP, lb = L_CAP;
   if (old) {
     const hrs = Math.max(0, (now - (old.last || now)) / 3_600_000);
-    fb = Math.min(F_CAP, (old.fb ?? F_CAP) + hrs * F_RATE);
-    lb = Math.min(L_CAP, (old.lb ?? L_CAP) + hrs * L_RATE);
+    const fresh = old.cv !== 2; // bản ghi từ trước v58b (đã bị cắt oan) → nạp đầy hạn mức để ghi đúng ngay lần đồng bộ đầu tiên
+    fb = fresh ? F_CAP : Math.min(F_CAP, (old.fb ?? F_CAP) + hrs * F_RATE);
+    lb = fresh ? L_CAP : Math.min(L_CAP, (old.lb ?? L_CAP) + hrs * L_RATE);
     if (p.floor - of > fb) p.floor = of + Math.floor(fb);
     if (p.lv - ol > lb) p.lv = ol + Math.floor(lb);
     fb -= Math.max(0, p.floor - of);
@@ -176,11 +179,11 @@ export default async (req) => {
   p.cp = Math.min(p.cp, cpMax(p.lv));
   p.bosses = Math.min(p.bosses, Math.floor(p.floor / 10));
   p.done = p.floor >= 100 && p.done;
-  p.best = Math.min(p.best, Math.ceil(5 * (days + 1)));
+  p.best = Math.min(p.best, Math.ceil(60 * (days + 1)));
   if (p.pet) p.pet.lv = Math.min(p.pet.lv, p.lv + 5);
   // thời điểm đạt tầng do máy chủ ghi (không tin giờ của máy người chơi)
   p.floorT = old && p.floor <= of ? old.floorT || now : now;
-  const entry = { ...p, h, first, last: now, fb: Math.round(fb * 100) / 100, lb: Math.round(lb * 100) / 100 };
+  const entry = { ...p, h, first, last: now, cv: 2, fb: Math.round(fb * 100) / 100, lb: Math.round(lb * 100) / 100 };
   await store.setJSON("p/" + id, entry);
   const board = await mergeBoard(store, id, entry, old);
   return json(view(board, id));
