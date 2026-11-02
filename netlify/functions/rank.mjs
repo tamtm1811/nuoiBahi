@@ -60,7 +60,7 @@ function sorted(board, id) {
 }
 function view(board, id) {
   const list = sorted(board, id);
-  const pub = (e, i) => { const { h, last, first, id: pid, fb, lb, tm, cv, ...rest } = e; return { rank: i + 1, ...rest, me: pid === id }; };
+  const pub = (e, i) => { const { h, last, first, id: pid, fb, lb, tm, cv, fixed, rs, ...rest } = e; return { rank: i + 1, ...rest, me: pid === id }; };
   const top = list.slice(0, 10).map(pub);
   let me = null, ahead = null, behind = null;
   const i = id ? list.findIndex((e) => e.id === id) : -1;
@@ -69,7 +69,7 @@ function view(board, id) {
 }
 function pubView(board) {
   const list = sorted(board, null);
-  const top = list.slice(0, 10).map((e, i) => { const { h, last, first, id, fb, lb, tm, cv, ...rest } = e; return { rank: i + 1, ...rest }; });
+  const top = list.slice(0, 10).map((e, i) => { const { h, last, first, id, fb, lb, tm, cv, fixed, rs, ...rest } = e; return { rank: i + 1, ...rest }; });
   return { top, total: list.length, at: Date.now(), ver: board.ver || 0, feed: (board.feed || []).slice(0, 12) };
 }
 // tin mới cho dải chạy chữ: ai vừa lên tầng, ai vừa vượt mặt ai (không lộ id, bỏ qua tài khoản bị đánh dấu)
@@ -88,12 +88,53 @@ function feedEvents(board, id, entry, old) {
 }
 
 const REBUILD_MS = 5 * 60_000;
+// giới hạn hợp lý (v58b): xem giải thích ở phần POST
+const F_CAP = 30, F_RATE = 8, L_CAP = 40, L_RATE = 12;
+function ageCaps(days) { return { F_AGE: Math.min(100, Math.floor(40 + 15 * days)), L_AGE: Math.floor(50 + 25 * days) }; }
+// v58c: SỬA DỮ LIỆU CŨ NGAY TRÊN MÁY CHỦ, không cần người chơi mở game.
+// Bản ghi trước v58b (chưa có cv: 2) có thể đã bị cắt oan tầng/cấp. Game tự sao lưu đám mây (/api/save) cho mọi người chơi,
+// trong bản lưu có pid (danh tính Bảng Vàng) + tầng + cấp thật → lấy số đó để ghi lại (vẫn trong giới hạn hợp lý, bỏ qua bản lưu bị sửa).
+async function repairFromSaves(store, p) {
+  const need = Object.entries(p).filter(([, e]) => e && e.cv !== 2 && !e.tm && !e.rs); // rs: đã quét 1 lần, không quét lại
+  if (!need.length) return 0;
+  const saves = getStore({ name: "bahi-save-s" + SEASON, consistency: "strong" });
+  const { blobs } = await saves.list({ prefix: "s/" });
+  const best = {};
+  await Promise.all(blobs.map(async (b) => {
+    const sv = await saves.get(b.key, { type: "json" }).catch(() => null);
+    if (!sv || typeof sv.data !== "string") return;
+    let o; try { o = JSON.parse(sv.data); } catch { return; }
+    if (!o || typeof o.pid !== "string" || o.tamper || (o.season != null && o.season !== SEASON)) return;
+    const f = clamp(o.floor, 0, 100), lv = clamp(o.lv, 1, 5000, 1), c = best[o.pid];
+    if (!c || f > c.f || (f === c.f && lv > c.lv)) best[o.pid] = { f, lv, ft: +o.floorT || 0, at: sv.at || 0 };
+  }));
+  const now = Date.now();
+  let n = 0;
+  for (const [id, e] of need) {
+    const b = best[id];
+    if (!b) { e.rs = 1; await store.setJSON("p/" + id, e); continue; }
+    const acc = await store.get("a/" + id, { type: "json" }).catch(() => null);
+    const first = Math.min(acc ? acc.first : now, e.first || now);
+    const { F_AGE, L_AGE } = ageCaps(Math.max(0, (now - first) / 86_400_000));
+    const f = Math.min(b.f, F_AGE), lv = Math.min(b.lv, L_AGE);
+    e.rs = 1;
+    if (f <= (e.floor || 0) && lv <= (e.lv || 1)) { await store.setJSON("p/" + id, e); continue; }
+    if (f > (e.floor || 0)) { e.floor = f; e.floorT = b.ft > first && b.ft < now ? b.ft : b.at || now; }
+    if (lv > (e.lv || 1)) e.lv = lv;
+    e.bosses = Math.min(e.bosses || 0, Math.floor(e.floor / 10));
+    e.cv = 2; e.fb = F_CAP; e.lb = L_CAP; e.fixed = now;
+    await store.setJSON("p/" + id, e);
+    n++;
+  }
+  return n;
+}
 // mỗi người chơi lưu 1 khóa riêng (p/<id>) — không bao giờ mất dữ liệu khi ghi đồng thời;
 // "board" chỉ là bản tổng hợp để đọc nhanh, tự dựng lại định kỳ từ các khóa riêng
 async function rebuild(store, prev) {
   const { blobs } = await store.list({ prefix: "p/" });
   const p = {};
   await Promise.all(blobs.map(async (b) => { const e = await store.get(b.key, { type: "json" }); if (e) p[b.key.slice(2)] = e; }));
+  await repairFromSaves(store, p).catch(() => 0);
   if (!prev) prev = await store.get(KEY, { type: "json" }).catch(() => null);
   const board = { p, rebuilt: Date.now(), ver: ((prev && prev.ver) || 0) + 1, feed: (prev && prev.feed) || [] };
   await store.setJSON(KEY, board);
@@ -121,7 +162,7 @@ export default async (req) => {
   if (req.method === "GET") {
     if (url.searchParams.get("t")) return json({ at: Date.now(), season: SEASON }); // giờ chuẩn cho game (chống chỉnh đồng hồ máy)
     let board = await store.get(KEY, { type: "json" });
-    if (!board || Date.now() - (board.rebuilt || 0) > REBUILD_MS) board = await rebuild(store, board);
+    if (!board || Date.now() - (board.rebuilt || 0) > REBUILD_MS || (url.searchParams.get("fix") && Date.now() - (board.rebuilt || 0) > 20_000)) board = await rebuild(store, board);
     if (url.searchParams.get("pub")) return json(pubView(board), 200, PUB_CACHE);
     const v = url.searchParams.get("v");
     if (v != null && +v === (board.ver || 0)) return json({ same: 1, ver: board.ver || 0, at: Date.now() }); // không có gì mới: trả gói rất nhẹ
@@ -159,8 +200,7 @@ export default async (req) => {
   // 2) trần theo tuổi tài khoản rất rộng: tầng 40 + 15 × ngày, cấp 50 + 25 × ngày (tài khoản giả vẫn cần ~4 ngày mới chạm tầng 100)
   // 3) lực chiến không vượt mức tối đa của cấp. Vượt quá → chỉ ghi đến mức hợp lý; lần đồng bộ sau tự ghi tiếp phần còn lại.
   const days = Math.max(0, (now - first) / 86_400_000);
-  const F_AGE = Math.min(100, Math.floor(40 + 15 * days)), L_AGE = Math.floor(50 + 25 * days);
-  const F_CAP = 30, F_RATE = 8, L_CAP = 40, L_RATE = 12;
+  const { F_AGE, L_AGE } = ageCaps(days);
   const of = old ? old.floor || 0 : 0, ol = old ? old.lv || 1 : 1;
   let fb = F_CAP, lb = L_CAP;
   if (old) {
