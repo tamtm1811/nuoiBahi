@@ -11,8 +11,11 @@ const NICK_MAX = 12;
 const MIN_GAP_MS = 10_000; // chống gửi dồn dập
 const clamp = (v, a, b, d = 0) => (Number.isFinite(+v) ? Math.min(b, Math.max(a, Math.round(+v))) : d);
 const str = (s, n) => String(s ?? "").replace(/[\u0000-\u001f\u007f<>]/g, "").trim().slice(0, n);
-const json = (o, status = 200) =>
-  new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
+const json = (o, status = 200, extra) =>
+  new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...(extra || {}) } });
+// v58: bản công khai (top 10 + tin mới) được CDN Netlify giữ 3 giây → hàng trăm người cùng xem trực tiếp mà máy chủ chỉ chạy ~20 lần/phút
+const PUB_CACHE = { "cache-control": "public, max-age=0, must-revalidate", "netlify-cdn-cache-control": "public, durable, s-maxage=3, stale-while-revalidate=5", "netlify-vary": "query=pub" };
+const FEED_MAX = 20;
 
 async function sha(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
@@ -51,34 +54,60 @@ function clean(p) {
 function cpMax(lv) { return Math.round(CP_A + CP_B * lv); }
 const CP_A = 12500, CP_B = 1900; // đo v51: tối đa ≈ 9.700 + 1.495 × cấp
 
-function view(board, id) {
+function sorted(board, id) {
   // dữ liệu bị chỉnh sửa (tm) không lên bảng, chỉ chủ tài khoản thấy chính mình
-  const list = Object.entries(board.p || {}).map(([k, e]) => ({ id: k, ...e })).filter((e) => !e.tm || e.id === id).sort(cmp);
+  return Object.entries(board.p || {}).map(([k, e]) => ({ id: k, ...e })).filter((e) => !e.tm || e.id === id).sort(cmp);
+}
+function view(board, id) {
+  const list = sorted(board, id);
   const pub = (e, i) => { const { h, last, first, id: pid, fb, lb, tm, ...rest } = e; return { rank: i + 1, ...rest, me: pid === id }; };
   const top = list.slice(0, 10).map(pub);
-  let me = null, ahead = null;
+  let me = null, ahead = null, behind = null;
   const i = id ? list.findIndex((e) => e.id === id) : -1;
-  if (i >= 0) { me = pub(list[i], i); if (i > 0) ahead = pub(list[i - 1], i - 1); }
-  return { top, me, ahead, total: list.length, at: Date.now() };
+  if (i >= 0) { me = pub(list[i], i); if (i > 0) ahead = pub(list[i - 1], i - 1); if (i + 1 < list.length) behind = pub(list[i + 1], i + 1); }
+  return { top, me, ahead, behind, total: list.length, at: Date.now(), ver: board.ver || 0, feed: (board.feed || []).slice(0, 12) };
+}
+function pubView(board) {
+  const list = sorted(board, null);
+  const top = list.slice(0, 10).map((e, i) => { const { h, last, first, id, fb, lb, tm, ...rest } = e; return { rank: i + 1, ...rest }; });
+  return { top, total: list.length, at: Date.now(), ver: board.ver || 0, feed: (board.feed || []).slice(0, 12) };
+}
+// tin mới cho dải chạy chữ: ai vừa lên tầng, ai vừa vượt mặt ai (không lộ id, bỏ qua tài khoản bị đánh dấu)
+function feedEvents(board, id, entry, old) {
+  const ev = [];
+  if (entry.tm) return ev;
+  const of = old ? old.floor || 0 : 0;
+  if (entry.floor > of) {
+    const before = sorted(board, null), r0 = before.findIndex((e) => e.id === id);
+    const after = sorted({ p: { ...board.p, [id]: entry } }, null), r1 = after.findIndex((e) => e.id === id);
+    const t = Date.now();
+    if (r1 >= 0 && (r0 < 0 || r1 < r0) && after[r1 + 1]) ev.push({ k: r1 === 0 ? "top1" : "pass", n: entry.nick, o: after[r1 + 1].nick, r: r1 + 1, f: entry.floor, t });
+    else ev.push({ k: "up", n: entry.nick, f: entry.floor, r: r1 + 1, t });
+  }
+  return ev;
 }
 
 const REBUILD_MS = 5 * 60_000;
 // mỗi người chơi lưu 1 khóa riêng (p/<id>) — không bao giờ mất dữ liệu khi ghi đồng thời;
 // "board" chỉ là bản tổng hợp để đọc nhanh, tự dựng lại định kỳ từ các khóa riêng
-async function rebuild(store) {
+async function rebuild(store, prev) {
   const { blobs } = await store.list({ prefix: "p/" });
   const p = {};
   await Promise.all(blobs.map(async (b) => { const e = await store.get(b.key, { type: "json" }); if (e) p[b.key.slice(2)] = e; }));
-  const board = { p, rebuilt: Date.now() };
+  if (!prev) prev = await store.get(KEY, { type: "json" }).catch(() => null);
+  const board = { p, rebuilt: Date.now(), ver: ((prev && prev.ver) || 0) + 1, feed: (prev && prev.feed) || [] };
   await store.setJSON(KEY, board);
   return board;
 }
-async function mergeBoard(store, id, entry) {
+async function mergeBoard(store, id, entry, old) {
   for (let tries = 0; tries < 5; tries++) {
     const cur = await store.getWithMetadata(KEY, { type: "json" });
     if (!cur) return rebuild(store);
     const board = cur.data;
+    const ev = feedEvents(board, id, entry, old);
     board.p[id] = entry;
+    board.ver = (board.ver || 0) + 1;
+    if (ev.length) board.feed = ev.concat(board.feed || []).slice(0, FEED_MAX);
     const res = await store.setJSON(KEY, board, { onlyIfMatch: cur.etag });
     if (res.modified) return board;
     await new Promise((r) => setTimeout(r, 40 + Math.random() * 120));
@@ -92,7 +121,10 @@ export default async (req) => {
   if (req.method === "GET") {
     if (url.searchParams.get("t")) return json({ at: Date.now(), season: SEASON }); // giờ chuẩn cho game (chống chỉnh đồng hồ máy)
     let board = await store.get(KEY, { type: "json" });
-    if (!board || Date.now() - (board.rebuilt || 0) > REBUILD_MS) board = await rebuild(store);
+    if (!board || Date.now() - (board.rebuilt || 0) > REBUILD_MS) board = await rebuild(store, board);
+    if (url.searchParams.get("pub")) return json(pubView(board), 200, PUB_CACHE);
+    const v = url.searchParams.get("v");
+    if (v != null && +v === (board.ver || 0)) return json({ same: 1, ver: board.ver || 0, at: Date.now() }); // không có gì mới: trả gói rất nhẹ
     return json(view(board, str(url.searchParams.get("id"), 40)));
   }
   if (req.method !== "POST") return json({ error: "method" }, 405);
@@ -150,6 +182,6 @@ export default async (req) => {
   p.floorT = old && p.floor <= of ? old.floorT || now : now;
   const entry = { ...p, h, first, last: now, fb: Math.round(fb * 100) / 100, lb: Math.round(lb * 100) / 100 };
   await store.setJSON("p/" + id, entry);
-  const board = await mergeBoard(store, id, entry);
+  const board = await mergeBoard(store, id, entry, old);
   return json(view(board, id));
 };
