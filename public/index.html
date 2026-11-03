@@ -3207,6 +3207,908 @@ if (!back) p.glow(x, y, 5, cold ? G[6] : C[6], 0.3);
 }
 __e["meta"] = meta;__e["create"] = create;
 };
+__d["fx/bahi/arrow-rain.js"]=function(__e,__r){
+const { Particles, Bits, Lights, P, B, Rng, fit, band, sparkle, clamp, smooth, ease, TAU, WHITE } = __r("core/embed.js");
+const N = 16, SPREAD = 56, H = 136, SLANT = 0.42;
+const VOLLEY = 0.42;
+const DIM0 = 1.5, DIM1 = 2.45;
+const meta = {
+name: "Arrow rain",
+desc: "A volley falls at a slant: broadheads glint, shafts thud in and stand quivering in puffs of dust, a few snap and tumble, and the forest of shafts leans and fades.",
+tags: ["archer", "arrow", "volley", "rain", "aoe", "ranged", "ground", "one-shot"],
+size: [240, 180],
+origin: [128, 158],
+duration: 2.6,
+loop: false,
+fps: 30,
+bg: "ground",
+options: {
+palette: ["#1b1208", "#3a2712", "#6b4620", "#9a6a2e", "#c89a4a", "#e6c477", "#f6e4b0", "#ffffff"],
+steel: ["#2a2e38", "#555c6c", "#8d96a8", "#ccd4e2", "#ffffff"],
+seed: 7,
+},
+};
+function arrow(p, x, y, len, C, S, a, glint) {
+const dx = SLANT, dy = 1, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+for (let d = 4; d < len; d++) {
+const px = x - ux * d, py = y - uy * d;
+p.dot(px, py, C[3], a);
+p.dot(px - 1, py, d % 3 === 0 ? C[5] : C[4], a * 0.8);
+}
+p.dot(x, y, WHITE, a);
+p.dot(x - ux, y - uy, S[4], a);
+p.dot(x - ux - 1, y - uy, S[3], a * 0.9);
+p.dot(x - ux * 2, y - uy * 2, S[3], a);
+p.dot(x - ux * 2 - 1, y - uy * 2, S[2], a);
+p.dot(x - ux * 3, y - uy * 3, S[1], a * 0.8);
+const fx = x - ux * len, fy = y - uy * len;
+for (let k = 0; k < 4; k++) {
+p.dot(fx + ux * k - 1.6, fy + uy * k, k < 2 ? C[6] : C[5], a);
+p.dot(fx + ux * k + 1.6, fy + uy * k, k < 2 ? C[5] : C[4], a * 0.9);
+}
+if (glint > 0) sparkle(p, x, y, 5 * glint, WHITE, S[3], 0.6 * glint);
+}
+function create(o) {
+const C = fit(o.palette, 8), S = fit(o.steel, 5), R = new Rng(o.seed), floor = () => 0;
+const ps = new Particles({ rng: R, ground: floor, sparks: [WHITE, C[6], C[5], C[3]] });
+const bits = new Bits({ ground: floor }), lights = new Lights();
+const xs = Array.from({ length: N }, (_, i) => -SPREAD + ((i + R.range(0.15, 0.85)) * 2 * SPREAD) / N);
+for (let i = N - 1; i > 0; i--) { const j = R.int(0, i); [xs[i], xs[j]] = [xs[j], xs[i]]; }
+const arrows = xs.map((x, i) => {
+const y = R.range(-2, 1), h = H * R.range(0.88, 1.06), len = R.range(13, 18);
+return {
+x, y, sx: x - h * SLANT, sy: y - h, len,
+t0: 0.02 + (i / N) * VOLLEY + R.range(0, 0.03), T: R.range(0.2, 0.27),
+stuck: false, snap: R.chance(0.22), lean: R.range(-0.16, 0.16), ph: R.range(0, TAU),
+};
+});
+const last = Math.max(...arrows.map((a) => a.t0 + a.T));
+let t = 0;
+const at = (s, tt) => {
+const q = clamp((tt - s.t0) / s.T), e = ease.inQuad(q) * 0.3 + q * 0.7;
+return [s.sx + (s.x - s.sx) * e, s.sy + (s.y - s.sy) * e, q];
+};
+return {
+update(dt) {
+t += dt;
+for (const s of arrows) {
+if (s.stuck || t < s.t0 + s.T) continue;
+s.stuck = true;
+s.land = t;
+lights.add(s.x, s.y - 2, 20, C[6], 0.5, 0.26);
+for (let i = 0; i < 7; i++) {
+const a = -Math.PI / 2 + R.range(-1.1, 1.1);
+ps.spawn(P.DUST, s.x + R.range(-2, 2), -1, Math.cos(a) * R.range(14, 46), Math.sin(a) * R.range(10, 34), R.range(0.3, 0.6), C[2], R.range(1.6, 3));
+}
+for (let i = 0; i < 3; i++) {
+const a = -Math.PI / 2 + R.range(-0.9, 0.9);
+ps.spawn(P.SPARK, s.x, -1, Math.cos(a) * R.range(40, 120), Math.sin(a) * R.range(50, 150), R.range(0.1, 0.25));
+}
+if (s.snap) {
+for (let i = 0; i < 2; i++) {
+const a = -Math.PI / 2 + R.range(-1.3, 1.3) + 0.4;
+bits.add({ kind: B.SHARD, x: s.x, y: -3, vx: Math.cos(a) * R.range(50, 130), vy: Math.sin(a) * R.range(60, 150),
+g: 1, drag: 0.5, bounce: 0.3, life: R.range(0.6, 1), a: R.range(0, TAU), va: R.range(-16, 16),
+s: R.range(2.5, 4.5), c: R.pick([C[4], C[3], C[5]]) });
+}
+}
+}
+ps.update(dt); bits.update(dt); lights.update(dt);
+},
+drawBack(p) {
+ps.draw(p, "back");
+for (const s of arrows) {
+if (!s.stuck) continue;
+const k = (t - s.land) / 0.4;
+if (k >= 0 && k < 1) band(p, s.x, 0, 2 + 13 * ease.outCubic(k), 0.26, Math.max(1, 2 * (1 - k)), 1 - k, [C[2], C[4], C[6], WHITE], (g) => Math.sin(g) < 0, k < 0.18);
+}
+},
+draw(p) {
+for (const s of arrows) {
+if (t < s.t0) continue;
+const [x, y, q] = at(s, t);
+if (!s.stuck) {
+for (let k = 1; k <= 5; k++) {
+const [ax, ay] = at(s, t - k * 0.012);
+p.dot(ax, ay - 1, k < 3 ? C[6] : C[5], (1 - k / 6) * 0.55);
+}
+arrow(p, x, y, s.len, C, S, 1, q > 0.8 ? (q - 0.8) / 0.2 : 0);
+if (q > 0.9) p.glow(x, y, 9, C[6], 0.3);
+continue;
+}
+if (s.snap) continue;
+const age = t - s.land;
+const bury = Math.min(4, 1 + age * 24);
+const quiver = Math.exp(-age * 9) * 2.4 * Math.sin(age * 46 + s.ph);
+const fade = 1 - smooth(DIM0, DIM1, t);
+if (fade <= 0.01) continue;
+const lean = s.lean * Math.min(1, age * 2.2);
+const tipx = s.x + lean * 2, tipy = -bury * 0.35;
+const len = s.len - 1;
+for (let d = 1; d < len; d++) {
+const u = d / len;
+const px = tipx - SLANT * d - lean * d * 0.5 + quiver * u * u;
+const py = tipy - d;
+p.dot(px, py, u < 0.4 ? C[4] : C[3], fade);
+if (d % 4 === 1) p.dot(px - 1, py, C[5], fade * 0.5);
+}
+const fxp = tipx - SLANT * len - lean * len * 0.5 + quiver, fyp = tipy - len;
+for (let k = 0; k < 3; k++) {
+p.dot(fxp + SLANT * k - 1.4, fyp + k, C[6], fade);
+p.dot(fxp + SLANT * k + 1.4, fyp + k, C[5], fade * 0.85);
+}
+if (age < 0.12) p.glow(s.x, -2, 12, C[6], 0.3 * (1 - age / 0.12));
+}
+for (const s of arrows) {
+if (!s.stuck) continue;
+const k = (t - s.land) / 0.4;
+if (k >= 0 && k < 1) band(p, s.x, 0, 2 + 13 * ease.outCubic(k), 0.26, Math.max(1, 2 * (1 - k)), 1 - k, [C[2], C[4], C[6], WHITE], (g) => Math.sin(g) >= 0, k < 0.18);
+}
+bits.draw(p);
+ps.draw(p, "front");
+lights.draw(p);
+const pool = 1 - smooth(last, last + 0.5, t);
+if (pool > 0.01) p.glow(0, -6, 52, C[4], 0.14 * pool);
+},
+};
+}
+__e["meta"] = meta;__e["create"] = create;
+};
+__d["fx/bahi/chi-palm.js"]=function(__e,__r){
+const { Particles, Lights, P, Rng, fit, band, sparkle, clamp, smooth, ease, TAU, WHITE } = __r("core/embed.js");
+const PUSH = 96;
+const T0 = 0.05;
+const RINGS = 3;
+const meta = {
+name: "Chi palm",
+desc: "A palm strike: air packs into a white disc at the hand, then three shells of pressure punch out one behind the other, streaks racing through and dust torn off the floor.",
+tags: ["martial", "chi", "palm", "force", "shockwave", "melee", "directional", "one-shot"],
+size: [240, 116],
+origin: [44, 86],
+duration: 1.25,
+loop: false,
+fps: 30,
+bg: "ground",
+options: {
+palette: ["#0d1a22", "#153240", "#1c5a6e", "#22909c", "#44c8c0", "#86eede", "#ccfff4", "#ffffff"],
+seed: 5,
+},
+};
+function shell(p, cx, cy, rx, ry, thick, C, a, hot) {
+p.shade(cx - rx - 2, cy - ry - 2, cx + rx + 2, cy + ry + 2, (x, y, out) => {
+const dx = (x - cx) / rx, dy = (y - cy) / ry, d = Math.hypot(dx, dy);
+if (d > 1.02 || d < 1 - thick / Math.min(rx, ry)) return;
+const ang = Math.atan2(dy, dx);
+const fwd = Math.cos(ang);
+if (fwd < -0.45) return;
+const edge = (d - (1 - thick / Math.min(rx, ry))) / (thick / Math.min(rx, ry));
+const lean = clamp(fwd * 0.6 + 0.5);
+const i = hot && edge > 0.55 ? 7 : Math.round(3 + edge * 3.4 + lean * 1.2);
+out.c = C[clamp(i, 1, 7) | 0];
+out.a = a * (0.55 + 0.45 * clamp(fwd + 0.5)) * (edge > 0.5 ? 1 : 0.8);
+});
+}
+function create(o) {
+const C = fit(o.palette, 8), R = new Rng(o.seed), floor = () => 0;
+const ps = new Particles({ rng: R, ground: floor, sparks: [WHITE, C[6], C[5], C[4]], haze: C[4] });
+const lights = new Lights();
+const HY = -24;
+const streaks = Array.from({ length: 28 }, () => ({
+y: HY + R.range(-15, 15), t0: T0 + R.range(0, 0.2), sp: R.range(260, 460),
+len: R.range(7, 20), a: R.range(0.35, 1),
+}));
+for (let i = 0; i < 16; i++) {
+const a = R.range(0, TAU), d = R.range(14, 30);
+ps.spawn(P.STREAK, Math.cos(a) * d * 0.7, HY + Math.sin(a) * d, -Math.cos(a) * d * 2.4, -Math.sin(a) * d * 2.4, T0 + 0.02, R.pick([C[5], C[6], WHITE]), 1, 0);
+}
+lights.add(0, HY, 30, C[5], 0.55, T0 + 0.1);
+let t = 0, fired = false;
+return {
+update(dt) {
+t += dt;
+if (!fired && t >= T0) {
+fired = true;
+lights.add(6, HY, 54, C[5], 0.9, 0.3);
+lights.add(6, HY, 18, WHITE, 0.8, 0.14);
+for (let i = 0; i < 22; i++) {
+const u = R.range(0, 1);
+ps.spawn(P.DUST, 8 + u * PUSH * 0.8, -1, R.range(50, 200) * (0.4 + u), -R.range(10, 70), R.range(0.35, 0.8), C[2], R.range(2, 4.5), u * 0.22);
+}
+for (let i = 0; i < 20; i++) {
+const a = R.range(-0.9, 0.9);
+ps.spawn(P.SPARK, 10, HY + R.range(-10, 10), Math.cos(a) * R.range(220, 460), Math.sin(a) * R.range(-90, 90), R.range(0.12, 0.3), 0, 1, R.range(0, 0.1));
+}
+}
+ps.update(dt); lights.update(dt);
+},
+drawBack(p) {
+ps.draw(p, "back");
+const k = (t - T0) / 0.42;
+if (k > 0 && k < 1) band(p, 10, 0, 6 + 46 * ease.outQuart(k), 0.24, Math.max(1, 2.2 * (1 - k)), (1 - k) * 0.7, [C[2], C[3], C[5], C[6]], (g) => Math.sin(g) < 0, false);
+},
+draw(p) {
+if (t < T0 + 0.02) {
+const q = clamp(t / T0), r = 3 + 5 * q;
+p.ellipse(2, HY, r * (1 - q * 0.35), r, (d) => (d < 0.4 ? WHITE : d < 0.75 ? C[6] : C[5]), 0.85);
+p.glow(2, HY, 16 + 10 * q, C[5], 0.4 + 0.3 * q);
+if (q > 0.6) sparkle(p, 2, HY, 7 * (q - 0.6) / 0.4, WHITE, C[6], 0.6);
+}
+for (let i = 0; i < RINGS; i++) {
+const d0 = i * 0.055;
+const k = (t - T0 - d0) / (0.4 + i * 0.07);
+if (k <= 0 || k >= 1) continue;
+const e = ease.outQuart(k);
+const x = 8 + PUSH * e * (1 - i * 0.14);
+const ry = 12 + 22 * e + i * 3;
+const rx = ry * (0.3 + 0.22 * e);
+const a = (1 - k) * (1 - i * 0.22);
+shell(p, x, HY + 2, rx, ry, 3.4 + 3 * (1 - k), C, Math.min(1, a * 1.35), k < 0.45 && i === 0);
+if (i === 0) p.glowLine(x - rx, HY + 2, x + rx, HY + 2, 10 + 8 * (1 - k), C[5], 0.3 * (1 - k));
+}
+for (const s of streaks) {
+const age = t - s.t0;
+if (age < 0 || age > 0.42) continue;
+const x = 10 + age * s.sp, f = 1 - age / 0.42;
+const L = s.len * (0.5 + f);
+p.line(x - L, s.y, x, s.y, (u) => (u > 0.78 ? WHITE : u > 0.45 ? C[6] : C[5]), s.a * f * 0.9);
+}
+ps.draw(p, "front");
+const k = (t - T0) / 0.42;
+if (k > 0 && k < 1) band(p, 10, 0, 6 + 46 * ease.outQuart(k), 0.24, Math.max(1, 2.2 * (1 - k)), (1 - k) * 0.7, [C[2], C[3], C[5], C[6]], (g) => Math.sin(g) >= 0, false);
+lights.draw(p);
+const pool = 1 - smooth(T0, 0.9, t);
+if (pool > 0.01) p.glow(40, -4, 60, C[3], 0.16 * pool);
+},
+};
+}
+__e["meta"] = meta;__e["create"] = create;
+};
+__d["fx/bahi/gear-saw.js"]=function(__e,__r){
+const { Particles, Bits, Lights, P, B, Rng, fit, sparkle, clamp, smooth, ease, TAU, WHITE } = __r("core/embed.js");
+const SPINUP = 0.22;
+const ROLL = 0.62;
+const REACH = 112;
+const meta = {
+name: "Gear saw",
+desc: "A toothed gear winds up throwing sparks off the floor, rolls out fast with its teeth biting the stone, then jams and bursts into bolts, washers and a puff of hot grit.",
+tags: ["engineer", "gear", "saw", "metal", "sparks", "ground", "directional", "one-shot"],
+size: [240, 112],
+origin: [52, 92],
+duration: 2.0,
+loop: false,
+fps: 30,
+bg: "ground",
+options: {
+palette: ["#16181f", "#2b2f3b", "#4c566a", "#7e879c", "#b3bdd2", "#dfe7f5", "#ffffff", "#ffffff"],
+heat: ["#5e2a06", "#a8520c", "#e08a18", "#ffc247", "#fff0b0"],
+seed: 9,
+},
+};
+const TEETH = 9, RAD = 9;
+function gear(p, cx, cy, a, C, H, hot) {
+for (let i = 0; i < TEETH; i++) {
+const an = a + (i * TAU) / TEETH;
+const bx = cx + Math.cos(an) * RAD, by = cy + Math.sin(an) * RAD;
+const tx = cx + Math.cos(an) * (RAD + 3), ty = cy + Math.sin(an) * (RAD + 3);
+const nx = -Math.sin(an), ny = Math.cos(an);
+p.poly([[bx + nx * 1.9, by + ny * 1.9], [bx - nx * 1.9, by - ny * 1.9],
+[tx - nx * 1.1, ty - ny * 1.1], [tx + nx * 1.1, ty + ny * 1.1]],
+(x, y) => (y < cy ? C[4] : C[2]), 1);
+p.line(bx + nx * 1.9, by + ny * 1.9, tx + nx * 1.1, ty + ny * 1.1, C[5], 0.9);
+}
+p.ring(cx, cy, RAD, 2.6, (v, an) => (Math.sin(an) < -0.2 ? C[5] : v > 0.6 ? C[3] : C[2]));
+for (let i = 0; i < 4; i++) {
+const an = a * 1 + (i * TAU) / 4;
+p.line(cx + Math.cos(an) * 2, cy + Math.sin(an) * 2, cx + Math.cos(an) * (RAD - 2), cy + Math.sin(an) * (RAD - 2), C[3]);
+}
+p.circle(cx, cy, 2.6, (d) => (d < 0.45 ? C[4] : C[2]));
+if (hot > 0) {
+p.ring(cx, cy, RAD + 2.6, 1.4, H[2], hot * 0.5);
+p.glow(cx, cy, 13, H[1], 0.24 * hot);
+}
+}
+function create(o) {
+const C = fit(o.palette, 8), H = fit(o.heat, 5), R = new Rng(o.seed), floor = () => 0;
+const ps = new Particles({ rng: R, ground: floor, sparks: [WHITE, H[3], H[2], H[1]] });
+const bits = new Bits({ ground: floor }), lights = new Lights();
+const CY = -RAD - 1;
+let t = 0, burst = false, spark = 0;
+const xAt = (tt) => {
+if (tt < SPINUP) return 2;
+const k = clamp((tt - SPINUP) / ROLL);
+return 2 + REACH * ease.outQuad(k);
+};
+return {
+update(dt) {
+t += dt;
+spark -= dt;
+if (t < SPINUP + ROLL && spark <= 0) {
+spark = 0.012;
+const x = xAt(t), fast = t > SPINUP;
+for (let i = 0; i < (fast ? 3 : 2); i++) {
+const a = Math.PI + R.range(-1.3, 0.35);
+ps.spawn(P.SPARK, x + R.range(-3, 3), -1.5, Math.cos(a) * R.range(90, 260) + (fast ? -40 : 0), Math.sin(a) * R.range(70, 230), R.range(0.12, 0.34));
+}
+if (R.chance(0.3)) ps.spawn(P.DUST, x, -1, R.range(-70, -10), -R.range(6, 26), R.range(0.25, 0.5), C[1], R.range(1.4, 2.6));
+}
+if (!burst && t >= SPINUP + ROLL) {
+burst = true;
+const x = xAt(t);
+lights.add(x, CY, 34, H[3], 0.8, 0.26);
+lights.add(x, CY, 14, WHITE, 0.6, 0.12);
+for (let i = 0; i < 12; i++) {
+const a = R.range(-2.5, -0.15);
+bits.add({ kind: R.chance(0.5) ? B.SHARD : B.CHUNK, x, y: CY, vx: Math.cos(a) * R.range(60, 200), vy: Math.sin(a) * R.range(80, 230),
+g: 1, drag: 0.4, bounce: 0.35, life: R.range(0.5, 0.92), a: R.range(0, TAU), va: R.range(-22, 22),
+s: R.range(2, 4), c: R.pick([C[3], C[4], C[2]]), ramp: [C[1], C[3], C[5]] });
+}
+for (let i = 0; i < 26; i++) {
+const a = R.range(0, TAU);
+ps.spawn(P.SPARK, x, CY, Math.cos(a) * R.range(90, 300) + 40, Math.sin(a) * R.range(90, 300), R.range(0.15, 0.45));
+}
+for (let i = 0; i < 10; i++) ps.spawn(P.GRIT, x, CY, R.range(-70, 150), -R.range(40, 160), R.range(0.4, 0.78), C[2], R.range(1, 2));
+for (let i = 0; i < 7; i++) ps.spawn(P.DUST, x + R.range(-6, 6), -1, R.range(-50, 110), -R.range(14, 54), R.range(0.4, 0.8), C[1], R.range(2.4, 4.4));
+}
+ps.update(dt); bits.update(dt); lights.update(dt);
+},
+drawBack(p) {
+ps.draw(p, "back");
+const cut = clamp((t - SPINUP) / ROLL);
+if (cut > 0 && t < 1.8) {
+const fade = 1 - smooth(1.0, 1.8, t);
+const x1 = xAt(t);
+for (let x = 2; x < x1; x += 1) {
+const u = (x - 2) / Math.max(1, x1 - 2);
+p.dot(x, -0.5, C[1], 0.5 * fade * (0.4 + u * 0.6));
+if ((x | 0) % 3 === 0) p.dot(x, -1.5, C[2], 0.3 * fade * u);
+}
+}
+},
+draw(p) {
+if (!burst) {
+const x = xAt(t);
+const spd = t < SPINUP ? 8 + (t / SPINUP) * 40 : 48;
+const a = -t * spd;
+const hot = clamp((t - 0.06) / 0.5) * (t < SPINUP ? 1 : 1);
+if (t > SPINUP) {
+for (let k = 1; k <= 2; k++) {
+const xx = xAt(t - k * 0.022);
+p.ring(xx, CY, RAD + 1, 1.6, C[2], 0.2 / k);
+}
+}
+gear(p, x, CY, a, C, H, hot);
+p.line(x - 5, -0.5, x + 5, -0.5, (u) => (u > 0.35 && u < 0.7 ? WHITE : H[3]), 0.8);
+p.glow(x, -1, 11, H[2], 0.32);
+if (t < SPINUP) {
+const q = t / SPINUP;
+sparkle(p, x, CY, 5 + 9 * q, H[4], H[3], 0.4 + 0.3 * q);
+}
+} else {
+const b = (t - SPINUP - ROLL) / 0.12;
+if (b < 1) {
+const x = xAt(SPINUP + ROLL);
+sparkle(p, x, CY, 26 * (1 - b), WHITE, H[3], 0.9 * (1 - b));
+p.glow(x, CY, 30 * (1 - b) + 8, H[2], 0.5 * (1 - b));
+}
+}
+bits.draw(p);
+ps.draw(p, "front");
+lights.draw(p);
+},
+};
+}
+__e["meta"] = meta;__e["create"] = create;
+};
+__d["fx/bahi/heart-bond.js"]=function(__e,__r){
+const { Particles, Lights, P, Rng, fit, sparkle, clamp, smooth, ease, TAU, WHITE } = __r("core/embed.js");
+const T0 = 0.08;
+const meta = {
+name: "Heart bond",
+desc: "A bond flares: hearts bloom from the chest and swim up on looping paths, swelling on each beat, bursting into petals and a warm sparkle over a soft pulsing pool of light.",
+tags: ["pet", "bond", "heart", "love", "buff", "support", "one-shot"],
+size: [152, 162],
+origin: [76, 136],
+duration: 2.3,
+loop: false,
+fps: 30,
+bg: "ground",
+options: {
+palette: ["#2a0a1c", "#5e1236", "#9c1f52", "#d93a74", "#f4699a", "#ffa0c0", "#ffd6e4", "#ffffff"],
+seed: 6,
+},
+};
+function heart(p, x, y, r, c, lit, a) {
+p.shade(x - r - 1, y - r - 1, x + r + 1, y + r * 1.5 + 1, (px, py, out) => {
+const dx = (px - x) / r, dy = (py - y) / r;
+const u = dx, v = -dy + 0.25;
+const f = Math.pow(u * u + v * v - 0.62, 3) - u * u * v * v * v * 0.9;
+if (f > 0) return;
+const d = Math.hypot(dx, dy);
+out.c = dy < -0.25 && dx < 0.1 ? lit : d > 0.78 ? c : c;
+out.a = a;
+});
+p.dot(x - r * 0.42, y - r * 0.42, WHITE, a * 0.9);
+}
+function create(o) {
+const C = fit(o.palette, 8), R = new Rng(o.seed), floor = () => 0;
+const ps = new Particles({ rng: R, ground: floor, sparks: [WHITE, C[6], C[5], C[4]], haze: C[5] });
+const lights = new Lights();
+const CY = -22;
+const hearts = Array.from({ length: 9 }, (_, i) => ({
+t0: T0 + i * 0.075 + R.range(0, 0.05),
+T: R.range(0.75, 1.15),
+sx: R.range(-7, 7),
+drift: R.range(-38, 38),
+swing: R.range(5, 13) * R.sign(),
+rate: R.range(2.2, 4),
+r: R.range(2.6, 4.4),
+rise: R.range(52, 86),
+popped: false,
+}));
+lights.add(0, CY, 34, C[5], 0.5, 0.45);
+let t = 0;
+const posOf = (h, tt) => {
+const q = clamp((tt - h.t0) / h.T), e = ease.outQuad(q);
+return [h.sx + h.drift * e + Math.sin(q * TAU * 0.9 + h.rate) * h.swing * (0.3 + q),
+CY - h.rise * e, q];
+};
+return {
+update(dt) {
+t += dt;
+for (const h of hearts) {
+if (h.popped) continue;
+const [x, y, q] = posOf(h, t);
+if (q < 1) continue;
+h.popped = true;
+for (let i = 0; i < 4; i++) {
+const a = R.range(0, TAU);
+ps.spawn(P.FLAKE, x, y, Math.cos(a) * R.range(14, 50), Math.sin(a) * R.range(14, 46) - 8, R.range(0.3, 0.62), R.pick([C[5], C[6], C[4]]), R.range(1.2, 2.2));
+}
+for (let i = 0; i < 3; i++) ps.spawn(P.STAR, x, y, R.range(-18, 18), -R.range(6, 24), R.range(0.3, 0.6), WHITE, R.range(1.6, 2.8));
+lights.add(x, y, 13, C[5], 0.38, 0.24);
+}
+ps.update(dt); lights.update(dt);
+},
+drawBack(p) {
+ps.draw(p, "back");
+const k = smooth(T0, T0 + 0.18, t) * (1 - smooth(1.25, 2.05, t));
+if (k > 0.01) {
+const beat = 0.78 + 0.22 * Math.sin(t * 6.4);
+p.disc(0, 0, 26 * k * beat, (d) => (d > 0.6 ? C[2] : C[1]), (d) => 0.3 * k * (1 - d * 0.75));
+p.glow(0, -5, 34 * beat, C[4], 0.22 * k);
+}
+},
+draw(p) {
+for (const h of hearts) {
+if (h.popped) continue;
+const [x, y, q] = posOf(h, t);
+if (q <= 0) continue;
+const beat = 1 + 0.17 * Math.sin(t * 9 + h.rate * 2);
+const r = h.r * beat * (q < 0.12 ? q / 0.12 : 1);
+const a = clamp(1 - (q - 0.62) / 0.38) * clamp(q * 8);
+if (a <= 0.02 || r < 0.6) continue;
+heart(p, x, y, r, C[4], C[6], a);
+p.glow(x, y, 7 + r, C[5], 0.2 * a);
+}
+const b = (t - T0) / 0.26;
+if (b > 0 && b < 1) {
+sparkle(p, 0, CY, 20 * (1 - b), WHITE, C[6], 0.7 * (1 - b));
+p.glow(0, CY, 26 * (1 - b) + 8, C[5], 0.4 * (1 - b));
+}
+ps.draw(p, "front");
+lights.draw(p);
+},
+};
+}
+__e["meta"] = meta;__e["create"] = create;
+};
+__d["fx/bahi/note-wave.js"]=function(__e,__r){
+const { Particles, Lights, P, Rng, fit, sparkle, clamp, smooth, ease, TAU, WHITE } = __r("core/embed.js");
+const T0 = 0.06;
+const RINGS = 4;
+const meta = {
+name: "Note wave",
+desc: "A chord strikes: rings of sound roll out as thin staff lines with quavers tumbling along them end over end, each popping into a sparkle, over a bright bloom at the source.",
+tags: ["bard", "music", "note", "sound", "wave", "ring", "magic", "one-shot"],
+size: [216, 144],
+origin: [48, 112],
+duration: 1.9,
+loop: false,
+fps: 30,
+bg: "ground",
+options: {
+palette: ["#140a28", "#2a1452", "#4a2490", "#7540c8", "#a976ee", "#d4b4ff", "#f0e4ff", "#ffffff"],
+seed: 4,
+},
+};
+function note(p, x, y, kind, spin, c, lit, a) {
+const lean = Math.cos(spin) * 0.5, up = Math.sin(spin) > 0 ? -1 : 1;
+p.ellipse(x, y, 3.4, 2.5, (d) => (d > 0.82 ? "#140a28" : d < 0.45 ? lit : c), a);
+const sx = x + 3 * (lean > 0 ? 1 : -1);
+for (let d = 1; d <= 8; d++) {
+p.dot(sx + lean * d * 0.25, y + up * d, c, a);
+p.dot(sx + lean * d * 0.25 + 1, y + up * d, "#140a28", a * 0.7);
+}
+if (kind) {
+const ty = y + up * 8;
+for (let d = 0; d < 5; d++) {
+p.dot(sx + 1 + d * 0.9, ty - up * d * 0.75, lit, a * (1 - d * 0.1));
+p.dot(sx + 1 + d * 0.9, ty - up * d * 0.75 + up, c, a * (1 - d * 0.14));
+}
+}
+}
+function create(o) {
+const C = fit(o.palette, 8), R = new Rng(o.seed), floor = () => 0;
+const ps = new Particles({ rng: R, ground: floor, sparks: [WHITE, C[6], C[5], C[4]] });
+const lights = new Lights();
+const CY = -30;
+const notes = Array.from({ length: 11 }, (_, i) => ({
+ring: i % RINGS,
+an: R.range(-1.15, 1.15),
+kind: R.chance(0.55) ? 1 : 0,
+sp: R.range(-13, 13), ph: R.range(0, TAU),
+pop: R.range(0.58, 0.92),
+popped: false,
+}));
+let t = 0;
+const ringR = (i, tt) => {
+const k = clamp((tt - T0 - i * 0.07) / (0.52 + i * 0.05));
+return { k, r: 4 + 92 * ease.outQuart(k) };
+};
+lights.add(0, CY, 28, C[5], 0.6, 0.3);
+return {
+update(dt) {
+t += dt;
+for (const n of notes) {
+if (n.popped) continue;
+const { k } = ringR(n.ring, t);
+if (k < n.pop) continue;
+n.popped = true;
+const { r } = ringR(n.ring, t);
+const x = Math.cos(n.an) * r, y = CY + Math.sin(n.an) * r * 0.62;
+for (let i = 0; i < 3; i++) {
+const a = R.range(0, TAU);
+ps.spawn(P.STAR, x, y, Math.cos(a) * R.range(10, 40), Math.sin(a) * R.range(10, 40) - 10, R.range(0.25, 0.55), R.chance(0.5) ? C[6] : WHITE, R.range(1.4, 2.6));
+}
+lights.add(x, y, 10, C[5], 0.3, 0.2);
+}
+ps.update(dt); lights.update(dt);
+},
+drawBack(p) { ps.draw(p, "back"); },
+draw(p) {
+for (let i = 0; i < RINGS; i++) {
+const { k, r } = ringR(i, t);
+if (k <= 0 || k >= 1) continue;
+const a = (1 - k) * (1 - i * 0.16);
+const ry = r * 0.62;
+for (const off of [0, 2.2]) {
+p.shade(-r - 3, CY - ry - 3, r + 3, CY + ry + 3, (x, y, out) => {
+const dx = x / (r + off), dy = (y - CY) / (ry + off * 0.62), d = Math.hypot(dx, dy);
+if (d > 1.015 || d < 0.975) return;
+const fwd = dx;
+if (fwd < -0.5) return;
+out.c = fwd > 0.55 ? C[6] : fwd > 0.1 ? C[5] : C[4];
+out.a = a * (0.45 + 0.55 * clamp(fwd + 0.5)) * (off ? 0.55 : 1);
+});
+}
+if (i === 0 && k < 0.5) p.glow(r * 0.6, CY, 16 * (1 - k), C[5], 0.25 * (1 - k));
+}
+for (const n of notes) {
+if (n.popped) continue;
+const { k, r } = ringR(n.ring, t);
+if (k <= 0) continue;
+const x = Math.cos(n.an) * r, y = CY + Math.sin(n.an) * r * 0.62;
+const a = clamp(1 - (k - 0.5) * 1.6) * clamp(k * 6);
+if (a <= 0.02) continue;
+note(p, x, y, n.kind, t * n.sp + n.ph, C[5], C[7], a);
+}
+const b = (t - T0) / 0.3;
+if (b > 0 && b < 1) {
+const rr = 4 + 13 * ease.outQuart(b);
+p.ellipse(0, CY, rr, rr * 0.7, (d) => (d < 0.35 ? WHITE : d < 0.7 ? C[6] : C[5]), (1 - b) * 0.9);
+sparkle(p, 0, CY, 22 * (1 - b), WHITE, C[6], 0.7 * (1 - b));
+p.glow(0, CY, 30 * (1 - b) + 8, C[5], 0.45 * (1 - b));
+}
+ps.draw(p, "front");
+lights.draw(p);
+},
+};
+}
+__e["meta"] = meta;__e["create"] = create;
+};
+__d["fx/bahi/talisman-seal.js"]=function(__e,__r){
+const { Particles, Lights, P, Rng, fit, sparkle, clamp, smooth, ease, TAU, WHITE } = __r("core/embed.js");
+const SPIN = 0.44;
+const SLAM = 0.5;
+const BURN = 0.95;
+const N = 6;
+const meta = {
+name: "Talisman seal",
+desc: "Paper talismans whirl in and slap into a hexagram; its glyphs catch one by one, then it flashes and discharges straight down in a column of light that scorches the floor.",
+tags: ["monk", "priest", "talisman", "seal", "sigil", "holy", "magic", "one-shot"],
+size: [176, 188],
+origin: [88, 160],
+duration: 2.4,
+loop: false,
+fps: 30,
+bg: "ground",
+options: {
+palette: ["#1d0a06", "#4a160c", "#8a2a12", "#c8491c", "#eb8a2c", "#ffab3a", "#fff0b8", "#ffffff"],
+paper: ["#6b5a2e", "#b8a05a", "#e8d79a", "#fffbe0"],
+seed: 3,
+},
+};
+function slip(p, x, y, lean, h, PA, C, a) {
+const w = 2.2;
+for (let d = -h / 2; d <= h / 2; d++) {
+const px = x + lean * d, py = y + d;
+p.dot(px - w, py, PA[1], a);
+p.dot(px, py, PA[2], a);
+p.dot(px + w, py, PA[1], a * 0.85);
+}
+for (let d = -h / 2 + 1; d <= h / 2 - 1; d += 1) p.dot(x + lean * d, y + d, C[2], a * 0.9);
+p.dot(x + lean * (-h / 2), y - h / 2, PA[3], a);
+}
+function hexagram(p, cx, cy, r, lit, C, a, rot) {
+const pt = (i) => [cx + Math.cos(rot + (i * TAU) / 6) * r, cy + Math.sin(rot + (i * TAU) / 6) * r * 0.92];
+for (let i = 0; i < 6; i++) {
+const on = i / 6 <= lit;
+const [ax, ay] = pt(i), [bx, by] = pt((i + 2) % 6);
+p.line(ax, ay, bx, by, on ? C[6] : C[2], a * (on ? 1 : 0.55));
+if (on) p.glowLine(ax, ay, bx, by, 4, C[5], 0.22 * a);
+}
+for (let g = 0; g < 48; g++) {
+const an = rot + (g / 48) * TAU, on = g / 48 <= lit;
+const x = cx + Math.cos(an) * r * 1.1, y = cy + Math.sin(an) * r * 1.02;
+p.dot(x, y, on ? C[5] : C[1], a * (on ? 1 : 0.5));
+if (g % 8 === 0 && on) {
+p.dot(x, y - 1, C[6], a);
+p.dot(x, y + 1, C[6], a * 0.7);
+}
+}
+}
+function create(o) {
+const C = fit(o.palette, 8), PA = fit(o.paper, 4), R = new Rng(o.seed), floor = () => 0;
+const ps = new Particles({ rng: R, ground: floor, sparks: [WHITE, C[6], C[5], C[3]] });
+const lights = new Lights();
+const CY = -58, RAD = 26;
+const slips = Array.from({ length: N }, (_, i) => ({
+a0: (i / N) * TAU + R.range(-0.2, 0.2),
+r0: R.range(62, 86), ph: R.range(0, TAU), h: R.range(9, 13), lead: i * 0.012,
+}));
+let t = 0, slammed = false, burst = false;
+return {
+update(dt) {
+t += dt;
+if (!slammed && t >= SLAM) {
+slammed = true;
+lights.add(0, CY, 40, C[5], 0.6, 0.3);
+for (let i = 0; i < 14; i++) {
+const a = R.range(0, TAU);
+ps.spawn(P.SPARK, Math.cos(a) * RAD, CY + Math.sin(a) * RAD * 0.9, Math.cos(a) * R.range(40, 120), Math.sin(a) * R.range(40, 120) - 20, R.range(0.2, 0.5));
+}
+}
+if (!burst && t >= BURN) {
+burst = true;
+lights.add(0, CY, 26, WHITE, 0.75, 0.14);
+lights.add(0, CY, 40, C[5], 0.5, 0.45);
+lights.add(0, -6, 34, C[4], 0.32, 0.6);
+for (let i = 0; i < 22; i++) {
+const a = R.range(0, TAU);
+ps.spawn(P.EMBER, Math.cos(a) * RAD * R.range(0.6, 1.2), CY + Math.sin(a) * RAD * 0.8, Math.cos(a) * R.range(10, 50), -R.range(20, 70), R.range(0.5, 1.2), C[R.int(4, 6)], R.range(1, 1.8), R.range(0, 0.25));
+}
+for (let i = 0; i < 16; i++) {
+const s = R.sign() * R.range(10, 48);
+ps.spawn(P.DUST, s, -1, s * R.range(1.4, 3), -R.range(8, 40), R.range(0.35, 0.7), C[1], R.range(2, 4), R.range(0, 0.12));
+}
+for (let i = 0; i < 18; i++) {
+const s = R.sign() * R.range(4, 26);
+ps.spawn(P.SPARK, s, -2, s * R.range(3, 7), -R.range(60, 190), R.range(0.15, 0.4), 0, 1, R.range(0, 0.1));
+}
+}
+ps.update(dt); lights.update(dt);
+},
+drawBack(p) {
+ps.draw(p, "back");
+const k = smooth(BURN, BURN + 0.1, t) * (1 - smooth(1.7, 2.3, t));
+if (k > 0.01) {
+p.shade(-32, -7, 32, 7, (x, y, out) => {
+const d = Math.hypot(x / 30, y / 6.5);
+if (d > 1) return;
+out.c = d > 0.78 ? C[1] : d > 0.46 ? "#2a0d06" : "#160805";
+out.a = 0.3 * k * (d > 0.5 ? 1 : 0.45);
+});
+p.glow(0, -2, 34, C[3], 0.16 * k);
+}
+},
+draw(p) {
+const rot = t * 1.9;
+for (const s of slips) {
+const q = clamp((t - s.lead) / SPIN);
+if (q >= 1 && t > BURN + 0.05) continue;
+const e = ease.inQuad(q);
+const r = s.r0 + (RAD * 1.1 - s.r0) * e;
+const an = s.a0 + e * 4.2 + (q >= 1 ? rot : 0);
+const x = Math.cos(an) * r, y = CY + Math.sin(an) * r * 0.9;
+const a = q >= 1 ? (t > BURN ? 1 - (t - BURN) / 0.14 : 1) : 1;
+if (a <= 0.02) continue;
+slip(p, x, y, q >= 1 ? 0 : Math.cos(an + 1.2) * 0.35, s.h, PA, C, a);
+if (q < 1) p.glow(x, y, 6, C[5], 0.2);
+}
+const lit = clamp((t - SLAM) / (BURN - SLAM));
+const seal = smooth(SPIN * 0.55, SLAM, t) * (1 - smooth(BURN + 0.04, BURN + 0.3, t));
+if (seal > 0.01) {
+const r = RAD * (1 + 0.06 * Math.sin(t * 9)) * (t > BURN ? 1 + (t - BURN) * 1.6 : 1);
+hexagram(p, 0, CY, r, lit, C, seal, rot * 0.5);
+p.glow(0, CY, 26 + lit * 14, C[4], 0.22 * seal * (0.6 + lit * 0.6));
+}
+const b = (t - BURN) / 0.55;
+if (b > 0 && b < 1) {
+const w = 11 * (b < 0.12 ? b / 0.12 : Math.pow(1 - (b - 0.12) / 0.88, 0.8));
+if (w > 0.4) {
+p.shade(-w - 1, CY, w + 1, 1, (x, y, out) => {
+const v = clamp((y - CY) / -CY);
+const ww = w * (1 - v * 0.42) * (1 + 0.1 * Math.sin(y * 0.9 + t * 40));
+const u = Math.abs(x) / Math.max(0.6, ww);
+if (u > 1) return;
+out.c = u < 0.26 ? WHITE : u < 0.58 ? C[6] : C[5];
+out.a = (1 - u * 0.5) * (b < 0.12 ? 1 : 0.85) * (1 - v * 0.2);
+});
+p.glowLine(0, CY, 0, 0, w * 2.2, C[5], 0.4 * (1 - b));
+}
+if (b < 0.14) {
+const f = 1 - b / 0.14;
+sparkle(p, 0, CY, 24 * f, WHITE, C[6], 0.85 * f);
+p.glow(0, CY, 22 * f + 10, C[6], 0.42 * f);
+}
+}
+ps.draw(p, "front");
+lights.draw(p);
+},
+};
+}
+__e["meta"] = meta;__e["create"] = create;
+};
+__d["fx/bahi/wok-flambe.js"]=function(__e,__r){
+const { Particles, Bits, Lights, P, PF, B, Rng, fit, sparkle, clamp, smooth, ease, TAU, WHITE } = __r("core/embed.js");
+const T0 = 0.08;
+const REACH = 104;
+const meta = {
+name: "Wok flambé",
+desc: "Oil catches in a tipped pan: a roll of flame licks forward, chunks of food tumble out of it trailing smoke, hot oil skitters over the floor and a warm pool fades under the smoke.",
+tags: ["chef", "cooking", "fire", "flambe", "food", "melee", "directional", "one-shot"],
+size: [344, 148],
+origin: [44, 104],
+duration: 3.4,
+loop: false,
+fps: 30,
+bg: "ground",
+options: {
+palette: ["#280c04", "#5e1a06", "#9c3408", "#d4600f", "#f08d1c", "#ffbe46", "#ffe79a", "#ffffff"],
+food: ["#5a3418", "#8a5a24", "#c08a3a", "#e8c070", "#7a9a40", "#c8d85a"],
+seed: 11,
+},
+};
+function morsel(p, x, y, r, c, lit, a) {
+p.ellipse(x, y, r, r * 0.82, (d, ang) => (Math.sin(ang) < -0.25 && d > 0.3 ? lit : d > 0.78 ? c : c), a);
+p.dot(x - r * 0.3, y - r * 0.45, lit, a);
+}
+function create(o) {
+const C = fit(o.palette, 8), F = fit(o.food, 6), R = new Rng(o.seed), floor = () => 0;
+const ps = new Particles({ rng: R, ground: floor, sparks: [WHITE, C[6], C[5], C[3]], haze: C[4] });
+const bits = new Bits({ ground: floor }), lights = new Lights();
+const PY = -26;
+const food = Array.from({ length: 7 }, (_, i) => {
+const a = -0.95 + R.range(-0.4, 0.45);
+return {
+t0: T0 + 0.03 + i * 0.03 + R.range(0, 0.04),
+vx: Math.cos(a) * R.range(120, 215), vy: Math.sin(a) * R.range(105, 175),
+r: R.range(1.8, 3.2), c: F[R.int(0, 2)], lit: F[R.int(3, 5)],
+sp: R.range(-11, 11), ph: R.range(0, TAU), landed: false,
+};
+});
+let t = 0, lit = false;
+return {
+update(dt) {
+t += dt;
+if (!lit && t >= T0) {
+lit = true;
+lights.add(10, PY, 64, C[5], 0.95, 0.55);
+lights.add(10, PY, 22, WHITE, 0.7, 0.16);
+for (let i = 0; i < 40; i++) {
+const lag = i / 40 + R.range(-0.04, 0.04);
+const x = 6 + lag * REACH + R.range(-5, 5);
+const rise = R.range(-7, 7) - lag * 8;
+ps.spawn(P.FIRE, x, PY + rise, R.range(2, 26), -R.range(10, 45),
+R.range(0.4, 0.85) * (1 - lag * 0.3), 0, R.range(2.6, 5.6) * (1 - lag * 0.28),
+Math.max(0, lag) * 0.26, PF.SMOKES | (R.chance(0.3) ? PF.BIG : 0));
+}
+for (let i = 0; i < 5; i++) {
+const a = -0.55 + R.range(-0.25, 0.25);
+ps.spawn(P.BRAND, 8, PY + R.range(-3, 3), Math.cos(a) * R.range(120, 190), Math.sin(a) * R.range(90, 150),
+R.range(0.3, 0.55), C[5], R.range(1.6, 2.6), R.range(0, 0.08));
+}
+for (let i = 0; i < 26; i++) {
+const a = -0.55 + R.range(-0.8, 0.8);
+ps.spawn(P.SPARK, 8, PY, Math.cos(a) * R.range(140, 330), Math.sin(a) * R.range(110, 300), R.range(0.18, 0.5), 0, 1, R.range(0, 0.18));
+}
+for (let i = 0; i < 16; i++) {
+ps.spawn(P.EMBER, R.range(0, 54), PY + R.range(-8, 2), R.range(10, 70), -R.range(22, 62), R.range(0.6, 1.5), C[R.int(4, 6)], R.range(1, 1.8), R.range(0, 0.45));
+}
+for (let i = 0; i < 6; i++) {
+bits.add({ kind: B.DRIP, x: R.range(4, 16), y: PY + 2, vx: R.range(60, 170), vy: R.range(-40, 20),
+g: 1, drag: 0.35, bounce: 0.45, life: R.range(0.5, 0.95), a: 0, va: 0, s: R.range(1.4, 2.4), c: C[R.chance(0.5) ? 5 : 4] });
+}
+}
+for (const m of food) {
+if (m.landed) continue;
+const age = t - m.t0;
+if (age <= 0) continue;
+const y = PY + m.vy * -0 + (-m.vy * age + 480 * age * age * 0.5) * -1;
+if (-y <= 1 && age > 0.1) {
+m.landed = true;
+const x = 10 + m.vx * age;
+for (let i = 0; i < 3; i++) ps.spawn(P.DUST, x, -1, R.range(-40, 60), -R.range(8, 34), R.range(0.25, 0.5), C[1], R.range(1.4, 2.6));
+ps.spawn(P.SPARK, x, -2, R.range(-50, 70), -R.range(40, 110), 0.2);
+}
+}
+ps.update(dt); bits.update(dt); lights.update(dt);
+},
+drawBack(p) {
+ps.draw(p, "back");
+const k = smooth(T0, T0 + 0.3, t) * (1 - smooth(1.8, 2.7, t));
+if (k > 0.01) p.disc(46, 0, 30 * k, (d) => (d < 0.55 ? "#1a0f0a" : C[1]), (d) => 0.34 * k * (1 - d * 0.8));
+},
+draw(p) {
+const tip = clamp(t / (T0 + 0.1));
+if (t < 0.5) {
+const a = 1 - smooth(0.26, 0.5, t);
+const lean = tip * 0.5;
+p.beam(-17, PY + 5 + lean * 3, 9, PY - lean * 6, 4.2, (u, v) => (v > 0.72 ? "#15151b" : u > 0.55 ? "#44444f" : "#2c2c36"), a);
+for (let d = 0; d <= 10; d++) {
+const u = d / 10, x = -17 + u * 26, y = PY + 3 + lean * 3 - u * (lean * 9 + 2);
+p.dot(x, y - 2, u > 0.55 ? C[5] : "#6a6a78", a * (0.5 + u * 0.5));
+}
+p.beam(-34, PY + 11, -16, PY + 6, 2.4, "#2c2c36", a);
+p.dot(-35, PY + 11, "#44444f", a);
+if (tip > 0.5 && t < T0 + 0.12) {
+for (let d = 0; d < 7; d++) p.dot(8 + d * 1.4, PY - 4 + d * 0.9, d < 3 ? C[6] : C[5], a * (1 - d / 8));
+}
+}
+const pop = (t - T0) / 0.07;
+if (pop > 0 && pop < 1) {
+const r = 6 + 11 * ease.outQuart(pop);
+p.ellipse(12 + r * 0.3, PY, r * 1.4, r * 0.62, (d) => (d < 0.3 ? WHITE : d < 0.62 ? C[6] : C[5]), (1 - pop) * 0.9);
+sparkle(p, 10, PY, 13 * (1 - pop), WHITE, C[6], 0.6 * (1 - pop));
+}
+ps.draw(p, "front");
+for (const m of food) {
+const age = t - m.t0;
+if (age <= 0) continue;
+const x = 10 + m.vx * age;
+let y = PY - m.vy * age + 480 * age * age * 0.5;
+let a = 1;
+if (y > -1) {
+y = -1.5;
+a = 1 - smooth(1.4, 2.35, t);
+if (a <= 0.01) continue;
+}
+const r = m.r * (1 + 0.1 * Math.sin(age * m.sp + m.ph));
+morsel(p, x, y, r, m.c, m.lit, a);
+if (age < 0.35) {
+p.dot(x + r * 0.6, y + r * 0.2, C[5], (1 - age / 0.35) * 0.7);
+p.glow(x, y, 5, C[4], 0.16 * (1 - age / 0.35));
+}
+}
+bits.draw(p);
+lights.draw(p);
+const pool = smooth(T0, T0 + 0.1, t) * (1 - smooth(0.8, 2.3, t));
+if (pool > 0.01) p.glow(48, -16, 58, C[4], 0.13 * pool);
+},
+};
+}
+__e["meta"] = meta;__e["create"] = create;
+};
 __d["fx/explosions/_lib.js"]=function(__e,__r){
 const { P, PF, clamp, smooth, rand, TAU, WHITE, hex, mix, scale, rgb } = __r("core/embed.js");
 const OUTLINE = hex("#1a1422"), SOOT = hex("#0d0a12"), SOOT2 = hex("#17121d");
@@ -6607,76 +7509,6 @@ lights.draw(p);
 }
 __e["meta"] = meta;__e["create"] = create;
 };
-__d["fx/impacts/impact-frame.js"]=function(__e,__r){
-const { Rng, fit, clamp, ease, TAU } = __r("core/embed.js");
-const meta = {
-name: "Impact frame",
-desc: "An anime impact: two frames of white with black burst lines rushing at the hit, two frames inverted, then the lines pull out past the edges and vanish.",
-tags: ["impact", "hit", "anime", "manga", "flash", "speed-lines", "screen", "one-shot"],
-size: [320, 180],
-origin: [160, 90],
-duration: 0.3,
-loop: false,
-fps: 30,
-bg: "black",
-options: { palette: ["#000000", "#ffffff"], lines: 64, seed: 19 },
-};
-const FRAME = 1 / 30;
-function burst(R, n) {
-return Array.from({ length: n }, (_, i) => {
-const thick = R.chance(0.18);
-return { a: ((i + R.range(0.1, 0.9)) / n) * TAU, inner: thick ? R.range(30, 48) : R.range(18, 70), w: thick ? R.range(5, 8) : R.range(1.2, 3.6) };
-});
-}
-const spikes = (a, ph) => 10 + 6 * Math.abs(Math.sin(a * 5 + ph)) + 4 * Math.abs(Math.sin(a * 11 + ph * 2.7)) + 2 * Math.sin(a * 23 + ph);
-function create(o) {
-const C = fit(o.palette, 3), R = new Rng(o.seed), INK = C[0], PAPER = C[2];
-const [W, H] = meta.size, [OX, OY] = meta.origin, x0 = -OX, y0 = -OY;
-const sets = [burst(R, o.lines), burst(R, o.lines)], jit = [[Math.round(R.range(-2, 2)), Math.round(R.range(-1, 1))], [Math.round(R.range(-2, 2)), Math.round(R.range(-1, 1))]];
-const ph = [R.range(0, TAU), R.range(0, TAU), R.range(0, TAU), R.range(0, TAU)];
-const masks = [];
-for (let f = 0; f < 8; f++) {
-const m = new Uint8Array(W * H), set = sets[f % 2], n = set.length, [jx, jy] = f < 4 ? jit[f % 2] : [0, 0];
-const reach = f < 4 ? 0 : Math.pow((f - 3) / 4.5, 1.5), thin = f < 4 ? 1 : 1 - (f - 3) / 5.5;
-for (let j = 0; j < H; j++)
-for (let i = 0; i < W; i++) {
-const X = x0 + i + 0.5 - jx, Y = y0 + j + 0.5 - jy, rho = Math.hypot(X, Y * 1.35), ang = Math.atan2(Y * 1.35, X);
-const slot = Math.floor((((ang % TAU) + TAU) % TAU) / (TAU / n));
-let line = false;
-for (let k = -1; k <= 1 && !line; k++) {
-const l = set[(slot + k + n) % n];
-let d = (((ang - l.a) % TAU) + TAU) % TAU;
-if (d > Math.PI) d = TAU - d;
-const inner = l.inner + reach * 150, hw = l.w * clamp((rho - inner) / 40) * thin;
-line = rho > inner && d * rho < Math.max(0.5, hw);
-}
-if (f < 4) {
-const r2 = Math.hypot(X, Y * 1.1), core = spikes(Math.atan2(Y * 1.1, X), ph[f]) * (f === 0 ? 0.85 : 1 + f * 0.08);
-m[j * W + i] = r2 < core ? (r2 < 4 + f ? 2 : 1) : line ? 1 : 2;
-} else m[j * W + i] = line ? 2 : 0;
-}
-masks.push(m);
-}
-let t = 0;
-return {
-update(dt) {
-t += dt;
-},
-draw(p) {
-const f = Math.floor(t / FRAME + 1e-6);
-if (f >= 8) return;
-const m = masks[f], inv = f === 2 || f === 3, ink = inv ? PAPER : INK, paper = inv ? INK : PAPER;
-p.shade(x0, y0, x0 + W, y0 + H, (x, y) => {
-const i = Math.floor(x - x0), j = Math.floor(y - y0);
-if (i < 0 || j < 0 || i >= W || j >= H) return;
-const v = m[j * W + i];
-return v === 1 ? ink : v === 2 ? (f < 4 ? paper : PAPER) : 0;
-});
-},
-};
-}
-__e["meta"] = meta;__e["create"] = create;
-};
 __d["fx/impacts/parry.js"]=function(__e,__r){
 const { Particles, Lights, P, Rng, fit, clamp, smooth, ease, TAU, WHITE } = __r("core/embed.js");
 const { star, brokenRing } = __r("fx/impacts/_lib.js");
@@ -7015,6 +7847,183 @@ __e["hash"] = hash;
 __e["Rng"] = Rng;
 __e["clamp"] = clamp;
 __e["VOLT"] = VOLT;__e["PLASMA"] = PLASMA;__e["SOOT"] = SOOT;__e["SOOT2"] = SOOT2;__e["zigzag"] = zigzag;__e["bowed"] = bowed;__e["bend"] = bend;__e["stroke"] = stroke;__e["crackle"] = crackle;__e["trace"] = trace;__e["scorch"] = scorch;__e["heat"] = heat;__e["flight"] = flight;__e["spark"] = spark;__e["puff"] = puff;__e["frameRng"] = frameRng;
+};
+__d["fx/lightning/chain-lightning.js"]=function(__e,__r){
+const { Particles, Lights, P, Rng, fit, sparkle, clamp, smooth, ease, rng, lerp, TAU, WHITE, hex, mix, READY } = __r("core/embed.js");
+const { VOLT, PLASMA, zigzag, bowed, stroke, crackle, trace, scorch } = __r("fx/lightning/_lib.js");
+const meta = {
+name: "Chain lightning",
+desc: "A bolt leaps from the caster's hand through three targets in turn; each flashes, sparks and grounds itself to the floor while the arcs between them flicker, then the chain snaps.",
+tags: ["lightning", "electric", "chain", "spell", "combat", "directional", "one-shot"],
+size: [248, 104],
+origin: [40, 82],
+duration: 1.8,
+loop: false,
+fps: 30,
+bg: "ground",
+actor: 2,
+options: { palette: VOLT, sparks: PLASMA, seed: 3 },
+};
+const AIM = { ...READY, x: -6, crouch: 4, lean: 4, fx: 16, fy: -16, bx: -6, by: -23, ffx: 11, fbx: -9 };
+const BACK = { ...READY, x: -6, crouch: 4, lean: -3, fx: -5, fy: -32, bx: 8, by: -24, armsFront: true, ffx: 9, fbx: -7 };
+const zap = (at, t, stop = 0.03) => ({ t, at, stop, push: 1.2, straw: 6, skin: "shock", shiver: 0.7, y: -22 });
+const act = {
+targets: [{ x: 58 }, { x: 104 }, { x: 150 }],
+poses: [
+[-0.46, { ...READY, x: -6 }],
+[-0.22, BACK],
+[0, { ...BACK, crouch: 5 }],
+[0.04, AIM, "snap"],
+[0.7, { ...AIM, crouch: 3 }],
+[1.35, { ...AIM, crouch: 3, fy: -18 }],
+[1.8, { ...READY, x: -6 }],
+],
+hits: [
+zap(0, 0.05),
+zap(1, 0.14),
+{ ...zap(2, 0.23, 0.07), shake: 0.14, amp: 1 },
+{ t: 1.35, push: 0, straw: 0, flash: 0, skin: null },
+],
+};
+const HAND = [10, -16], HOPS = [[58, -22], [104, -30], [150, -19]];
+const WIND = 0.12, LEAP = 0.05, GAP = 0.075, HOLD = 0.78, BREAK = 0.16, ASH = hex("#5b5566");
+const on = (i) => WIND + i * GAP + LEAP;
+const off = (i) => HOLD + i * 0.05;
+function level(i, t) {
+const a = t - on(i);
+if (a < 0) return 0;
+const hum = a < 0.1 ? [1, 0.55, 1][Math.floor(a * 30)] ?? 1 : 0.78 + 0.22 * Math.sin(t * 61 + i) * Math.sin(t * 23 + i * 2);
+const b = t - off(i);
+return b < 0 ? hum : b < BREAK ? hum * (1 - b / BREAK) * (Math.floor(b * 60) % 3 === 1 ? 0.5 : 1) : 0;
+}
+function create(o) {
+const C = fit(o.palette, 8), R = new Rng(o.seed), floor = () => 0;
+const ps = new Particles({ rng: R, ground: floor, sparks: o.sparks }), hot = new Particles({ rng: R, ground: floor }), lights = new Lights();
+const pts = [HAND, ...HOPS], hit = HOPS.map(() => false), popped = HOPS.map(() => false);
+const ground = HOPS.map(([x]) => x + R.range(-5, 5));
+let t = 0;
+const shape = (i, f, salt = 0) => {
+const r = rng(o.seed, 31 + salt, i, f), [x0, y0] = pts[i], [x1, y1] = pts[i + 1], L = Math.hypot(x1 - x0, y1 - y0);
+return bowed(r, x0, y0, x1, y1, -L * r.range(0.05, 0.15), 0.2, 0.08);
+};
+return {
+update(dt) {
+t += dt;
+if (t < WIND && R.chance(70 * dt)) {
+const a = R.range(0, TAU), d = R.range(10, 24), T = R.range(0.06, 0.1), v = (d * 3) / (Math.exp(3 * T) - 1);
+ps.spawn(P.STREAK, HAND[0] + Math.cos(a) * d, HAND[1] + Math.sin(a) * d, -Math.cos(a) * v, -Math.sin(a) * v, T, R.chance(0.5) ? C[6] : C[5]);
+}
+for (const [i, [x, y]] of HOPS.entries()) {
+if (!hit[i] && t >= on(i)) {
+hit[i] = true;
+const [px, py] = pts[i], dir = Math.atan2(y - py, x - px);
+lights.add(x, y, 56, C[4], 0.85, 0.22);
+lights.add(x, y, 16, WHITE, 0.7, 0.08);
+if (i === 0) lights.add(HAND[0], HAND[1], 40, C[4], 0.6, 0.15);
+for (let j = 0; j < 18; j++) {
+const a = R.chance(0.6) ? dir + R.range(-1.1, 1.1) : R.range(0, TAU), sp = R.range(70, 230);
+ps.spawn(P.SPARK, x, y, Math.cos(a) * sp, Math.sin(a) * sp - 40, R.range(0.15, 0.4));
+}
+for (let j = 0; j < 5; j++) hot.spawn(P.SPARK, x + R.range(-2, 2), y + 2, R.range(-50, 50), R.range(-60, 20), R.range(0.5, 0.9));
+ps.spawn(P.STAR, x + R.range(-4, 4), y - R.range(3, 7), 0, -6, R.range(0.25, 0.4), C[6], R.range(1.5, 2.5));
+for (let j = 0; j < 2; j++) ps.spawn(P.SMOKE, x + R.range(-4, 4), y + R.range(-2, 3), R.range(-6, 6), -R.range(8, 16), R.range(0.7, 1), mix(ASH, C[2], 0.35), R.range(2, 3.5), R.range(0.1, 0.25));
+}
+if (hit[i] && t < off(i)) {
+if (R.chance(9 * dt)) {
+const u = R.next(), [x0, y0] = pts[i];
+ps.spawn(P.SPARK, lerp(x0, x, u), lerp(y0, y, u) - 2, R.range(-60, 60), R.range(-90, 20), R.range(0.1, 0.25));
+}
+if (R.chance(7 * dt)) ps.spawn(P.SPARK, ground[i], -1, R.range(-70, 70), -R.range(40, 140), R.range(0.12, 0.3));
+if (R.chance(2 * dt)) hot.spawn(P.SPARK, x + R.range(-3, 3), y + 3, R.range(-30, 30), R.range(-30, 10), R.range(0.5, 0.8));
+}
+if (!popped[i] && t >= off(i) + BREAK) {
+popped[i] = true;
+for (let j = 0; j < 7; j++) {
+const a = R.range(0, TAU), sp = R.range(40, 140);
+ps.spawn(P.SPARK, x, y, Math.cos(a) * sp, Math.sin(a) * sp - 30, R.range(0.12, 0.3));
+}
+ps.spawn(P.SMOKE, x, y, R.range(-4, 4), -R.range(10, 16), R.range(0.55, 0.7), mix(ASH, C[2], 0.35), R.range(2.5, 3.5));
+lights.add(x, y, 30, C[4], 0.5, 0.12);
+}
+}
+ps.update(dt);
+hot.update(dt);
+lights.update(dt);
+},
+drawBack(p) {
+for (const [i] of HOPS.entries()) {
+const a = t - on(i);
+if (a < 0) continue;
+const T0 = Math.min(1, a / 0.2) * Math.pow(clamp(1 - (t - off(i)) / 0.7), 1.3) * 0.9;
+scorch(p, ground[i], 0, 7, T0, 1 - smooth(1.35, 1.75, t));
+}
+ps.draw(p, "back");
+hot.draw(p, "back");
+},
+draw(p) {
+const f = Math.floor(t * 30 + 1e-4), f2 = f >> 1;
+const kh = t < WIND ? t / WIND : level(0, t);
+if (kh > 0.02) {
+const r = (1.2 + 1.6 * kh + Math.sin(t * 53) * 0.4) * Math.min(1, kh * 1.5);
+p.circle(HAND[0], HAND[1], r + 1.2, C[4]);
+p.circle(HAND[0], HAND[1], r, C[6]);
+p.circle(HAND[0], HAND[1], r * 0.5, WHITE);
+p.glow(HAND[0], HAND[1], 18, C[4], 0.6 * kh);
+if (t > WIND * 0.5) {
+const r2 = rng(o.seed, 5, f), a = r2.range(0, TAU), d = r2.range(4, 8);
+crackle(p, zigzag(r2, HAND[0], HAND[1], HAND[0] + Math.cos(a) * d, HAND[1] + Math.sin(a) * d, 0.4, 0.3), 0.6 * kh, C, 0.3);
+}
+}
+for (const [i, [x, y]] of HOPS.entries()) {
+const t0 = WIND + i * GAP, [x0, y0] = pts[i];
+if (t >= t0 && t < on(i)) {
+const u = ease.outQuad((t - t0) / LEAP), b = shape(i, -1), trunk = { paths: [b.paths[0]] };
+stroke(p, trunk, 1, C, 0.75, { upTo: u });
+const tp = b.paths[0].pts, [hx, hy] = tp[Math.min(tp.length - 1, Math.floor(u * (tp.length - 1)))];
+p.circle(hx, hy, 2, WHITE);
+p.glow(hx, hy, 16, C[5], 0.7);
+}
+const k = level(i, t);
+if (k > 0) {
+stroke(p, shape(i, f2), k, C, 0.75);
+} else if (t >= off(i) + BREAK && t < off(i) + BREAK + 0.35) {
+const g = 1 - (t - off(i) - BREAK) / 0.35, b = shape(i, Math.floor((off(i) + BREAK) * 15));
+trace(p, b.paths[0].pts, g > 0.5 ? C[4] : C[2], g * 0.9);
+}
+const a = t - on(i);
+if (a >= 0 && a < 0.09) {
+const q = a / 0.09;
+p.circle(x, y, 6 * (1 - q) + 1.5, C[5]);
+p.circle(x, y, 5 * (1 - q), WHITE);
+sparkle(p, x, y, Math.round(10 * (1 - q)), C[6], C[4], 0.6);
+}
+if (k > 0.05) {
+const r = (2.6 + Math.sin(t * 47 + i) * 0.7) * k;
+p.circle(x, y, r + 1.5, C[2]);
+p.circle(x, y, r + 0.7, C[5]);
+p.circle(x, y, r * 0.6, WHITE);
+p.glow(x, y, 26, C[4], 0.6 * k);
+p.glow(x, y, 8, C[6], 0.5 * k);
+const r2 = rng(o.seed, 11, i, f);
+for (let j = 0; j < (t - on(i) < 0.12 ? 2 : 1); j++) {
+const a0 = r2.range(0, TAU), a1 = a0 + r2.sign() * r2.range(0.5, 1), d0 = r2.range(4, 6), d1 = r2.range(5, 8);
+crackle(p, zigzag(r2, x + Math.cos(a0) * d0, y + Math.sin(a0) * d0, x + Math.cos(a1) * d1, y + Math.sin(a1) * d1, 0.35, 0), r2.range(0.45, 0.7) * k, C, 0.25);
+}
+if (r2.next() < 0.3 * k) {
+const gx = ground[i] + r2.range(-3, 3);
+crackle(p, zigzag(r2, x + r2.range(-2, 2), y + 3, gx, -0.5, 0.3, 0.35), 0.75 * k, C, 0.35);
+p.glow(gx, -1, 12, C[5], 0.5 * k);
+p.px(gx, -1, WHITE);
+}
+}
+}
+ps.draw(p, "front");
+hot.draw(p, "front");
+lights.draw(p);
+},
+};
+}
+__e["meta"] = meta;__e["act"] = act;__e["create"] = create;
 };
 __d["fx/lightning/lightning-strike.js"]=function(__e,__r){
 const { Particles, Lights, P, Rng, fit, sparkle, clamp, smooth, ease, rand, rng, TAU, WHITE, hex, mix } = __r("core/embed.js");
@@ -8246,6 +9255,233 @@ p.glow(X, -6, 30, C[5], 0.8 * pop);
 p.glow(X, -2, 10, WHITE, 0.7 * pop);
 }
 for (const b of bits.list) rock(p, b, st);
+ps.draw(p, "front");
+lights.draw(p);
+},
+};
+}
+__e["meta"] = meta;__e["act"] = act;__e["create"] = create;
+};
+__d["fx/melee/scythe-reap.js"]=function(__e,__r){
+const { Particles, Lights, P, PF, Rng, fit, sparkle, clamp, smooth, ease, rand, WHITE, READY } = __r("core/embed.js");
+const { swing, onSwing, travel, smear, glowAlong } = __r("fx/melee/_lib.js");
+const meta = {
+name: "Scythe reap",
+desc: "A slow, huge dark crescent reaps round the front with a pale ghostly edge; it hangs, then tears away from the tail into curling wisps and cold vapour.",
+tags: ["melee", "scythe", "reap", "dark", "ghost", "death", "slash", "combat", "one-shot"],
+size: [184, 116],
+origin: [84, 98],
+duration: 2.1,
+loop: false,
+fps: 30,
+bg: "ground",
+actor: 2,
+options: {
+palette: ["#07040c", "#140a22", "#24113a", "#3b1d58", "#5a3a82", "#7fd6c0", "#d8fff2", "#ffffff"],
+seed: 13,
+},
+};
+const REST_ = { ...READY, weapon: "scythe", x: 2, sa: -1.5, fx: 11, fy: -22, bx: 7, by: -16 };
+const OUT_ = { ...REST_, two: true, crouch: 4, lean: 4, fx: 17, fy: -27, sa: -0.45, ffx: 11, fbx: -8 };
+const END = { ...REST_, two: true, x: 0, yaw: 3.14, crouch: 6, lean: 4, fx: 15, fy: -24, sa: 0.3, ffx: 11, fbx: -10, toeB: true };
+const act = {
+target: { x: 66 },
+poses: [
+[-0.56, REST_],
+[-0.26, OUT_],
+[0.08, { ...OUT_, crouch: 5 }],
+[0.2, { ...OUT_, yaw: 0.8, crouch: 5, lean: 3, fx: 16, fy: -23, sa: 0.1, ghost: 1 }],
+[0.3, { ...OUT_, x: 1, yaw: 1.9, crouch: 6, lean: 3, fx: 15, fy: -23, sa: 0.2, ghost: 1 }],
+[0.42, END],
+[0.92, { ...END, crouch: 5 }],
+[1.3, { ...REST_, x: 1, yaw: 1.4, crouch: 4 }],
+[1.7, REST_],
+],
+hits: [{ t: 0.14, stop: 0.12, shake: 0.16, amp: 2, push: 2.4, straw: 20, skin: "shadow" }],
+dust: [{ t: 0.3, x: 2, n: 6 }],
+};
+const WIND = 0.08, SWEEP = 0.34, HANG = 0.14, TEAR = 0.55;
+const T0 = WIND, T1 = WIND + SWEEP, T2 = T1 + HANG, T3 = T2 + TEAR;
+const head = (t) => ease.inOutSine(clamp((t - T0) / SWEEP));
+function create(o) {
+const C = fit(o.palette, 8), Rg = new Rng(o.seed), ps = new Particles({ rng: Rg, ground: () => 0, haze: C[5] }), lights = new Lights();
+const A = swing({ cx: 8, cy: -33, R: 52, sy: 0.6, k: 0.1, rot: 0.08, a0: -0.5, dir: 1, span: 3.5 });
+const W = 21;
+const wisps = [];
+let t = 0, lastTear = 0;
+const tear = () => smooth(T2, T3, t);
+const addWisp = (x, y, far) => wisps.push({ x, y, vx: Rg.range(-12, 12), vy: -Rg.range(8, 26), life: Rg.range(0.5, 0.9), max: 0, seed: Rg.range(0, 100), pts: [], far });
+return {
+update(dt) {
+t += dt;
+if (t < WIND && Rg.chance(0.5)) {
+const [x, y] = onSwing(A, A.R - 4, 0);
+ps.spawn(P.VAPOUR, x + Rg.range(-14, 14), y + Rg.range(-8, 8), Rg.range(-10, 10), Rg.range(-6, 6), Rg.range(0.3, 0.5), C[5], Rg.range(1.5, 2.5));
+}
+if (t > T0 && t < T1 && Rg.chance(0.5)) {
+const tr = travel(A, A.span * head(t) * Rg.range(0.75, 1));
+ps.spawn(P.VAPOUR, tr.x, tr.y, tr.dx * 20, -Rg.range(4, 14), Rg.range(0.5, 0.9), C[6], Rg.range(2, 3.5), 0, Math.sin(tr.a) < 0 ? PF.BACK : 0);
+}
+const k = tear();
+for (let u = lastTear; u < k * 1.15; u += 0.022) {
+const uu = Math.min(1, u) * A.span, tr = travel({ ...A, R: A.R - Rg.range(0, 8) }, uu), far = Math.sin(tr.a) < 0;
+addWisp(tr.x, tr.y, far);
+if (Rg.chance(0.5)) ps.spawn(P.VAPOUR, tr.x, tr.y, Rg.range(-10, 10), -Rg.range(6, 18), Rg.range(0.55, 0.85), Rg.chance(0.5) ? C[5] : C[4], Rg.range(2.5, 4.5), 0, far ? PF.BACK : 0);
+if (Rg.chance(0.2)) ps.spawn(P.STAR, tr.x + Rg.range(-3, 3), tr.y + Rg.range(-3, 3), 0, -6, Rg.range(0.25, 0.5), Rg.chance(0.5) ? C[6] : WHITE, Rg.range(0.6, 1.6), 0, far ? PF.BACK : 0);
+}
+lastTear = Math.max(lastTear, k * 1.15);
+for (let i = wisps.length - 1; i >= 0; i--) {
+const w = wisps[i];
+w.max += dt;
+if (w.max > w.life) {
+wisps.splice(i, 1);
+continue;
+}
+w.vy -= 30 * dt;
+w.vx += Math.sin(w.max * 9 + w.seed) * 120 * dt;
+w.vx -= w.vx * 2 * dt;
+w.vy -= w.vy * 1.2 * dt;
+w.x += w.vx * dt;
+w.y += w.vy * dt;
+w.pts.push([w.x, w.y]);
+if (w.pts.length > 14) w.pts.shift();
+}
+ps.update(dt);
+lights.update(dt);
+},
+drawBack(p) {
+this.blade(p, -1);
+ps.draw(p, "back");
+this.threads(p, true);
+},
+draw(p) {
+this.blade(p, 1);
+if (t < WIND + 0.05) {
+const [x, y] = onSwing(A, A.R - 3, 0);
+sparkle(p, x, y, 6 * Math.min(1, t / 0.04) * (1 - smooth(WIND - 0.02, WIND + 0.05, t)), C[6], C[5], 0.45);
+}
+const g = t - T1 + 0.06;
+if (g > 0 && g < 0.3) {
+const [x, y] = onSwing(A, A.R - 3, A.span);
+sparkle(p, x, y, 9 * ease.outBack(Math.min(1, g / 0.06)) * (1 - g / 0.3), C[6], C[5], 0.55);
+}
+ps.draw(p, "front");
+this.threads(p, false);
+lights.draw(p);
+},
+blade(p, half) {
+const U = A.span * head(t), k = tear();
+if (U < 0.02 || k >= 1) return;
+const ramp = half < 0 ? [C[0], C[0], C[1], C[2], C[3], C[4], C[5], C[6]] : C;
+smear(p, A, 0, U, W, (u, r, out, a) => {
+const v = u / U, w = W * Math.pow(Math.sin(Math.PI * Math.pow(v, 1.7)), 0.55);
+if (w < 0.5) return;
+const q = (A.R - r) / w;
+if (q < 0 || q > 1) return;
+const n = rand(Math.floor(u * 40), Math.floor(r), 7);
+if (k > 0 && (u / A.span) < k * 1.2 - n * 0.2) return;
+const ci = q < 0.08 ? 7 : q < 0.16 ? 6 : q < 0.25 ? 5 : q < 0.4 ? 4 : q < 0.62 ? 3 : 2;
+out.c = ramp[t > T1 && q < 0.2 ? ci - 1 : ci];
+out.a = Math.min(1, v / 0.25);
+}, half);
+glowAlong(p, A, A.R - 2, Math.max(0, k * 1.2 * A.span - 0.3), U, 14, C[5], (u) => 0.3 * (u / U), half, 0.25);
+},
+threads(p, back) {
+for (const w of wisps) {
+if (w.far !== back) continue;
+const life = 1 - w.max / w.life;
+for (let i = 1; i < w.pts.length; i++) {
+const f = i / w.pts.length;
+p.line(w.pts[i - 1][0], w.pts[i - 1][1], w.pts[i][0], w.pts[i][1], f > 0.75 ? C[6] : f > 0.4 ? C[5] : C[3], life * (0.3 + 0.7 * f));
+}
+if (life > 0.5) p.glow(w.x, w.y, 5, C[5], 0.25 * life);
+}
+},
+};
+}
+__e["meta"] = meta;__e["act"] = act;__e["create"] = create;
+};
+__d["fx/melee/spear-sweep.js"]=function(__e,__r){
+const { Particles, Lights, P, PF, Rng, fit, sparkle, clamp, ease, READY } = __r("core/embed.js");
+const { swing, onSwing, travel, slash, slashEnd, stone } = __r("fx/melee/_lib.js");
+const meta = {
+name: "Spear sweep",
+desc: "A wide low sweep at shin height: a long flat crescent swings from behind the legs round the front, and the wind of it kicks a wake of dust and grit along the floor.",
+tags: ["melee", "sweep", "spear", "polearm", "low", "aoe", "ground", "dust", "combat", "one-shot"],
+size: [216, 84],
+origin: [104, 70],
+duration: 1.5,
+loop: false,
+fps: 30,
+bg: "ground",
+actor: 2,
+options: {
+palette: ["#0f2a2a", "#18504a", "#22806e", "#3fb894", "#8fe6c0", "#dcfff0", "#ffffff"],
+sparks: ["#fff3a6", "#ffe26b", "#ff8a2a", "#f2561d"],
+stone: "#4a3f69",
+seed: 10,
+},
+};
+const REST_ = { ...READY, weapon: "spear", sa: -1.42, fx: 11, fy: -21, bx: 7, by: -16 };
+const COCK = { ...REST_, two: true, yaw: 2.5, crouch: 6, lean: 2, fx: 15, fy: -17, sa: 0.05, ffx: 9, fbx: -8 };
+const OUT_ = { ...REST_, two: true, x: 2, crouch: 6, lean: 6, fx: 20, fy: -15, sa: 0.04, ffx: 12, fbx: -10, toeB: true };
+const act = {
+target: { x: 62 },
+poses: [
+[-0.56, REST_],
+[-0.34, { ...REST_, two: true, crouch: 4, fx: 14, fy: -22, sa: -0.7 }],
+[-0.14, COCK],
+[-0.02, { ...COCK, crouch: 7, yaw: 2.7 }],
+[0.045, { ...OUT_, x: 1, yaw: 1.3, ghost: 1 }, "snap"],
+[0.09, { ...OUT_, ghost: 1 }, "snap"],
+[0.14, OUT_, "snap"],
+[0.62, { ...OUT_, crouch: 5, lean: 5 }],
+[1.12, { ...REST_, two: true, crouch: 4, sa: -0.7, fx: 14, fy: -22 }],
+[1.5, REST_],
+],
+hits: [{ t: 0.1, stop: 0.12, shake: 0.18, amp: 2, push: 2.6, straw: 18, y: -12 }],
+dust: [{ t: 0.09, x: 14, n: 6, dir: 1 }, { t: 0.09, x: -10, n: 5, dir: -1 }],
+};
+function create(o) {
+const C = fit(o.palette, 7), Rg = new Rng(o.seed), st = stone(o.stone), ps = new Particles({ rng: Rg, ground: () => 0, sparks: o.sparks }), lights = new Lights();
+const A = swing({ cx: 2, cy: -12, R: 50, sy: 0.2, k: 0.19, rot: -0.04, a0: Math.PI + 0.55, dir: -1, span: Math.PI + 0.35, W: 19, t0: 0, sweep: 0.13, hold: 0.05, trail: 0.3, ramp: C });
+const end = slashEnd(A);
+let t = 0, lastU = 0, done = false;
+return {
+update(dt) {
+t += dt;
+const U = A.span * ease.outExpo(clamp(t / A.sweep));
+for (let u = lastU; u < U; u += 0.09) {
+const tr = travel(A, u), near = Math.sin(tr.a) >= 0, fy = near ? -1 : -3, sp = Rg.range(30, 90);
+ps.spawn(P.SMOKE, tr.x, fy - Rg.range(0, 2), tr.dx * sp, -Rg.range(4, 16), Rg.range(0.7, 1.15), st.dust, Rg.range(3, 5.5), Rg.range(0, 0.05));
+if (Rg.chance(0.6)) ps.spawn(P.GRIT, tr.x, fy, tr.dx * Rg.range(40, 120) + Rg.range(-20, 20), -Rg.range(40, 130), Rg.range(0.6, 1.0), Rg.pick([st.light, st.body, st.shade]), Rg.chance(0.3) ? 2 : 1);
+if (Rg.chance(0.35)) ps.spawn(P.MOTE, tr.x, tr.y, tr.dx * Rg.range(40, 100), tr.dy * 40 - Rg.range(5, 20), Rg.range(0.2, 0.4), Rg.chance(0.5) ? C[4] : C[5], 0.6, 0, near ? 0 : PF.BACK);
+}
+lastU = U;
+if (!done && t >= A.sweep) {
+done = true;
+lights.add(end.x, end.y - 4, 50, C[3], 0.5, 0.35);
+for (let i = 0; i < 8; i++) {
+const a = Math.atan2(end.dy, end.dx) + Rg.range(-0.5, 0.3), sp = Rg.range(120, 260);
+ps.spawn(P.SPARK, end.x, end.y, Math.cos(a) * sp, Math.sin(a) * sp - 40, Rg.range(0.12, 0.3));
+}
+for (let i = 0; i < 6; i++) ps.spawn(P.SMOKE, end.x + Rg.range(-6, 4), -Rg.range(1, 4), Rg.range(30, 90), -Rg.range(4, 14), Rg.range(0.9, 1.25), st.dust, Rg.range(4.5, 7), Rg.range(0, 0.08), PF.BIG);
+}
+ps.update(dt);
+lights.update(dt);
+},
+drawBack(p) {
+slash(p, A, t, -1);
+ps.draw(p, "back");
+},
+draw(p) {
+slash(p, A, t, 1);
+const g = t - A.sweep * 0.6;
+if (g > 0 && g < 0.24) sparkle(p, end.x, end.y, 9 * ease.outBack(Math.min(1, g / 0.05)) * (1 - g / 0.24), C[5], C[3], 0.55);
+if (t < A.sweep + 0.12) {
+const [x, y] = onSwing(A, A.R - 5, A.span * ease.outExpo(clamp(t / A.sweep)));
+p.glow(x, y, 36, C[3], 0.45 * (1 - t / (A.sweep + 0.12)));
+}
 ps.draw(p, "front");
 lights.draw(p);
 },
@@ -10087,81 +11323,6 @@ p.glow(4, 0, 16, F[4], 0.2 * pop);
 };
 }
 __e["meta"] = meta;__e["create"] = create;
-};
-__d["fx/projectiles/muzzle-smg.js"]=function(__e,__r){
-const { clamp, rand, rng, wrap, fit, fly, flyV, hex, mix, TAU, WHITE } = __r("core/embed.js");
-const { flashShape, flash, spark, cloud, casing, drawCasing } = __r("fx/projectiles/_lib.js");
-const meta = {
-name: "SMG burst",
-desc: "Sustained fire at twelve rounds a second: each shot a different spiky flash with a white core, sparks, smoke wisps piling up and drifting, brass casings bouncing on the floor.",
-tags: ["projectile", "muzzle", "gun", "automatic", "flash", "smoke", "casing", "directional", "loop"],
-size: [112, 72],
-origin: [56, 66],
-duration: 1,
-loop: true,
-fps: 30,
-bg: "ground",
-options: {
-palette: ["#4a1712", "#8a1f17", "#c9281f", "#f2561d", "#ff8a2a", "#ffc23d", "#ffe26b", "#fff3a6", "#ffffff"],
-brass: ["#4a2e10", "#8c5c1c", "#d9a441", "#ffe39a"],
-smoke: ["#26222e", "#3b3644", "#544e5e", "#6f6979", "#8c8596", "#aca5b5", "#cbc4d2"],
-height: 26,
-seed: 6,
-},
-};
-const SHOTS = 12, F1 = 1 / 30;
-function shots(t, D, life, fn) {
-for (let s = 0; s < SHOTS; s++) for (let age = wrap(t - (s * D) / SHOTS + 1e-7, D); age < life; age += D) fn(s, age);
-}
-function draw(p, t, o) {
-const F = fit(o.palette, 9), B = fit(o.brass, 4), SM = fit(o.smoke, 7), S = o.seed, D = meta.duration, H = o.height;
-const MX = 0, MY = -H, SP = [F[7], F[6], F[4], F[3]], top = -meta.origin[1] + 1;
-let pop = 0;
-shots(t, D, 0.2, (s, age) => (pop = Math.max(pop, Math.exp(-(age + 0.008) / 0.035))));
-const puffs = [];
-shots(t, D, 2.2, (s, age) => {
-for (let j = 0; j < 3; j++) {
-const r = rng(S, s, j, 3), life = r.range(1.5, 2.2), dl = j * 0.03;
-if (age < dl || age - dl >= life) continue;
-const a = age - dl, k = a / life, port = j === 2;
-const vx = port ? r.range(-12, 6) : r.range(45, 100) * (1 - j * 0.4), vy = port ? -r.range(14, 26) : -r.range(4, 16);
-const x = (port ? -7 : MX + 3) + (vx * (1 - Math.exp(-3.2 * a))) / 3.2 - r.range(3, 7) * a * a + Math.sin(a * 2.1 + r.range(0, TAU)) * a * 2.5;
-const y = (port ? MY - 2 : MY) + (vy * (1 - Math.exp(-2.4 * a))) / 2.4 - 0.5 * r.range(9, 16) * a * a;
-const rad = (port ? 1 : 1.2) + r.range(2, 4.5) * (1 - Math.exp(-1.4 * a));
-if (y - rad < top + 1) continue;
-const edge = Math.min(1, (y - rad - top) / 12);
-puffs.push({ x, y, r: rad, a: Math.min(1, a * 10) * Math.pow(1 - k, 1.6) * (port ? 0.24 : 0.34) * edge, b: clamp(0.92 - k * 0.6), w: pop * Math.exp(-Math.hypot(x - MX, y - MY) / 9) });
-}
-});
-cloud(p, puffs, SM, [SM[0], mix(F[1], SM[1], 0.5), mix(F[2], SM[2], 0.4), F[3], F[4], F[5], F[7]], { dens: 1.4, max: 0.7, lit: 1.3 });
-shots(t, D, D, (s, age) => {
-const r = rng(S, s, 7), k = casing(-7, MY - 1, -r.range(18, 48), -r.range(85, 135), r.sign() * r.range(20, 32), age, 850, -0.5, 0.42, r.range(0, TAU));
-drawCasing(p, k, B, clamp((D - age) / 0.25));
-});
-shots(t, D, 2 * F1, (s, age) => {
-const r = rng(S, s), f = age < F1 ? 1 : 2, tilt = r.range(-0.06, 0.06);
-const L = flashShape(r, f, { size: r.range(0.95, 1.2), spike: [12, 21], diag: [6, 11], cross: [4, 7.5], back: [2.5, 5] });
-const C = f === 1 ? [WHITE, F[7], F[6], F[3]] : [F[7], F[6], F[4], F[2]];
-flash(p, MX, MY, tilt, L, C, s * 7 + f);
-});
-shots(t, D, 0.3, (s, age) => {
-for (let j = 0; j < 5; j++) {
-const r = rng(S, s, j, 11), life = r.range(0.05, 0.16) * (j > 2 ? 1.8 : 1);
-if (age >= life) continue;
-const a = r.range(-0.3, 0.3), sp = r.range(170, 380) * (j > 2 ? 0.5 : 1), [x, y] = fly(MX + 2, MY, Math.cos(a) * sp, Math.sin(a) * sp, age, 420, 2.2);
-const [vx, vy] = flyV(Math.cos(a) * sp, Math.sin(a) * sp, age, 420, 2.2);
-if (j > 2) p.px(x, y, age / life < 0.5 ? F[6] : F[4]);
-else spark(p, x, y, vx, vy, 1 - age / life, SP, 0.45, 0.011);
-}
-});
-shots(t, D, 0.15, (s, age) => {
-const k = Math.exp(-(age + 0.008) / 0.03);
-p.glow(MX + 4, MY, 26, F[4], 0.8 * k);
-p.glow(MX + 2, MY, 7, WHITE, 0.45 * k);
-p.glow(MX + 2, 0, 12, F[4], 0.16 * k);
-});
-}
-__e["meta"] = meta;__e["draw"] = draw;
 };
 __d["fx/scifi/_lib.js"]=function(__e,__r){
 const { Particles, P, PF, GRAVITY, hex, rand, WHITE, TAU } = __r("core/embed.js");
@@ -12087,6 +13248,13 @@ var __fx = {
 "arcane/mana-burst":__r("fx/arcane/mana-burst.js"),
 "arcane/star-fall":__r("fx/arcane/star-fall.js"),
 "arcane/time-stop":__r("fx/arcane/time-stop.js"),
+"bahi/arrow-rain":__r("fx/bahi/arrow-rain.js"),
+"bahi/chi-palm":__r("fx/bahi/chi-palm.js"),
+"bahi/gear-saw":__r("fx/bahi/gear-saw.js"),
+"bahi/heart-bond":__r("fx/bahi/heart-bond.js"),
+"bahi/note-wave":__r("fx/bahi/note-wave.js"),
+"bahi/talisman-seal":__r("fx/bahi/talisman-seal.js"),
+"bahi/wok-flambe":__r("fx/bahi/wok-flambe.js"),
 "explosions/cartoon-pow":__r("fx/explosions/cartoon-pow.js"),
 "explosions/firework-burst":__r("fx/explosions/firework-burst.js"),
 "explosions/plasma-explosion":__r("fx/explosions/plasma-explosion.js"),
@@ -12104,9 +13272,9 @@ var __fx = {
 "impacts/crit-hit":__r("fx/impacts/crit-hit.js"),
 "impacts/ground-slam":__r("fx/impacts/ground-slam.js"),
 "impacts/hit-spark":__r("fx/impacts/hit-spark.js"),
-"impacts/impact-frame":__r("fx/impacts/impact-frame.js"),
 "impacts/parry":__r("fx/impacts/parry.js"),
 "impacts/shield-block":__r("fx/impacts/shield-block.js"),
+"lightning/chain-lightning":__r("fx/lightning/chain-lightning.js"),
 "lightning/lightning-strike":__r("fx/lightning/lightning-strike.js"),
 "lightning/zap-hit":__r("fx/lightning/zap-hit.js"),
 "melee/claw-swipe":__r("fx/melee/claw-swipe.js"),
@@ -12114,6 +13282,8 @@ var __fx = {
 "melee/double-slash":__r("fx/melee/double-slash.js"),
 "melee/hammer-smash":__r("fx/melee/hammer-smash.js"),
 "melee/heavy-cleave":__r("fx/melee/heavy-cleave.js"),
+"melee/scythe-reap":__r("fx/melee/scythe-reap.js"),
+"melee/spear-sweep":__r("fx/melee/spear-sweep.js"),
 "melee/spin-slash":__r("fx/melee/spin-slash.js"),
 "melee/sword-slash":__r("fx/melee/sword-slash.js"),
 "melee/thrust":__r("fx/melee/thrust.js"),
@@ -12124,7 +13294,6 @@ var __fx = {
 "nature/vine-whip":__r("fx/nature/vine-whip.js"),
 "projectiles/magic-missile":__r("fx/projectiles/magic-missile.js"),
 "projectiles/muzzle-pistol":__r("fx/projectiles/muzzle-pistol.js"),
-"projectiles/muzzle-smg":__r("fx/projectiles/muzzle-smg.js"),
 "scifi/emp-blast":__r("fx/scifi/emp-blast.js"),
 "shadow/dark-explosion":__r("fx/shadow/dark-explosion.js"),
 "shadow/life-steal":__r("fx/shadow/life-steal.js"),
@@ -12142,15 +13311,23 @@ window.PFXLIB = Object.assign({}, __core, { fx: __fx });
    pixelfx vẽ vào bộ đệm riêng (color + light) rồi ghép lên canvas trận đấu.
    Hai lớp: "back" (sau nhân vật) và "front" (trước nhân vật), khớp đúng thứ
    tự vẽ sẵn có của game. Có hàng đợi, trần hiệu năng và tự tắt khi máy yếu.
+
+   v59b · Hiệu ứng bám theo THÂN NGƯỜI, không còn toạ độ cố định:
+   · game nạp "hệ xương" mỗi khung (PFX.setRig) gồm vị trí, hướng mặt, chiều cao
+     và các điểm neo thật của từng bên — đầu gậy, bàn tay, miệng, ngực, đỉnh đầu;
+   · hiệu ứng neo vào một điểm ("me:cast", "mon:front"...) nên phép phát ra từ
+     đầu gậy, khiên dựng trước mặt, đòn đánh trúng đúng thân;
+   · cỡ hiệu ứng tính theo chiều cao nhân vật (kh), nên Bé Vuông cao 28 px và
+     Thực Thần Vũ Trụ cao 83 px đều ra đòn cân xứng với mình.
    pixelfx: MIT · github.com/patch-gg/pixelfx
    ========================================================================= */
 const PFX = (function () {
   const BW = 200, BH = 112;
+  const H_REF = 34, GROW = 0.6; // chiều cao tham chiếu và độ giảm tốc khi nhân vật to lên
   let L = null, frame = null, idat = null, ocv = null, octx = null;
   let live = [], queue = [], ready = false, off = false;
   let emaMs = 0, slowStrikes = 0;
 
-  // Trần hiệu năng: máy yếu thì giảm dần rồi tắt hẳn, game vẫn chạy bằng hiệu ứng cũ.
   const MAX_LIVE = 7, MAX_HEAVY = 2, SLOW_MS = 9.0, SLOW_LIMIT = 24;
 
   function init() {
@@ -12168,6 +13345,124 @@ const PFX = (function () {
     return ready;
   }
 
+  /* ---------------- hệ xương: game nạp vào mỗi khung ----------------
+     Mỗi bên: { x, y, face, h, w, A }
+       x, y  : chỗ đứng trên sân (y là mặt sàn dưới chân)
+       face  : 1 nhìn sang phải, -1 nhìn sang trái
+       h, w  : chiều cao / bề ngang thật của hình, tính bằng điểm ảnh
+       A     : điểm neo trong không gian xương — x lệch so với tâm (sẽ nhân face),
+               y âm là hướng lên, gốc đặt ở bàn chân. Thiếu thì suy ra từ h/w.      */
+  const DEF = { x: 100, y: 98, face: 1, h: 34, w: 24, A: null };
+  let RIG = {
+    me:   { x: 52,  y: 98,  face: 1,  h: 34, w: 24, A: null },
+    mon:  { x: 150, y: 98,  face: -1, h: 34, w: 30, A: null },
+    ally: { x: 20,  y: 106, face: 1,  h: 20, w: 18, A: null },
+  };
+  function setRig(r) { if (r) for (const k in r) if (r[k]) RIG[k] = Object.assign({}, DEF, RIG[k], r[k]); }
+  function body(who) { return RIG[who] || RIG.mon; }
+
+  /**
+   * Một điểm neo trên thân, trả về toạ độ sân đấu.
+   * spec: "<ai>:<điểm>" — ai ∈ me|mon|ally, điểm ∈
+   *   foot (bàn chân) · body (giữa ngực) · head (đỉnh đầu) · over (trên đầu một quãng)
+   *   mouth (miệng) · hand (bàn tay) · cast (đầu gậy / chỗ phát chiêu)
+   *   front (ngay trước mặt) · back (sau lưng) · center (tâm hình)
+   */
+  function at(spec) {
+    const [who, pt] = String(spec || 'mon:body').split(':');
+    const b = body(who), A = b.A, f = b.face, H = b.h || 34, W = b.w || 24;
+    const P = (ax, ay) => ({ x: b.x + f * ax, y: b.y + ay, who, face: f, h: H, w: W });
+    const a = (n) => (A && Array.isArray(A[n]) ? A[n] : null);
+    switch (pt || 'body') {
+      case 'foot':   return P(0, 0);
+      case 'head':   { const t = a('top'); return P(t ? t[0] : 0, t ? t[1] : -H); }
+      case 'over':   { const t = a('top'); return P(t ? t[0] : 0, (t ? t[1] : -H) - H * 0.22); }
+      case 'mouth':  { const m = a('mouth') || a('face'); return P(m ? m[0] : W * 0.22, m ? m[1] : -H * 0.78); }
+      case 'hand':   { const h = a('hr') || a('hl'); return P(h ? h[0] : W * 0.45, h ? h[1] : -H * 0.42); }
+      case 'cast': {
+        // đầu gậy / mũi vũ khí. Hình nào không cầm gì thì cast trùng trục giữa —
+        // khi đó lấy bàn tay và đẩy ra trước, để phép không phát từ trong bụng.
+        const c = a('cast') || a('tip');
+        if (c && Math.abs(c[0]) > W * 0.12) return P(c[0], c[1]);
+        const h = a('hr') || a('hl');
+        if (h) return P(Math.max(h[0], W * 0.42) + 2, h[1] - H * 0.12);
+        return P(W * 0.5, -H * 0.6);
+      }
+      case 'front':  return P(W * 0.5 + 2, -H * 0.52);
+      // ngay trước mũi chân, sát mặt sàn: chỗ để thứ gì đó trồi lên rồi quất về phía đối thủ
+      case 'ahead':  return P(W * 0.5 + 8, 0);
+      case 'back':   return P(-W * 0.5 - 2, -H * 0.52);
+      case 'center': return P(0, -H * 0.5);
+      case 'body':
+      default:       { const c = a('body'); return P(c ? c[0] : 0, c ? c[1] : -H * 0.55); }
+    }
+  }
+
+
+  /* ---------------- hình học đo được của từng hiệu ứng ----------------
+     [tâm sáng x, tâm sáng y, bán kính] tính bằng điểm ảnh gốc của hiệu ứng.
+     · tâm sáng -> ghim đúng chỗ đó vào điểm neo trên thân (xem "pin")
+     · bán kính -> dùng để tham khảo khi căn, và cho trang thử hiển thị.         */
+  const GEO = {
+    'arcane/arcane-beam': [112, -24, 112],
+    'arcane/arcane-missiles': [142, -21, 112],
+    'arcane/mana-burst': [0, -36, 52],
+    'arcane/star-fall': [-10, -31, 111],
+    'arcane/time-stop': [-1, -41, 54],
+    'bahi/arrow-rain': [-7, -15, 117],
+    'bahi/chi-palm': [8, -23, 29],
+    'bahi/gear-saw': [112, -10, 70],
+    'bahi/heart-bond': [0, -22, 22],
+    'bahi/note-wave': [0, -30, 26],
+    'bahi/talisman-seal': [-1, -53, 71],
+    'bahi/wok-flambe': [10, -26, 28],
+    'explosions/cartoon-pow': [0, -3, 61],
+    'explosions/firework-burst': [0, 0, 44],
+    'explosions/plasma-explosion': [-1, -1, 66],
+    'explosions/small-explosion': [-4, -51, 102],
+    'fire/fire-breath': [62, -9, 73],
+    'fire/fireball': [-22, -2, 71],
+    'fire/flamethrower': [76, -5, 89],
+    'fire/meteor': [-9, -38, 156],
+    'holy/heal-aoe': [-5, -5, 106],
+    'holy/holy-pillar': [0, -93, 145],
+    'holy/smite': [-1, -21, 125],
+    'ice/frost-nova': [0, -21, 59],
+    'ice/ice-spikes': [95, -18, 100],
+    'impacts/blunt-hit': [-1, -21, 25],
+    'impacts/crit-hit': [1, -25, 59],
+    'impacts/ground-slam': [0, -8, 83],
+    'impacts/hit-spark': [4, -19, 36],
+    'impacts/parry': [-1, -31, 33],
+    'impacts/shield-block': [19, -20, 29],
+    'lightning/chain-lightning': [106, -22, 104],
+    'lightning/lightning-strike': [8, -85, 142],
+    'lightning/zap-hit': [-14, -2, 57],
+    'melee/claw-swipe': [34, -15, 30],
+    'melee/dagger-flurry': [44, -21, 46],
+    'melee/double-slash': [35, -24, 30],
+    'melee/hammer-smash': [20, -16, 70],
+    'melee/heavy-cleave': [28, -15, 60],
+    'melee/scythe-reap': [1, -17, 65],
+    'melee/spear-sweep': [19, -9, 75],
+    'melee/spin-slash': [3, -16, 63],
+    'melee/sword-slash': [31, -32, 53],
+    'melee/thrust': [64, -21, 71],
+    'melee/uppercut': [16, -49, 48],
+    'nature/earth-spike': [2, -15, 114],
+    'nature/poison-cloud': [-2, -7, 105],
+    'nature/tornado': [3, -89, 94],
+    'nature/vine-whip': [45, -18, 96],
+    'projectiles/magic-missile': [110, -26, 56],
+    'projectiles/muzzle-pistol': [5, -27, 16],
+    'scifi/emp-blast': [-1, -20, 53],
+    'shadow/dark-explosion': [0, -50, 131],
+    'shadow/life-steal': [104, -25, 21],
+    'spawn/poof': [-1, -17, 33],
+    'spawn/summon-rise': [0, -16, 65],
+    'water/wave-crash': [2, -13, 107],
+  };
+
   /* --- bảng màu: 3 màu của game (sáng→tối) thành dải 8 bậc tối→sáng của pixelfx --- */
   const _pcache = new Map();
   const _hx = (s) => { s = String(s).replace('#', ''); if (s.length === 3) s = s[0] + s[0] + s[1] + s[1] + s[2] + s[2]; const v = parseInt(s, 16) || 0; return [(v >> 16) & 255, (v >> 8) & 255, v & 255]; };
@@ -12177,7 +13472,6 @@ const PFX = (function () {
     if (!cols || !cols.length) return null;
     const key = cols.join('|') + '#' + n, hit = _pcache.get(key);
     if (hit) return hit;
-    // game xếp sáng→tối; pixelfx cần tối→sáng, và cần thêm bậc rất tối lẫn bậc trắng
     const src = cols.slice().reverse().map(_hx);
     const dark = src[0].map(v => v * 0.28), white = [255, 255, 255];
     const stops = [dark].concat(src, [src[src.length - 1].map((v, i) => v + (white[i] - v) * 0.55)]);
@@ -12199,12 +13493,13 @@ const PFX = (function () {
 
   /**
    * Chơi một hiệu ứng.
-   * id   : "melee/sword-slash"
-   * o.x,o.y : vị trí gốc hiệu ứng trên sân (y thường là mặt sàn 98)
-   * o.k  : hệ số thu nhỏ (hiệu ứng gốc vẽ cho khung to gấp đôi)
+   * o.at   : điểm neo, ví dụ "me:cast" · "mon:front" · "ally:hand"
+   * o.kh   : cỡ tính theo chiều cao nhân vật (1 = bằng hình nộm mẫu 38 px của pixelfx)
+   * o.k    : cỡ tuyệt đối, dùng khi hiệu ứng không gắn với ai (pháo hoa, khung chớp)
+   * o.kof  : lấy chiều cao của ai để tính kh; mặc định là chủ của điểm neo
+   * o.face : lật theo hướng nhìn của ai ("me"/"mon"/"ally"); mặc định theo điểm neo
+   * o.dx,dy: chỉnh thêm, dx tính theo hướng nhìn nên không cần đảo dấu khi lật
    * o.cols : 3 màu của game -> tự đổi thành dải màu pixelfx
-   * o.delay / o.cut : chờ trước khi chạy / cắt ngắn đuôi hiệu ứng
-   * o.heavy : hiệu ứng nặng, bị giới hạn số lượng cùng lúc
    */
   function play(id, o) {
     if (off || !init()) return null;
@@ -12215,9 +13510,38 @@ const PFX = (function () {
     const cap = o.must ? MAX_LIVE + 5 : MAX_LIVE;
     if (live.length + queue.length >= cap) return null;
     if (o.heavy && live.filter(v => v.heavy).length >= MAX_HEAVY) return null;
+
+    const anc = o.at ? at(o.at) : null;
+    const fw = (o.by || o.face) ? body(o.by || o.face).face : (anc ? anc.face : 1);
+    let k = o.k || 0.5;
+    if (o.span && o.to && anc) {
+      // hiệu ứng phải với tới đâu đó (luồng lửa, tia sáng, cú đâm): lấy cỡ từ chính
+      // khoảng cách tới đích, nên dù nhân vật to nhỏ hay đối thủ đứng xa gần vẫn chạm đúng
+      const t = at(o.to);
+      k = Math.abs(t.x - anc.x) / o.span;
+    } else {
+      // Cỡ lớn dần theo vóc dáng, nhưng CÓ GIẢM TỐC. Tỉ lệ thẳng sẽ khiến hình thái
+      // cao 63 px ra đòn to gấp 2,25 lần Bé Vuông 28 px — choán hết sân. Mũ 0,6 giữ
+      // đòn vẫn cân xứng với người vung: 28 px → 0,89 lần · 48 px → 1,23 · 83 px → 1,70.
+      if (o.grow !== 0) {
+        const hh = body(o.by || (anc ? anc.who : 'mon')).h || H_REF;
+        k *= Math.pow(hh / H_REF, GROW);
+      }
+    }
+    { const lo = o.kmin || 0.12, hi = o.kmax || 1.35; k = k < lo ? lo : k > hi ? hi : k; }
+    const dx = (o.dx || 0) * (o.rawdx ? 1 : fw);
+    let x = (anc ? anc.x : (o.x == null ? 150 : o.x)) + dx;
+    let y = (anc ? anc.y : (o.y == null ? 98 : o.y)) + (o.dy || 0);
+    // pin: ghim đúng một điểm BÊN TRONG hiệu ứng vào điểm neo, thay vì ghim gốc của nó.
+    // Nhờ vậy tâm vệt chém rơi đúng giữa ngực dù đối thủ cao hay thấp.
+    const gp = GEO[id];
+    const pin = o.pin === 0 ? null : Array.isArray(o.pin) ? o.pin
+      : (o.pin || (anc && !/: *foot$/.test(o.at) && !o.span)) ? gp : null;
+    if (pin) { x -= pin[0] * k * fw; y -= pin[1] * k; }
     const it = {
-      id, mod, x: o.x == null ? 150 : o.x, y: o.y == null ? 98 : o.y, k: o.k || 0.5,
-      flip: !!o.flip, delay: o.delay || 0, cut: o.cut || 0, heavy: !!o.heavy, t: 0, fx: null, opt: o,
+      id, mod, t: 0, fx: null, opt: o, heavy: !!o.heavy,
+      x, y, k, flip: o.flip != null ? !!o.flip : fw < 0,
+      delay: o.delay || 0, cut: o.cut || 0,
     };
     if (it.delay > 0) { queue.push(it); return it; }
     return start(it);
@@ -12228,7 +13552,7 @@ const PFX = (function () {
     const args = { x: it.x, y: it.y, scale: it.k, flip: it.flip, seed: o.seed == null ? (Math.random() * 1e6) | 0 : o.seed };
     if (p) args.palette = p;
     if (o.light != null) args.light = o.light;
-    if (o.opts) for (const k in o.opts) args[k] = o.opts[k];
+    if (o.opts) for (const k in o.opts) args[k] = typeof o.opts[k] === 'function' ? o.opts[k](it) : o.opts[k];
     try { it.fx = L.createFx(it.mod, args); } catch (e) { return null; }
     it.box = boxOf(it);
     live.push(it);
@@ -12254,7 +13578,6 @@ const PFX = (function () {
     meter(performance.now() - t0);
   }
 
-  // Ghép một lớp lên canvas trận đấu. Chỉ chạm đúng vùng các hiệu ứng đang chiếm.
   function draw(g, layer) {
     if (!ready || off || !live.length) return;
     const t0 = performance.now();
@@ -12271,7 +13594,6 @@ const PFX = (function () {
     for (const it of live) { try { it.fx.draw(frame, layer); any = true; } catch (e) { } }
     if (!any) return;
     L.composite(frame, idat.data, null);
-    // vùng nào trống thì khỏi vẽ
     octx.putImageData(idat, 0, 0, x0, y0, x1 - x0, y1 - y0);
     g.drawImage(ocv, x0, y0, x1 - x0, y1 - y0, x0, y0, x1 - x0, y1 - y0);
     meter(performance.now() - t0);
@@ -12286,7 +13608,8 @@ const PFX = (function () {
   function clear() { live = []; queue = []; }
 
   return {
-    play, step, draw, clear, ramp,
+    play, step, draw, clear, ramp, setRig, at,
+    get rig() { return RIG; },
     get on() { return !off && (ready || init()); },
     get load() { return emaMs; },
     get count() { return live.length; },
@@ -12296,159 +13619,176 @@ const PFX = (function () {
 /* =========================================================================
    PFXMAP · bản đồ ghép hiệu ứng pixelfx vào từng đòn đánh của Nuôi Bahi
    -------------------------------------------------------------------------
-   at : 'me' (Bahi, x=52) · 'mon' (đối thủ, x=150) · 'ally' (thú chiến, x=24) · 'mid'
-   k  : hệ số thu nhỏ — hiệu ứng gốc vẽ cho khung gấp ~2 lần sân đấu 200×112
-   cut: cắt đuôi hiệu ứng cho hợp nhịp trận đấu (khói tàn dài quá sẽ rối)
+   at   : điểm neo trên thân — "me:cast" (đầu gậy) · "me:mouth" (miệng) ·
+          "mon:body" (giữa ngực) · "mon:foot" (bàn chân) · "mon:front" (trước mặt) ·
+          "mon:over" (trên đầu) · "ally:*" (thú chiến)
+   by   : ai tung đòn — quyết định hướng lật và chiều cao dùng để tính cỡ
+   k    : cỡ cơ bản (đã căn bằng mắt); cầu nối nhân thêm hệ số vóc dáng của `by`
+          — cao 28 px ×0,89 · 48 px ×1,23 · 83 px ×1,70 — nên đòn luôn cân xứng người vung
+   span : với đòn phải "với tới" (tia, luồng lửa, cú đâm) thì cỡ lấy từ khoảng
+          cách thật tới đích `to`, nên đối thủ đứng xa hay gần đều chạm đúng
+   cut  : cắt đuôi hiệu ứng cho hợp nhịp trận đấu
+   Tệp này do genmap.py sinh ra từ hình học đo được của từng hiệu ứng.
    ========================================================================= */
-const PFX_AT = { me: 52, mon: 150, ally: 24, mid: 101 }, PFX_GY = 98;
 
-/* ---- đòn của Bahi: theo 42 kiểu tung chiêu trong BANIM ---- */
+/* ---- đòn của Bahi ---- */
 const PFXA = {
-  /* cận chiến */
-  slash:  [{ id: 'melee/sword-slash',    at: 'mon', k: 0.62, dx: -10, cut: 0.5 }],
-  xslash: [{ id: 'melee/double-slash',   at: 'mon', k: 0.56, dx: -4, dy: -8, cut: 0.62 }],
-  cleave: [{ id: 'melee/heavy-cleave',   at: 'mon', k: 0.54, dx: -8, cut: 0.95, heavy: 1 }],
-  multi:  [{ id: 'melee/dagger-flurry',  at: 'mon', k: 0.56, dx: -6, dy: -4, cut: 0.8 }],
-  thrust: [{ id: 'melee/thrust',         at: 'mon', k: 0.6,  dx: -48, dy: -6, cut: 0.6 }],
-  smash:  [{ id: 'melee/hammer-smash',   at: 'mon', k: 0.52, dx: -10, cut: 0.95, heavy: 1 }],
-  kick:   [{ id: 'melee/uppercut',       at: 'mon', k: 0.58, dx: -8,  cut: 0.62 }],
-  punch:  [{ id: 'impacts/blunt-hit',    at: 'mon', k: 0.58, dy: -24, cut: 0.42 }],
-  combo:  [{ id: 'melee/dagger-flurry',  at: 'mon', k: 0.52, dx: -6, dy: -4, cut: 0.72 }],
-  dash:   [{ id: 'melee/spin-slash',     at: 'mon', k: 0.52, dx: -6, dy: -14, cut: 0.6 }],
-
-  /* phép & phóng chiêu */
-  bolt:      [{ id: 'projectiles/magic-missile', at: 'me', k: 0.62, dy: -4, cut: 1.0, opts: { height: 44, reach: 158 } }],
-  beam:      [{ id: 'arcane/arcane-beam',        at: 'me', k: 0.52, dy: -30, cut: 0.7 }],
-  lightning: [{ id: 'lightning/lightning-strike', at: 'mon', k: 0.44, cut: 1.2, heavy: 1 }],
-  meteor:    [{ id: 'fire/meteor',               at: 'mon', k: 0.42, cut: 1.5, heavy: 1 }],
-  chi:       [{ id: 'arcane/mana-burst',         at: 'mon', k: 0.52, dy: -26, cut: 0.9 }],
-  clock:     [{ id: 'arcane/time-stop',          at: 'mon', k: 0.5,  dy: -22, cut: 1.6 }],
-  summon:    [{ id: 'spawn/summon-rise',         at: 'mon', k: 0.46, dx: -16, cut: 2.8, heavy: 1 }],
-  glitch:    [{ id: 'scifi/emp-blast',           at: 'mon', k: 0.5,  dy: -26, cut: 1.0 }],
-  void:      [{ id: 'shadow/dark-explosion',     at: 'mon', k: 0.42, dy: -24, cut: 1.4, heavy: 1 }],
-  moon:      [{ id: 'arcane/arcane-missiles',    at: 'me',  k: 0.56, dy: -30, cut: 1.1, cols: ['#ffffff', '#cfe4ff', '#6a74c8'] }],
-  drain:     [{ id: 'shadow/life-steal',         at: 'me',  k: 0.52, dy: -26, cut: 1.3 }],
-
-  /* nguyên tố */
-  fire:   [{ id: 'fire/fire-breath',   at: 'me',  k: 0.5,  dy: -18, cut: 0.6 }],
-  breath: [{ id: 'fire/fire-breath',   at: 'me',  k: 0.54, dy: -20, cut: 0.75 }],
-  wok:    [{ id: 'fire/flamethrower',  at: 'me',  k: 0.52, dy: -18, cut: 0.7 }],
-  ice:    [{ id: 'ice/ice-spikes',     at: 'me',  k: 0.52, dx: 16,  cut: 1.2 }],
-  poison: [{ id: 'nature/poison-cloud', at: 'mon', k: 0.5, dx: -24, cut: 1.5, heavy: 1 }],
-  wind:   [{ id: 'nature/tornado',     at: 'mon', k: 0.5,  cut: 1.1, heavy: 1 }],
-  leaves: [{ id: 'nature/vine-whip',   at: 'mon', k: 0.52, dx: -48, cut: 1.0 }],
-  petals: [{ id: 'nature/vine-whip',   at: 'mon', k: 0.52, dx: -48, cut: 1.0, cols: ['#ffffff', '#ffa8c8', '#d8709a'] }],
-  sun:    [{ id: 'holy/holy-pillar',   at: 'mon', k: 0.46, cut: 1.5, heavy: 1 }],
-  holy:   [{ id: 'holy/smite',         at: 'mon', k: 0.48, cut: 1.3 }],
-  heal:   [{ id: 'holy/heal-aoe',      at: 'me',  k: 0.5,  cut: 1.4 }],
-
-  /* bắn & súng ống */
-  arrow:  [{ id: 'impacts/hit-spark',       at: 'mon', k: 0.5, dy: -26, delay: 0.22, cut: 0.4, keep: 1 }],
-  volley: [{ id: 'arcane/star-fall',        at: 'mon', k: 0.5, cut: 1.5, cols: ['#ffffff', '#d8b878', '#8a5530'] }],
-  swords: [{ id: 'arcane/star-fall',        at: 'mon', k: 0.5, cut: 1.5 }],
-  bullet: [{ id: 'projectiles/muzzle-pistol', at: 'me', k: 0.52, dx: 10, cut: 0.45, opts: { height: 30 } },
-           { id: 'impacts/hit-spark',          at: 'mon', k: 0.5, dy: -26, delay: 0.14, cut: 0.35, keep: 1 }],
-  cannon: [{ id: 'projectiles/muzzle-pistol', at: 'me', k: 0.75, dx: 10, cut: 0.5, opts: { height: 28 } },
-           { id: 'explosions/plasma-explosion', at: 'mon', k: 0.48, dy: -22, delay: 0.26, cut: 1.1, heavy: 1 }],
-  turret: [{ id: 'projectiles/muzzle-smg',  at: 'me', k: 0.6, dx: -18, cut: 0.7, keep: 1, opts: { height: 16 } },
-           { id: 'impacts/hit-spark',        at: 'mon', k: 0.45, dy: -24, delay: 0.2, cut: 0.35, keep: 1 }],
-
-  /* còn lại giữ hiệu ứng cũ của game, chỉ thêm một lớp pixelfx cho đậm */
-  notes: [{ id: 'arcane/arcane-missiles', at: 'me', k: 0.5, dy: -30, cut: 1.1, keep: 1 }],
-  talis: [{ id: 'lightning/zap-hit',      at: 'mon', k: 0.55, dy: -24, cut: 0.7, keep: 1 }],
-  gavel: [{ id: 'impacts/ground-slam',    at: 'mon', k: 0.36, cut: 1.3, keep: 1, heavy: 1 }],
-  bell:  [{ id: 'scifi/emp-blast',        at: 'me',  k: 0.52, dy: -22, cut: 1.2, keep: 1 }],
-  food:  [{ id: 'explosions/cartoon-pow', at: 'mon', k: 0.5, dy: -26, cut: 0.7, keep: 1 }],
+  slash: [{ id: 'melee/sword-slash', at: 'mon:body', by: 'me', k: 0.62, cut: 0.5 }],  // vệt chém lưỡi liềm
+  xslash: [{ id: 'melee/double-slash', at: 'mon:body', by: 'me', k: 0.56, cut: 0.62 }],  // chém chữ X
+  cleave: [{ id: 'melee/heavy-cleave', at: 'mon:body', by: 'me', k: 0.54, cut: 0.95, heavy: 1 }],  // bổ nặng
+  multi: [{ id: 'melee/spear-sweep', at: 'mon:body', by: 'me', k: 0.6, cut: 0.85 }],  // quét ngang tầm thấp, khác hẳn loạn đao
+  combo: [{ id: 'melee/dagger-flurry', at: 'mon:body', by: 'me', k: 0.5, cut: 0.72 }],
+  dash: [{ id: 'melee/spin-slash', at: 'mon:body', by: 'me', k: 0.52, cut: 0.6 }],  // xoay người chém
+  kick: [{ id: 'melee/uppercut', at: 'mon:body', by: 'me', k: 0.58, cut: 0.62 }],  // đá móc
+  punch: [{ id: 'impacts/blunt-hit', at: 'mon:body', by: 'me', k: 0.58, cut: 0.42 }],
+  smash: [{ id: 'melee/hammer-smash', at: 'mon:foot', by: 'me', k: 0.52, cut: 0.95, heavy: 1 }],  // búa giã nứt sàn
+  thrust: [{ id: 'melee/thrust', at: 'me:cast', by: 'me', to: 'mon:body', span: 64, dy: 2, cut: 0.6 }],  // tầm với tự tính
+  bolt: [{ id: 'projectiles/magic-missile', at: 'me:cast', by: 'me', to: 'mon:body', span: 110, cut: 1, opts: { height: 10 } }],  // bay từ đầu gậy
+  beam: [{ id: 'arcane/arcane-beam', at: 'me:cast', by: 'me', to: 'mon:body', span: 224, cut: 0.7 }],  // tia chạy hết quãng
+  moon: [{ id: 'arcane/arcane-missiles', at: 'me:cast', by: 'me', to: 'mon:body', span: 150, cut: 1.1, cols: ['#ffffff', '#cfe4ff', '#6a74c8'] }],
+  drain: [{ id: 'shadow/life-steal', at: 'me:cast', by: 'me', to: 'mon:body', span: 140, cut: 1.3 }],
+  notes: [{ id: 'bahi/note-wave', at: 'me:body', by: 'me', k: 0.62, cut: 1.3 }],  // nốt nhạc · vòng sóng mang nốt bay ra
+  fire: [{ id: 'fire/flamethrower', at: 'me:cast', by: 'me', to: 'mon:body', span: 150, cut: 0.6 }],  // phát từ đầu gậy
+  breath: [{ id: 'fire/fire-breath', at: 'me:cast', by: 'me', to: 'mon:body', span: 170, cut: 0.6, kmax: 0.5 }],  // luồng rộng, chặn trần cỡ
+  wok: [{ id: 'bahi/wok-flambe', at: 'me:foot', by: 'me', to: 'mon:body', span: 112, cut: 1.6, heavy: 1 }],  // ĐẦU BẾP · chảo lửa tạt tới, món ăn văng ra
+  ice: [{ id: 'ice/ice-spikes', at: 'me:foot', by: 'me', to: 'mon:foot', span: 215, cut: 1.2 }],  // gai băng chạy trên sàn
+  leaves: [{ id: 'nature/vine-whip', at: 'me:ahead', by: 'me', to: 'mon:body', span: 118, cut: 1 }],  // trồi trước mặt rồi quất tới quái
+  petals: [{ id: 'nature/vine-whip', at: 'me:ahead', by: 'me', to: 'mon:body', span: 118, cut: 1, cols: ['#ffffff', '#ffa8c8', '#d8709a'] }],
+  lightning: [{ id: 'lightning/lightning-strike', at: 'mon:foot', k: 0.44, cut: 1.2, heavy: 1 }],  // cỡ theo đối thủ
+  meteor: [{ id: 'fire/meteor', at: 'mon:foot', k: 0.42, cut: 1.5, heavy: 1 }],
+  void: [{ id: 'shadow/dark-explosion', at: 'mon:body', k: 0.42, cut: 1.4, heavy: 1 }],
+  sun: [{ id: 'holy/holy-pillar', at: 'mon:foot', k: 0.46, cut: 1.5, heavy: 1 }],
+  holy: [{ id: 'holy/smite', at: 'mon:foot', k: 0.48, cut: 1.3 }],
+  wind: [{ id: 'nature/tornado', at: 'mon:foot', k: 0.5, cut: 1.1, heavy: 1 }],
+  poison: [{ id: 'nature/poison-cloud', at: 'mon:foot', k: 0.5, cut: 1.5, heavy: 1 }],
+  chi: [{ id: 'bahi/chi-palm', at: 'me:foot', by: 'me', to: 'mon:body', span: 104, cut: 0.95 }],  // VÕ SƯ · ba lớp sóng kình
+  clock: [{ id: 'arcane/time-stop', at: 'mon:body', k: 0.5, cut: 1.6 }],
+  summon: [{ id: 'spawn/summon-rise', at: 'mon:foot', k: 0.46, cut: 2.8, heavy: 1 }],
+  glitch: [{ id: 'scifi/emp-blast', at: 'mon:body', k: 0.5, cut: 1 }],
+  volley: [{ id: 'bahi/arrow-rain', at: 'mon:foot', k: 0.5, cut: 1.9, heavy: 1 }],  // CUNG THỦ · mưa tên thật, tên cắm xuống sàn
+  swords: [{ id: 'arcane/star-fall', at: 'mon:foot', k: 0.5, cut: 1.5 }],  // mưa kiếm
+  gavel: [{ id: 'impacts/ground-slam', at: 'mon:foot', k: 0.36, cut: 1.3, heavy: 1, keep: 1 }],
+  food: [{ id: 'explosions/cartoon-pow', at: 'mon:body', by: 'me', k: 0.5, cut: 0.7, keep: 1 }],
+  talis: [{ id: 'bahi/talisman-seal', at: 'mon:foot', k: 0.62, cut: 1.6, heavy: 1 }],  // TU SĨ · lục mang ấn rồi giáng xuống đúng mặt sàn
+  heal: [{ id: 'holy/heal-aoe', at: 'me:foot', by: 'me', k: 0.5, cut: 1.4 }],
+  bell: [{ id: 'bahi/note-wave', at: 'me:body', by: 'me', k: 0.6, cut: 1.3, cols: ['#fffbe0', '#ffd84a', '#b8860b'] }],  // chuông ngân · sóng âm vàng
+  arrow: [{ id: 'impacts/hit-spark', at: 'mon:body', by: 'me', k: 0.5, delay: 0.22, cut: 0.4, keep: 1 }],
+  bullet: [{ id: 'projectiles/muzzle-pistol', at: 'me:cast', by: 'me', k: 0.52, cut: 0.45, opts: { height: 6 } },
+    { id: 'impacts/hit-spark', at: 'mon:body', by: 'me', k: 0.5, delay: 0.14, cut: 0.35, keep: 1 }],  // nòng súng + điểm trúng
+  cannon: [{ id: 'projectiles/muzzle-pistol', at: 'me:cast', by: 'me', k: 0.75, cut: 0.5, opts: { height: 6 } },
+    { id: 'explosions/plasma-explosion', at: 'mon:body', k: 0.48, delay: 0.26, cut: 1.1, heavy: 1 }],
+  turret: [{ id: 'bahi/gear-saw', at: 'me:ahead', by: 'me', to: 'mon:body', span: 112, cut: 1.5, heavy: 1 }],  // KỸ SƯ · bánh răng lăn xé mặt sàn
 };
 
-/* ---- tuyệt kỹ thú chiến: theo 15 họ hiệu ứng trong PFXR ---- */
+/* ---- tuyệt kỹ thú chiến: 15 họ, 105 loài dùng chung, tô theo màu từng loài ---- */
 const PFXP = {
-  proj:   [{ id: 'projectiles/magic-missile', at: 'ally', k: 0.6, dy: -2, cut: 1.0, opts: { height: 26, reach: 205 } }],
-  melee:  [{ id: 'melee/claw-swipe',         at: 'mon',  k: 0.6,  dx: -10, cut: 0.7 }],
-  breath: [{ id: 'fire/fire-breath',         at: 'ally', k: 0.7,  dx: 8, dy: -8, cut: 0.8 }],
-  rings:  [{ id: 'scifi/emp-blast',          at: 'ally', k: 0.52, dy: -12, cut: 1.2 }],
-  sky:    [{ id: 'lightning/lightning-strike', at: 'mon', k: 0.44, cut: 1.2, heavy: 1 }],
-  ground: [{ id: 'nature/earth-spike',       at: 'mon',  k: 0.46, cut: 1.3, heavy: 1 }],
-  wave:   [{ id: 'water/wave-crash',         at: 'mon',  k: 0.58, dx: -4, cut: 1.3, heavy: 1 }],
-  beam:   [{ id: 'arcane/arcane-beam',       at: 'ally', k: 0.46, dy: -16, cut: 0.8 }],
-  aura:   [{ id: 'holy/heal-aoe',            at: 'ally', k: 0.46, cut: 1.2 }],
-  stars:  [{ id: 'arcane/star-fall',         at: 'mon',  k: 0.5,  cut: 1.4 }],
-  iai:    [{ id: 'melee/sword-slash',        at: 'mon',  k: 0.6,  dx: -10, cut: 0.5 }],
-  swords: [{ id: 'arcane/star-fall',         at: 'mon',  k: 0.5,  cut: 1.4 }],
-  lance:  [{ id: 'melee/thrust',             at: 'mon',  k: 0.58, dx: -46, dy: -4, cut: 0.6 }],
-  arrows: [{ id: 'arcane/star-fall',         at: 'mon',  k: 0.5,  cut: 1.4, cols: ['#ffffff', '#d8b878', '#6e4420'] }],
-  moon:   [{ id: 'arcane/arcane-missiles',   at: 'ally', k: 0.5,  dy: -16, cut: 1.1 }],
+  proj: [{ id: 'projectiles/magic-missile', at: 'ally:cast', by: 'ally', to: 'mon:body', span: 110, cut: 1, kmax: 0.85, opts: { height: 8 } }],
+  melee: [{ id: 'melee/claw-swipe', at: 'mon:body', by: 'ally', k: 0.6, cut: 0.7 }],
+  breath: [{ id: 'fire/fire-breath', at: 'ally:cast', by: 'ally', to: 'mon:body', span: 165, cut: 0.8, kmax: 0.42 }],  // phun từ mõm · thú nhỏ nên chặn cỡ thấp
+  rings: [{ id: 'scifi/emp-blast', at: 'ally:body', by: 'ally', k: 0.52, cut: 1.2 }],
+  sky: [{ id: 'lightning/chain-lightning', at: 'mon:body', by: 'ally', k: 0.5, cut: 1.2, heavy: 1 }],  // sét chuyền, khác sét giáng của Bahi
+  ground: [{ id: 'nature/earth-spike', at: 'mon:foot', k: 0.46, cut: 1.3, heavy: 1 }],
+  wave: [{ id: 'water/wave-crash', at: 'mon:foot', by: 'ally', k: 0.58, cut: 1.3, heavy: 1 }],
+  beam: [{ id: 'arcane/arcane-beam', at: 'ally:cast', by: 'ally', to: 'mon:body', span: 224, cut: 0.8, kmax: 0.75 }],
+  aura: [{ id: 'bahi/heart-bond', at: 'ally:body', by: 'ally', k: 0.75, cut: 1.5 }],  // thú thân thiết · tim bay lên
+  stars: [{ id: 'arcane/star-fall', at: 'mon:foot', k: 0.5, cut: 1.4 }],
+  iai: [{ id: 'melee/sword-slash', at: 'mon:body', by: 'ally', k: 0.6, cut: 0.5 }],
+  swords: [{ id: 'melee/scythe-reap', at: 'mon:body', by: 'ally', k: 0.52, cut: 1.1, heavy: 1 }],  // lưỡi hái lớn, khác mưa sao
+  lance: [{ id: 'melee/thrust', at: 'ally:cast', by: 'ally', to: 'mon:body', span: 64, cut: 0.6, kmax: 1.1 }],
+  arrows: [{ id: 'bahi/arrow-rain', at: 'mon:foot', k: 0.46, cut: 1.8, heavy: 1 }],
+  moon: [{ id: 'arcane/arcane-missiles', at: 'ally:cast', by: 'ally', to: 'mon:body', span: 150, cut: 1.1, kmax: 1 }],
 };
 
-/* ---- những khoảnh khắc chung của mọi trận ---- */
+/* ---- đòn của đối thủ ---- */
+const PFXM = {
+  norm: [{ id: 'melee/claw-swipe', at: 'me:body', by: 'mon', k: 0.58, cut: 0.6 }],  // tự lật theo mặt đối thủ
+  skill: [{ id: 'melee/claw-swipe', at: 'me:body', by: 'mon', k: 0.66, cut: 0.7 },
+    { id: 'impacts/hit-spark', at: 'me:body', by: 'mon', k: 0.55, delay: 0.18, cut: 0.4 }],
+  boss: [{ id: 'melee/heavy-cleave', at: 'me:body', by: 'mon', k: 0.54, cut: 1, heavy: 1 }],
+  slam: [{ id: 'impacts/ground-slam', at: 'me:foot', by: 'mon', k: 0.36, cut: 1.3, heavy: 1 }],
+};
+
+/* ---- khoảnh khắc lớn của trận ---- */
+const PFXMOMENT = {
+  die: [{ id: 'spawn/poof', at: 'mon:body', k: 0.6, cut: 1 }],
+  dieBoss: [{ id: 'explosions/small-explosion', at: 'mon:foot', k: 0.44, cut: 2, heavy: 1 }],
+  evolve: [{ id: 'explosions/plasma-explosion', at: 'mon:body', k: 0.46, cut: 1.2, heavy: 1 },
+    { id: 'arcane/mana-burst', at: 'mon:body', k: 0.5, delay: 0.25, cut: 1 }],
+  phase2: [{ id: 'shadow/dark-explosion', at: 'mon:body', k: 0.44, cut: 1.5, heavy: 1 }],
+  revive: [{ id: 'holy/holy-pillar', at: 'me:foot', k: 0.48, cut: 1.8, heavy: 1 }],
+  win: [{ id: 'explosions/firework-burst', at: 'mon:over', k: 0.42, pin: 0, dy: -24, cut: 2.2, heavy: 1 }],
+  crown: [{ id: 'explosions/firework-burst', at: 'mon:over', k: 0.5, pin: 0, dy: -28, cut: 2.6, heavy: 1 }],
+  slow: [{ id: 'ice/frost-nova', at: 'mon:foot', k: 0.44, cut: 1.1 }],
+  burn: [{ id: 'fire/fireball', at: 'mon:body', k: 0.42, cut: 0.45 }],
+  stun: [{ id: 'lightning/zap-hit', at: 'mon:over', k: 0.5, cut: 0.6 }],
+  guard: [{ id: 'impacts/shield-block', at: 'mon:foot', by: 'mon', k: 0.9, cut: 0.9 }],  // vòm khiên dựng trước mặt, cao hơn thân
+  enrage: [{ id: 'explosions/cartoon-pow', at: 'mon:body', k: 0.48, cut: 0.6 }],
+  curse: [{ id: 'shadow/dark-explosion', at: 'mon:body', k: 0.3, cut: 0.8 }],
+};
+
 function pfxPlayList(list, o) {
   if (!PFX.on || !list) return false;
   o = o || {};
   let any = false;
   for (const e of list) {
-    const x = (e.at ? PFX_AT[e.at] : PFX_AT.mon) + (e.dx || 0) + (o.dx || 0);
-    const y = PFX_GY + (e.dy || 0) + (o.dy || 0);
-    const r = PFX.play(e.id, {
-      x, y, k: (e.k || 0.5) * (o.kk || 1), flip: !!e.flip !== !!o.flip,
-      cols: e.cols || o.cols, delay: (e.delay || 0) + (o.delay || 0), cut: e.cut, heavy: e.heavy,
-      opts: e.opts, light: e.light, must: o.must,
+    const a = Object.assign({}, e, {
+      cols: e.cols || o.cols,
+      delay: (e.delay || 0) + (o.delay || 0),
+      must: o.must,
     });
-    if (r) any = true;
+    if (o.kk && a.k) a.k *= o.kk;
+    if (o.at) a.at = o.at;
+    if (PFX.play(e.id, a)) any = true;
   }
   return any;
 }
-
-/* đòn trúng: tia lửa nhỏ cho đòn thường, sao vỡ + khung chớp cho chí mạng */
-function pfxHit(side, crit, cols) {
-  if (!PFX.on) return;
-  const x = side === 'me' ? PFX_AT.me : PFX_AT.mon;
-  if (crit) {
-    PFX.play('impacts/crit-hit', { x, y: PFX_GY, k: 0.52, cols, cut: 0.6, opts: { height: 26 }, must: 1 });
-    PFX.play('impacts/impact-frame', { x: 100, y: 56, k: 0.62, cut: 0.3 });
-  } else {
-    PFX.play('impacts/hit-spark', { x, y: PFX_GY - 26, k: 0.55, cols, cut: 0.4 });
-  }
-}
-function pfxBlock(side) { if (PFX.on) PFX.play('impacts/shield-block', { x: side === 'me' ? PFX_AT.me : PFX_AT.mon, y: PFX_GY, k: 0.55, cut: 0.7 }); }
-function pfxMiss(side) { if (PFX.on) PFX.play('impacts/parry', { x: side === 'me' ? PFX_AT.me + 14 : PFX_AT.mon - 14, y: PFX_GY - 26, k: 0.5, cut: 0.6 }); }
-function pfxHeal(side) { if (PFX.on) PFX.play('holy/heal-aoe', { x: side === 'me' ? PFX_AT.me : PFX_AT.mon, y: PFX_GY, k: 0.46, cut: 1.1 }); }
-
-/* ---- đòn của đối thủ ---- */
-const PFXM = {
-  norm:  [{ id: 'melee/claw-swipe',     at: 'me', k: 0.58, dx: 10, cut: 0.6, flip: 1 }],
-  skill: [{ id: 'melee/claw-swipe',     at: 'me', k: 0.66, dx: 10, cut: 0.7, flip: 1 },
-          { id: 'impacts/hit-spark',    at: 'me', k: 0.55, dy: -26, delay: 0.18, cut: 0.4 }],
-  boss:  [{ id: 'melee/heavy-cleave',   at: 'me', k: 0.54, dx: 14, cut: 1.0, flip: 1, heavy: 1 }],
-  slam:  [{ id: 'impacts/ground-slam',  at: 'me', k: 0.36, cut: 1.3, heavy: 1 }],
-};
-
-/* ---- khoảnh khắc lớn của trận ---- */
-const PFXMOMENT = {
-  die:     [{ id: 'spawn/poof',                 at: 'mon', k: 0.6, dy: -22, cut: 1.0 }],
-  dieBoss: [{ id: 'explosions/small-explosion', at: 'mon', k: 0.44, cut: 2.0, heavy: 1 },
-            { id: 'impacts/impact-frame',       at: 'mid', dy: -42, k: 0.7, cut: 0.3 }],
-  evolve:  [{ id: 'explosions/plasma-explosion', at: 'mon', k: 0.46, dy: -26, cut: 1.2, heavy: 1 },
-            { id: 'arcane/mana-burst',          at: 'mon', k: 0.5, dy: -26, delay: 0.25, cut: 1.0 }],
-  phase2:  [{ id: 'shadow/dark-explosion',      at: 'mon', k: 0.44, dy: -26, cut: 1.5, heavy: 1 }],
-  revive:  [{ id: 'holy/holy-pillar',           at: 'me',  k: 0.48, cut: 1.8, heavy: 1 }],
-  win:     [{ id: 'explosions/firework-burst',  at: 'mid', dy: -46, k: 0.42, cut: 2.2, heavy: 1 }],
-  crown:   [{ id: 'explosions/firework-burst',  at: 'mid', dy: -52, k: 0.5, cut: 2.6, heavy: 1 }],
-  slow:    [{ id: 'ice/frost-nova',             at: 'mon', k: 0.44, cut: 1.1 }],
-  burn:    [{ id: 'fire/fireball',              at: 'mon', k: 0.42, dx: -16, dy: -24, cut: 0.45 }],
-  stun:    [{ id: 'lightning/zap-hit',          at: 'mon', k: 0.5, dy: -24, cut: 0.6 }],
-  guard:   [{ id: 'impacts/shield-block',       at: 'mon', k: 0.55, cut: 0.9 }],
-  enrage:  [{ id: 'explosions/cartoon-pow',     at: 'mon', k: 0.48, dy: -26, cut: 0.6 }],
-  curse:   [{ id: 'shadow/dark-explosion',      at: 'mon', k: 0.3, dy: -24, cut: 0.8 }],
-};
 function pfxMoment(k, o) { return pfxPlayList(PFXMOMENT[k], o); }
 
-// hiệu ứng theo trạng thái: chỉ vài trạng thái có hình riêng, còn lại để yên cho đỡ rối
-const PFXS = { slow: 'slow', burn: 'burn', stun: 'stun', roar: 'stun', fear: 'curse', curse: 'curse', break: 'enrage', shatter: 'enrage', guard: 'guard', barrier: 'guard', pshield: 'guard', enrage: 'enrage' };
+/* đòn trúng: tia lửa nhỏ cho đòn thường, sao vỡ + khung chớp cho chí mạng.
+   Cỡ theo chính thân người bị đánh, nên đánh trúng trùm to thì tia lửa cũng lớn. */
+function pfxHit(side, crit, cols) {
+  if (!PFX.on) return;
+  const who = side === 'me' ? 'me' : 'mon', by = side === 'me' ? 'mon' : 'me';
+  if (crit) {
+    // Chí mạng gói gọn quanh chỗ trúng đòn. Bản trước dùng khung chớp kiểu anime phủ kín
+    // màn hình — nhìn một lần thì đã, nhưng che mất cả hai bên đang đánh nhau.
+    PFX.play('impacts/crit-hit', { at: who + ':body', by, k: 0.62, cols, cut: 0.6, must: 1 });
+    PFX.play('impacts/hit-spark', { at: who + ':body', by, k: 0.45, cols, dx: -4, dy: -5, delay: 0.07, cut: 0.3 });
+  } else {
+    PFX.play('impacts/hit-spark', { at: who + ':body', by, k: 0.55, cols, cut: 0.4 });
+  }
+}
+/* chắn đòn: vòm khiên luôn dựng ở phía TRƯỚC mặt người chắn */
+function pfxBlock(side) {
+  if (!PFX.on) return;
+  const who = side === 'me' ? 'me' : 'mon';
+  // vòm cao hơn người một chút mới ra dáng che chắn: RY=44 trong hiệu ứng, k 0,9 cho vòm ~1,2 lần chiều cao
+  PFX.play('impacts/shield-block', { at: who + ':foot', by: who, k: 0.9, cut: 0.8 });
+}
+/* hụt đòn: hai lưỡi gạt nhau, nổ ở giữa hai bên */
+function pfxMiss(side) {
+  if (!PFX.on) return;
+  const who = side === 'me' ? 'me' : 'mon', by = side === 'me' ? 'mon' : 'me';
+  PFX.play('impacts/parry', { at: who + ':front', by, k: 0.5, cut: 0.6 });
+}
+function pfxHeal(side) {
+  if (!PFX.on) return;
+  const who = side === 'me' ? 'me' : 'mon';
+  PFX.play('holy/heal-aoe', { at: who + ':foot', by: who, k: 0.46, cut: 1.1 });
+}
+
+/* hiệu ứng theo trạng thái: chỉ vài trạng thái có hình riêng, còn lại để yên cho đỡ rối */
+const PFXS = { slow: 'slow', burn: 'burn', stun: 'stun', roar: 'stun', fear: 'curse', curse: 'curse',
+  break: 'enrage', shatter: 'enrage', guard: 'guard', barrier: 'guard', pshield: 'guard', enrage: 'enrage' };
 function pfxStatus(side, s) {
   const k = PFXS[s];
   if (!PFX.on || !k) return;
-  const dx = (side === 'me' ? PFX_AT.me : PFX_AT.mon) - PFX_AT.mon;
-  pfxPlayList(PFXMOMENT[k], { dx });
+  // cùng một hiệu ứng, chỉ đổi thân neo sang bên đang dính trạng thái
+  const list = PFXMOMENT[k].map(e => Object.assign({}, e, {
+    at: e.at.replace(/^mon:/, side === 'me' ? 'me:' : 'mon:'),
+    by: e.by === 'mon' && side === 'me' ? 'me' : e.by,
+  }));
+  pfxPlayList(list, {});
 }
 </script>
 
@@ -17712,7 +19052,7 @@ function winChance(f,n){const st=stats(),ps=battlePetStats();let w=0;for(let k=0
 // ---------- trận đấu ----------
 const BW2=200,BH2=112,BPARTS=[];
 const BT={run:false,last:0,speed:1};
-function newBattle(f){const st=stats(),m=makeMon(f);BFX.length=0;BX.length=0;try{PFX.clear();}catch(e){}if(m.big>=0){bossSprite(m.big,{f:0,atk:0,ph:0});S.bossSeen=S.bossSeen||{};S.bossSeen[f]=1;}Object.assign(BT,{rs:null,rsDone:0,bevo:null,bvs:0,prevMon:null,gi:null,guardDone:0,guarded:0,bcut:null,intro:m.big>=0?{t:0,d:m.big>=5?3.0:2.4}:null,cut:null,quake:0,ghost:0,lungeK:0,floor:f,mon:m,pet:petById(S.battlePet)||null,B:newFight(st,PET.F,f,battlePetStats()),t:0,next:0.5,phase:m.big>=0?'intro':'fight',act:null,flash:[0,0],shake:[0,0],res:null,endT:0,fq:0});BPARTS.length=0;}
+function newBattle(f){const st=stats(),m=makeMon(f);BFX.length=0;BX.length=0;try{PFX.clear();}catch(e){}if(m.big>=0){bossSprite(m.big,{f:0,atk:0,ph:0});S.bossSeen=S.bossSeen||{};S.bossSeen[f]=1;}Object.assign(BT,{rs:null,rsDone:0,bevo:null,bvs:0,prevMon:null,gi:null,guardDone:0,guarded:0,bcut:null,intro:m.big>=0?{t:0,d:m.big>=5?3.0:2.4}:null,cut:null,quake:0,ghost:0,lungeK:0,floor:f,mon:m,pet:petById(S.battlePet)||null,B:newFight(st,PET.F,f,battlePetStats()),t:0,next:0.5,phase:m.big>=0?'intro':'fight',act:null,flash:[0,0],shake:[0,0],res:null,endT:0,fq:0});BPARTS.length=0;try{pfxRig();}catch(e){}}
 function bFloat(side,txt,cls){const k=BT.fq++,box=$('b-float');setTimeout(()=>{const d=document.createElement('div');d.className='bfl '+(cls||'');d.textContent=txt;
   d.style.left=(side==='me'?26:74)+(((k%3)-1)*6)+'%';d.style.top=(30-(k%3)*7)+'%';box.appendChild(d);setTimeout(()=>d.remove(),900);},(k%4)*90);}
 function bspawn(o){const PC=PCUR;PCUR=BPARTS;spawn(o);PCUR=PC;}
@@ -17754,6 +19094,27 @@ function endBattle(win){BT.phase=win?'win':'lose';BT.endT=BT.t;const f=BT.floor;
   if(!win){const sw=strongWeak(PET.F),bb=bigBoss(f);BT.res=(BT.B.judged?'Hết giờ, đối thủ còn nhiều máu hơn. ':'')+(bb?'Trùm '+bb.n+' quá mạnh. Xem điểm yếu ở sảnh tháp, nâng trang bị, luyện thú chiến rồi quay lại.':'Thua ở tầng '+f+'. Nâng trang bị, chăm Bahi đủ no và sạch, hoặc luyện thêm cấp rồi thử lại.');const lx=bonusXP(Math.round((10+f*2)*TXP_LOSE));gainXP(lx);BT.res+=' (Vẫn học được +'+lx+' XP)';sfx('lose');}
   if(BT.guarded)guardResult(win);
   save();hud();if(win)setTimeout(()=>rankSync(true),250);setTimeout(()=>{$('b-res').textContent=BT.res+(BT.pet?' · '+BT.res2:'')+(BT.res2x||'');BT.res2x='';$('b-res').className='b-res '+(win?'ok':'bad');if(win){$('b-facttx').textContent=BT.fact;$('b-fact').hidden=false;}$('b-next').hidden=!(win&&!BT.enc&&S.floor<TOWER_TOP);againShow();towerUI();if(win&&BT.enc){const e=BT.enc;BT.enc=null;$('b-res').textContent+=' · Bụi rậm đang rung động... có gì đó!';sfx('rare',e.r);vib([40,60,40]);setTimeout(()=>{BT.run=false;$('b-fact').hidden=true;openCatch(e);},1800);}},500);}
+// ---- v59b: nạp "hệ xương" cho pixelfx, để hiệu ứng bám theo thân thật ----
+// Đo khung bao của một sprite đúng một lần rồi nhớ lại, quy về không gian xương
+// (x lệch so với tâm, y âm là hướng lên, gốc ở bàn chân) như các điểm neo của game.
+const _pfxBox=new WeakMap();
+function pfxBox(c){if(!c)return null;let b=_pfxBox.get(c);if(b)return b;
+  try{const w=c.width,h=c.height,ax=Math.round(w*AX/SW),ay=Math.round(h*AY/SH);
+    const d=c.getContext('2d').getImageData(0,0,w,h).data;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>8){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+    b=x0>x1?{w:24,h:34}:{w:x1-x0+1,h:ay-y0,cx:(x0+x1)/2-ax};
+  }catch(e){b={w:24,h:34};}
+  if(b.h<6)b.h=34;_pfxBox.set(c,b);return b;}
+function pfxRig(pe,ms){if(typeof PFX==='undefined'||!PFX.on||!BT.B)return;
+  try{
+    if(!pe)pe=getSprite(PET.F,defPose(PET.F));
+    const pb=pfxBox(pe.c),hH=pe.A&&pe.A.top?-pe.A.top[1]:pb.h;
+    const r={me:{x:52,y:98,face:1,h:hH,w:pb.w,A:pe.A}};
+    if(ms){const mb=pfxBox(ms);r.mon={x:150,y:98,face:-1,h:mb.h,w:mb.w,A:null};}
+    if(BT.pet){const ps=petSprite(BT.pet,{expr:'focus',bob:0,f:0}),pc=ps.c||ps,bb=pfxBox(pc);
+      r.ally={x:20,y:106,face:1,h:bb.h,w:bb.w,A:ps.A||null};}
+    PFX.setRig(r);
+  }catch(e){}}
 function drawBattle(){const cv=$('b-cv'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
   const big=BT.B.big;drawTowerBG(g,BT.floor,BT.t,big);drawBX(g,true);
   const t=BT.t,ranged=KIT[PET.F].t!=='melee',lunge=w=>BT.act&&BT.act.who===w?Math.sin(Math.min(1,BT.act.t/0.3)*Math.PI)*(w==='me'?(BT.lungeK?10*BT.lungeK:(ranged?-3:10)):(BT.mlungeK?10*BT.mlungeK:10)):0,me=lunge('me'),mo=lunge('mon');
@@ -17785,7 +19146,7 @@ function drawBattle(){const cv=$('b-cv'),g=cv.getContext('2d');g.imageSmoothingE
     const sy=big>=0?Math.max(8,48-big*5):40;
     if(BT.B.mon.poison>0)for(let k=0;k<BT.B.mon.poison;k++){g.fillStyle='#8ae05a';g.fillRect(138+k*4,sy+Math.round(Math.sin(t*4+k)*1),2,2);}
     if(BT.B.mon.burnT>0&&Math.floor(t*8)%2){g.fillStyle='#ffb347';g.fillRect(146,sy-4,3,3);g.fillRect(152,sy-2,2,2);}}
-  try{PFX.draw(g,'front');}catch(e){}drawBFX(g);drawBX(g,false);drawParts(g,true,BPARTS);drawRescue(g);g.restore();drawCutIn(g);drawPetCut(g);drawBossCut(g);drawBossEvoBanner(g);drawRescueText(g);drawSubSay(g);try{ptBattle(g);}catch(e){}if(BT.phase==='intro')drawBossIntro(g);if(BT.phase==='guard')drawGuardIntro(g);if(BT.phase==='win'&&BT.floor===TOWER_TOP)drawCrown(g,t-(BT.endT||0));}
+  try{pfxRig(pe,ms);PFX.draw(g,'front');}catch(e){}drawBFX(g);drawBX(g,false);drawParts(g,true,BPARTS);drawRescue(g);g.restore();drawCutIn(g);drawPetCut(g);drawBossCut(g);drawBossEvoBanner(g);drawRescueText(g);drawSubSay(g);try{ptBattle(g);}catch(e){}if(BT.phase==='intro')drawBossIntro(g);if(BT.phase==='guard')drawGuardIntro(g);if(BT.phase==='win'&&BT.floor===TOWER_TOP)drawCrown(g,t-(BT.endT||0));}
 const _silCache=new WeakMap();
 function bLoop(ts){if(!BT.run)return;requestAnimationFrame(bLoop);const d0=Math.min(0.05,(ts-(BT.last||ts))/1000);BT.last=ts;const d=d0*(BT.phase==='fight'?BT.speed:1);
   BT.t+=d;if(BT.act)BT.act.t+=d;if(BT.bevo){BT.bevo.t+=d;if(BT.bevo.t>=1.65&&!BT.bevo.done){BT.bevo.done=1;BT.bvs=BT.bevo.n;bossEvoBoom();}if(BT.bevo.t>3.1)BT.bevo=null;}updBFX(d);updBX(d);try{PFX.step(d);}catch(e){}if(BT.phase==='intro'){bossWarmStep(BT.B.big);BT.intro.t+=d;if(BT.intro.t>=BT.intro.d){BT.phase='fight';BT.next=0.3;}}BT.flash=BT.flash.map(v=>Math.max(0,v-d));BT.shake=BT.shake.map(v=>Math.max(0,v-d));
