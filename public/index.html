@@ -823,7 +823,7 @@ input,select,textarea{font-size:16px}
 </head>
 <body>
 <div id="intro"><img id="in-bgi" alt=""><div id="in-stage"><img id="in-img" src="title.webp" alt="Nuôi Bahi" decoding="async" fetchpriority="high"><canvas id="in-fx"></canvas></div>
-  <div class="in-ui"><button id="in-go" type="button" disabled><span>BẮT ĐẦU</span></button><p class="in-ver">Phiên bản v65 · Mùa 2</p></div></div>
+  <div class="in-ui"><button id="in-go" type="button" disabled><span>BẮT ĐẦU</span></button><p class="in-ver">Phiên bản v65.1 · Mùa 2</p></div></div>
 <div id="app">
   <div id="top" class="px">
     <div class="row"><div id="title">NUÔI BAHI</div><button id="b-snd">ÂM: BẬT</button></div>
@@ -950,7 +950,7 @@ input,select,textarea{font-size:16px}
     <p class="hint" id="cl-msg"></p>
     <div id="cl-prev"></div>
   </div>
-  <p class="hint" style="text-align:center;opacity:.7">Phiên bản v65 · Mùa 2</p><details class="dzmore"><summary>Tùy chọn khác</summary><div class="dzone"><small>Xóa tiến trình trên máy này và bắt đầu ván mới (có 2 bước xác nhận).</small><button class="mini gray" id="cl-reset">Chơi lại từ đầu</button></div></details>
+  <p class="hint" style="text-align:center;opacity:.7">Phiên bản v65.1 · Mùa 2</p><details class="dzmore"><summary>Tùy chọn khác</summary><div class="dzone"><small>Xóa tiến trình trên máy này và bắt đầu ván mới (có 2 bước xác nhận).</small><button class="mini gray" id="cl-reset">Chơi lại từ đầu</button></div></details>
   <div class="acts"><button class="pbtn grn" id="cl-save">Lưu ngay</button><button class="pbtn blue" id="cl-copy">Chép mã</button><button class="pbtn gray" data-close>Đóng</button></div>
 </div></div>
 
@@ -1340,7 +1340,7 @@ const g = rng(seed, i, 911);
 const born = g.next() * period;
 const L = typeof life === "function" ? life(g) : life;
 let age = (((t - born) % period) + period) % period;
-for (; age < L; age += period) fn(age, L, rng(seed, i), i);
+if (period > 0 && isFinite(age) && isFinite(L)) for (; age < L; age += period) fn(age, L, rng(seed, i), i);
 }
 }
 function stream(t, t0, t1, rate, seed, life, fn) {
@@ -2026,13 +2026,15 @@ if (o.k > 0) this.add(sx, sy, o.l || c, o.k);
 line(x0, y0, x1, y1, c, a = 1) {
 let sx = this.cellX(x0, y0), sy = this.cellY(x0, y0);
 const ex = this.cellX(x1, y1), ey = this.cellY(x1, y1);
+if (!isFinite(sx) || !isFinite(sy) || !isFinite(ex) || !isFinite(ey)) return;
+if (Math.abs(ex - sx) + Math.abs(ey - sy) > 4 * (this.w + this.h)) return;
 const dx = Math.abs(ex - sx), dy = -Math.abs(ey - sy), stepx = sx < ex ? 1 : -1, stepy = sy < ey ? 1 : -1;
 const n = Math.max(dx, -dy) || 1, fc = typeof c === "function", fa = typeof a === "function";
 let err = dx + dy, i = 0;
 for (;;) {
 const u = i++ / n;
 this.put(sx, sy, fc ? c(u) : c, fa ? a(u) : a);
-if (sx === ex && sy === ey) break;
+if ((sx === ex && sy === ey) || i > n + 2) break;
 const e2 = 2 * err;
 if (e2 >= dy) { err += dy; sx += stepx; }
 if (e2 <= dx) { err += dx; sy += stepy; }
@@ -2099,7 +2101,9 @@ o.a = call(a, u, v);
 }
 rect(x, y, w, h, c, a = 1) {
 if (this.sn === 0) {
-const X0 = Math.round(x), Y0 = Math.round(y), X1 = Math.round(x + w), Y1 = Math.round(y + h);
+if (!isFinite(x) || !isFinite(y) || !isFinite(w) || !isFinite(h)) return;
+const lx0 = this.fromX(this.ox, 0), lx1 = this.fromX(this.ox + this.w, 0), ly0 = this.fromY(0, this.oy), ly1 = this.fromY(0, this.oy + this.h);
+const X0 = Math.max(Math.round(x), Math.floor(Math.min(lx0, lx1)) - 2), Y0 = Math.max(Math.round(y), Math.floor(Math.min(ly0, ly1)) - 2), X1 = Math.min(Math.round(x + w), Math.ceil(Math.max(lx0, lx1)) + 2), Y1 = Math.min(Math.round(y + h), Math.ceil(Math.max(ly0, ly1)) + 2);
 for (let yy = Y0; yy < Y1; yy++) for (let xx = X0; xx < X1; xx++) this.put(this.cellX(xx, yy), this.cellY(xx, yy), c, a);
 return;
 }
@@ -2125,9 +2129,10 @@ o.a = call(a, x, y);
 }
 tri(x0, y0, x1, y1, x2, y2, c, a = 1) { this.poly([[x0, y0], [x1, y1], [x2, y2]], c, a); }
 glow(x, y, r, c, k = 0.5) {
-if (r < 1 || k <= 0.004) return;
+if (!(r >= 1) || !(k > 0.004) || !isFinite(r)) return;
 const cx = this.toX(x, y), cy = this.toY(x, y);
-const x0 = Math.floor(cx - r), x1 = Math.ceil(cx + r), y0 = Math.floor(cy - r), y1 = Math.ceil(cy + r);
+if (!isFinite(cx) || !isFinite(cy)) return;
+const x0 = Math.max(this.ox, Math.floor(cx - r)), x1 = Math.min(this.ox + this.w - 1, Math.ceil(cx + r)), y0 = Math.max(this.oy, Math.floor(cy - r)), y1 = Math.min(this.oy + this.h - 1, Math.ceil(cy + r));
 for (let sy = y0; sy <= y1; sy++) {
 const dy = (sy + 0.5 - cy) / r;
 for (let sx = x0; sx <= x1; sx++) {
@@ -2139,11 +2144,12 @@ this.add(sx, sy, c, f * f * k);
 }
 }
 glowLine(x0, y0, x1, y1, r, c, k = 0.5) {
-if (r < 1 || k <= 0.004) return;
+if (!(r >= 1) || !(k > 0.004) || !isFinite(r)) return;
 const ax = this.toX(x0, y0), ay = this.toY(x0, y0), bx = this.toX(x1, y1), by = this.toY(x1, y1);
+if (!isFinite(ax) || !isFinite(ay) || !isFinite(bx) || !isFinite(by)) return;
 const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy || 1e-9;
-const X0 = Math.floor(Math.min(ax, bx) - r), X1 = Math.ceil(Math.max(ax, bx) + r);
-const Y0 = Math.floor(Math.min(ay, by) - r), Y1 = Math.ceil(Math.max(ay, by) + r);
+const X0 = Math.max(this.ox, Math.floor(Math.min(ax, bx) - r)), X1 = Math.min(this.ox + this.w - 1, Math.ceil(Math.max(ax, bx) + r));
+const Y0 = Math.max(this.oy, Math.floor(Math.min(ay, by) - r)), Y1 = Math.min(this.oy + this.h - 1, Math.ceil(Math.max(ay, by) + r));
 for (let sy = Y0; sy <= Y1; sy++)
 for (let sx = X0; sx <= X1; sx++) {
 const px = sx + 0.5, py = sy + 0.5, u = clamp(((px - ax) * dx + (py - ay) * dy) / L2);
@@ -2154,10 +2160,11 @@ this.add(sx, sy, c, f * f * k);
 }
 }
 glowRing(x, y, R, r, c, k = 0.5) {
-if (r < 1 || k <= 0.004) return;
+if (!(r >= 1) || !(k > 0.004) || !isFinite(r) || !isFinite(R)) return;
 const cx = this.toX(x, y), cy = this.toY(x, y), E = R + r;
-for (let sy = Math.floor(cy - E); sy <= Math.ceil(cy + E); sy++)
-for (let sx = Math.floor(cx - E); sx <= Math.ceil(cx + E); sx++) {
+if (!isFinite(cx) || !isFinite(cy)) return;
+for (let sy = Math.max(this.oy, Math.floor(cy - E)); sy <= Math.min(this.oy + this.h - 1, Math.ceil(cy + E)); sy++)
+for (let sx = Math.max(this.ox, Math.floor(cx - E)); sx <= Math.min(this.ox + this.w - 1, Math.ceil(cx + E)); sx++) {
 const d = Math.abs(Math.hypot(sx + 0.5 - cx, sy + 0.5 - cy) - R) / r;
 if (d >= 1) continue;
 const f = 1 - d;
@@ -10136,7 +10143,7 @@ for (let o = -w / 2; o <= w / 2 + 0.01; o += 0.5) if (y + sa * (rr + o) * sy < m
 function walk(R, x, y, a, L, { jit = 0.55, steer = 0.45, step = [2, 4], maxY = Infinity, d0 = 0 } = {}) {
 const pts = [[x, y, d0]];
 let d = 0, cur = a;
-while (d < L - 0.01) {
+while (d < L - 0.01 && pts.length < 2048) {
 const s = Math.min(L - d, R.range(step[0], step[1]));
 cur += R.range(-jit, jit) + (a - cur) * steer;
 x += Math.cos(cur) * s;
@@ -11116,7 +11123,7 @@ const SOOT = hex("#110c16"), SOOT2 = hex("#1c1522");
 function zigzag(R, x0, y0, x1, y1, jag = 0.32, forks = 0.35, w = 1, depth = 0) {
 const out = { paths: [] }, L = Math.hypot(x1 - x0, y1 - y0);
 let pts = [[x0, y0], [x1, y1]], off = L * jag;
-while (pts.length < 2 + L / 3) {
+while (pts.length < 2 + L / 3 && pts.length < 2048) {
 const nxt = [pts[0]];
 for (let i = 0; i < pts.length - 1; i++) {
 const [ax, ay] = pts[i], [bx, by] = pts[i + 1], l = Math.hypot(bx - ax, by - ay) || 1, o = R.range(-off, off);
@@ -18066,6 +18073,7 @@ return this.specs.length;
 state(s, age) {
 const q = { k: s.k, x: s.x, y: s.y, vx: s.vx, vy: s.vy, life: s.life, max: s.life, col: s.col, size: s.size, seed: s.seed, delay: 0, flag: s.flag, hops: 0 };
 let a = 0;
+if (!(age < 60)) age = 60;
 while (a < age - 1e-9) {
 const dt = Math.min(STEP, age - a);
 move(q, dt, a, this.ground);
@@ -19580,12 +19588,13 @@ if (T.whip) lean += T.whip.a * Math.exp(-(((t - T.whip.t) / 0.14) ** 2));
 let th = -Math.PI / 2 + lean, x = T.x - Math.cos(th) * hidden, y = T.y - Math.sin(th) * hidden;
 const pts = [], n = Math.ceil(T.L / 0.5);
 for (let i = 0; i <= n; i++) {
-const s = i * 0.5, u = s / T.L;
+const s = i * 0.5, u = Math.min(1, s / T.L);
 pts.push({ x, y, th, w: T.W * Math.pow(1 - u, 0.75) + 0.45, u, s });
 th += 0.5 * (writhe * Math.sin((s / T.lam) * TAU - T.om * t + T.ph) + T.curl * hook * smooth(0.58, 1, u));
 x += Math.cos(th) * 0.5;
 y += Math.sin(th) * 0.5;
 }
+for (const q of pts) if (!isFinite(q.x) || !isFinite(q.y) || !isFinite(q.w)) return null;
 return pts;
 }
 function tentacle(p, T, pts, C, t) {
@@ -30255,7 +30264,7 @@ function winChance(f,n){const st=stats(),ps=battlePetStats();let w=0;for(let k=0
 const BW2=200,BH2=112,BPARTS=[];
 const BT={run:false,last:0,speed:1};
 function newBattle(f){const st=stats(),m=makeMon(f);BFX.length=0;BX.length=0;try{PFX.clear();}catch(e){}
-  try{pfxReset();}catch(e){}BT.hold=0;BT.holdAt=0;if(m.big>=0){bossSprite(m.big,{f:0,atk:0,ph:0});S.bossSeen=S.bossSeen||{};S.bossSeen[f]=1;}Object.assign(BT,{rs:null,rsDone:0,bevo:null,bvs:0,prevMon:null,gi:null,guardDone:0,guarded:0,bcut:null,intro:m.big>=0?{t:0,d:m.big>=5?3.0:2.4}:null,cut:null,quake:0,ghost:0,lungeK:0,floor:f,mon:m,pet:petById(S.battlePet)||null,B:newFight(st,PET.F,f,battlePetStats()),t:0,next:0.5,phase:m.big>=0?'intro':'fight',act:null,flash:[0,0],shake:[0,0],res:null,endT:0,fq:0});BPARTS.length=0;try{pfxRig();}catch(e){}}
+  try{pfxReset();}catch(e){}BT.hold=0;BT.holdAt=0;if(m.big>=0){bossSprite(m.big,{f:0,atk:0,ph:0});S.bossSeen=S.bossSeen||{};S.bossSeen[f]=1;}Object.assign(BT,{rs:null,rsDone:0,bevo:null,bvs:0,prevMon:null,gi:null,guardDone:0,terr:0,derr:0,guarded:0,bcut:null,intro:m.big>=0?{t:0,d:m.big>=5?3.0:2.4}:null,cut:null,quake:0,ghost:0,lungeK:0,floor:f,mon:m,pet:petById(S.battlePet)||null,B:newFight(st,PET.F,f,battlePetStats()),t:0,next:0.5,phase:m.big>=0?'intro':'fight',act:null,flash:[0,0],shake:[0,0],res:null,endT:0,fq:0});BPARTS.length=0;try{pfxRig();}catch(e){}}
 function bFloat(side,txt,cls){const k=BT.fq++,box=$('b-float');setTimeout(()=>{const d=document.createElement('div');d.className='bfl '+(cls||'');d.textContent=txt;
   d.style.left=(side==='me'?26:74)+(((k%3)-1)*6)+'%';d.style.top=(30-(k%3)*7)+'%';box.appendChild(d);setTimeout(()=>d.remove(),900);},(k%4)*90);}
 function bspawn(o){const PC=PCUR;PCUR=BPARTS;spawn(o);PCUR=PC;}
@@ -30365,8 +30374,8 @@ function bLoop(ts){if(!BT.run)return;requestAnimationFrame(bLoop);const d0=Math.
   BT.t+=d;if(BT.act)BT.act.t+=d;if(BT.bevo){BT.bevo.t+=d;if(BT.bevo.t>=1.65&&!BT.bevo.done){BT.bevo.done=1;BT.bvs=BT.bevo.n;bossEvoBoom();}if(BT.bevo.t>3.1)BT.bevo=null;}updBFX(d);updBX(d);try{PFX.step(d);}catch(e){}if(BT.phase==='intro'){bossWarmStep(BT.B.big);BT.intro.t+=d;if(BT.intro.t>=BT.intro.d){BT.phase='fight';BT.next=0.3;}}BT.flash=BT.flash.map(v=>Math.max(0,v-d));BT.shake=BT.shake.map(v=>Math.max(0,v-d));
   if(BT.phase==='guard')guardTick(d0);
   if(BT.phase==='rescue')rescueTick(d0);
-  if(BT.phase==='fight'){BT.next-=d;if(BT.next<=0){BT.next=0.6;doTurn();}}
-  updParts(d,BPARTS);drawBattle();}
+  if(BT.phase==='fight'){BT.next-=d;if(BT.next<=0){BT.next=0.6;try{doTurn();}catch(e){BT.terr=(BT.terr||0)+1;console.error('doTurn',e);if(BT.terr>3&&BT.B&&!BT.B.over){try{const w=BT.B.me.hp/BT.B.me.max>BT.B.mon.hp/BT.B.mon.max;BT.B.over=w?'win':'lose';BT.B.judged=1;endBattle(w);}catch(e2){BT.phase='lose';}}}}}
+  updParts(d,BPARTS);try{drawBattle();}catch(e){BT.derr=(BT.derr||0)+1;if(BT.derr<5)console.error('drawBattle',e);try{PFX.clear();}catch(e2){}}}
 function bHud(){const me=BT.B.me,m=BT.B.mon;$('b-mehp').style.width=(Math.max(0,me.hp)/me.max*100)+'%';$('b-monhp').style.width=(Math.max(0,m.hp)/m.max*100)+'%';
   $('b-metx').textContent=Math.max(0,me.hp)+'/'+me.max+(me.shield>0?' · khiên '+me.shield:'');$('b-montx').textContent=m.guard?'? ? ?':Math.max(0,m.hp)+'/'+m.max+(m.block>0?' · chặn '+m.block:'');}
 function againShow(){const f=BT.floor,b=$('b-again');if(!f||BT.phase==='fight')return;$('b-agtx').textContent='Tầng '+f+' · 1 năng lượng';b.classList.toggle('gray',!$('b-next').hidden);b.hidden=false;$('b-speed').hidden=true;}
