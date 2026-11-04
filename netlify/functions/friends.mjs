@@ -51,7 +51,7 @@ function clean(p) {
   p = p && typeof p === "object" ? p : {};
   const gear = Array.isArray(p.gear) ? p.gear.slice(0, 4).map((g) => ({ id: str(g && g.id, 24), r: clamp(g && g.r, 0, 5), s: clamp(g && g.s, 0, 9) })) : [];
   const pet = p.pet && typeof p.pet === "object"
-    ? { sp: clamp(p.pet.sp, 0, 999), v: clamp(p.pet.v, 0, 9), br: Array.isArray(p.pet.br) ? p.pet.br.slice(0, 4).map((x) => clamp(x, 0, 9)) : [], lv: clamp(p.pet.lv, 1, 999, 1), r: clamp(p.pet.r, 0, 9) }
+    ? { sp: clamp(p.pet.sp, 0, 999), v: clamp(p.pet.v, 0, 9), br: Array.isArray(p.pet.br) ? p.pet.br.slice(0, 6).map((x) => clamp(x, 0, 9)) : [], lv: clamp(p.pet.lv, 1, 999, 1), r: clamp(p.pet.r, 0, 9) }
     : null;
   return {
     nick: str(p.nick, NICK_MAX),

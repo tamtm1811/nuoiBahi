@@ -16,6 +16,8 @@ const json = (o, status = 200, extra) =>
 // v58: bản công khai (top 10 + tin mới) được CDN Netlify giữ 3 giây → hàng trăm người cùng xem trực tiếp mà máy chủ chỉ chạy ~20 lần/phút
 const PUB_CACHE = { "cache-control": "public, max-age=0, must-revalidate", "netlify-cdn-cache-control": "public, durable, s-maxage=3, stale-while-revalidate=5", "netlify-vary": "query=pub" };
 const FEED_MAX = 20;
+// v65: 10 thần thú độc nhất, chỉ số loài 105–114 (cùng LEG0 trong index.html)
+const LEG_MIN = 105, LEG_N = 10;
 
 async function sha(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
@@ -29,7 +31,7 @@ function cmp(a, b) {
 
 function clean(p) {
   const gear = Array.isArray(p.gear) ? p.gear.slice(0, 4).map((g) => ({ id: str(g.id, 24), r: clamp(g.r, 0, 5), s: clamp(g.s, 0, 9) })) : [];
-  const pet = p.pet && typeof p.pet === "object" ? { sp: clamp(p.pet.sp, 0, 999), v: clamp(p.pet.v, 0, 9), br: Array.isArray(p.pet.br) ? p.pet.br.slice(0, 4).map((x) => clamp(x, 0, 9)) : [], lv: clamp(p.pet.lv, 1, 999, 1), r: clamp(p.pet.r, 0, 9) } : null;
+  const pet = p.pet && typeof p.pet === "object" ? { sp: clamp(p.pet.sp, 0, 999), v: clamp(p.pet.v, 0, 9), br: Array.isArray(p.pet.br) ? p.pet.br.slice(0, 6).map((x) => clamp(x, 0, 9)) : [], lv: clamp(p.pet.lv, 1, 999, 1), r: clamp(p.pet.r, 0, 9) } : null;
   return {
     nick: str(p.nick, NICK_MAX),
     floor: clamp(p.floor, 0, 100),
@@ -65,12 +67,12 @@ function view(board, id) {
   let me = null, ahead = null, behind = null;
   const i = id ? list.findIndex((e) => e.id === id) : -1;
   if (i >= 0) { me = pub(list[i], i); if (i > 0) ahead = pub(list[i - 1], i - 1); if (i + 1 < list.length) behind = pub(list[i + 1], i + 1); }
-  return { top, me, ahead, behind, total: list.length, at: Date.now(), ver: board.ver || 0, feed: (board.feed || []).slice(0, 12) };
+  return { top, me, ahead, behind, total: list.length, at: Date.now(), ver: board.ver || 0, feed: (board.feed || []).slice(0, 12), leg: board.leg || {} };
 }
 function pubView(board) {
   const list = sorted(board, null);
   const top = list.slice(0, 10).map((e, i) => { const { h, last, first, id, fb, lb, tm, cv, fixed, rs, ...rest } = e; return { rank: i + 1, ...rest }; });
-  return { top, total: list.length, at: Date.now(), ver: board.ver || 0, feed: (board.feed || []).slice(0, 12) };
+  return { top, total: list.length, at: Date.now(), ver: board.ver || 0, feed: (board.feed || []).slice(0, 12), leg: board.leg || {} };
 }
 // tin mới cho dải chạy chữ: ai vừa lên tầng, ai vừa vượt mặt ai (không lộ id, bỏ qua tài khoản bị đánh dấu)
 function feedEvents(board, id, entry, old) {
@@ -136,7 +138,9 @@ async function rebuild(store, prev) {
   await Promise.all(blobs.map(async (b) => { const e = await store.get(b.key, { type: "json" }); if (e) p[b.key.slice(2)] = e; }));
   await repairFromSaves(store, p).catch(() => 0);
   if (!prev) prev = await store.get(KEY, { type: "json" }).catch(() => null);
-  const board = { p, rebuilt: Date.now(), ver: ((prev && prev.ver) || 0) + 1, feed: (prev && prev.feed) || [] };
+  const board = { p, rebuilt: Date.now(), ver: ((prev && prev.ver) || 0) + 1, feed: (prev && prev.feed) || [], leg: {} };
+  // v65: danh sách chủ thần thú lấy từ khóa L/<loài> (nguồn gốc duy nhất), phòng khi bảng bị dựng lại
+  try { for (const it of (await store.list({ prefix: "L/" })).blobs || []) { const v = await store.get(it.key, { type: "json" }); if (v) board.leg[it.key.slice(2)] = { n: v.n, t: v.t }; } } catch { board.leg = (prev && prev.leg) || {}; }
   await store.setJSON(KEY, board);
   return board;
 }
@@ -179,6 +183,30 @@ export default async (req) => {
   const acc = await store.get("a/" + id, { type: "json" });
   if (acc && acc.h !== h) return json({ error: "owner" }, 403);
   const now = Date.now();
+  // v65 · THẦN THÚ ĐỘC NHẤT: ai gửi yêu cầu trước thì được (ghi khóa L/<loài> với onlyIfNew — máy chủ đảm bảo chỉ một người thắng)
+  if (body.op === "legend") {
+    const sp = clamp(body.sp, LEG_MIN, LEG_MIN + LEG_N - 1, -1);
+    if (sp < LEG_MIN || +body.sp !== sp) return json({ error: "sp" }, 400);
+    if (!acc) return json({ error: "id" }, 400);
+    const mine = await store.get("p/" + id, { type: "json" });
+    if (mine && mine.h !== h) return json({ error: "owner" }, 403);
+    if (mine && (mine.floor || 0) < 55) return json({ error: "floor" }, 403); // thần thú chỉ xuất hiện từ tầng 60
+    const nick = str(body.nick, NICK_MAX) || (mine && mine.nick) || "Sếp ẩn danh";
+    const rec = { id, n: nick, t: now };
+    const w = await store.setJSON("L/" + sp, rec, { onlyIfNew: true });
+    if (!w || !w.modified) { const cur = await store.get("L/" + sp, { type: "json" }); if (cur && cur.id === id) return json({ ok: true, again: 1 }); return json({ error: "taken", by: cur ? cur.n : "" }, 409); }
+    for (let tries = 0; tries < 6; tries++) {
+      const cur = await store.getWithMetadata(KEY, { type: "json" });
+      const board = cur ? cur.data : { p: {}, feed: [], ver: 0 };
+      board.leg = board.leg || {}; board.leg[sp] = { n: nick, t: now };
+      board.feed = [{ k: "legend", n: nick, sp, t: now }].concat(board.feed || []).slice(0, FEED_MAX);
+      board.ver = (board.ver || 0) + 1;
+      const res = cur ? await store.setJSON(KEY, board, { onlyIfMatch: cur.etag }) : await store.setJSON(KEY, board, { onlyIfNew: true });
+      if (res && res.modified) break;
+      await new Promise((r) => setTimeout(r, 40 + Math.random() * 120));
+    }
+    return json({ ok: true, at: now });
+  }
   if (body.op === "hello") {
     if (!acc) await store.setJSON("a/" + id, { h, first: now });
     return json({ ok: true, at: now });
